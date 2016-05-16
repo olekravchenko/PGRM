@@ -11,14 +11,14 @@ for i = 1:nf+2
         tmp = tmp01 .* tmp02;
         surf(x, y, omega .* tmp)
         shading interp
-        lighting phong
-        camlight('left')
+%        lighting phong
+%        camlight('left')
         axis square
         axis off
         view(0,90)
-        xlabel('$x$','Interpreter','latex')
-        ylabel('$y$','Interpreter','latex')
-        title(['$\psi_{' int2str(k) '}=' '\omega \mathrm{B}_{3,' int2str(i-1) '}\mathrm{B}_{3,' int2str(j-1) '}$'],'Interpreter','latex')
+        xlabel('x','Interpreter','tex')
+        ylabel('y','Interpreter','tex')
+        title(['\psi_{' int2str(k) '}=' '\omega {B}_{3,' int2str(i-1) '}{B}_{3,' int2str(j-1) '}'],'Interpreter','tex')
 %         title(['(' int2str(i-1),',' int2str(j-1) ')'])
     end
 end
