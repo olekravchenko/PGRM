@@ -49,8 +49,8 @@ addpath 'core' 'core_rfm'
 a = 0; b = 5;
 c = 0; d = 1;
 % Space grid
-nx = 2^6;   dx = (b-a) / (nx-1);
-ny = 2^6;   dy = (d-c) / (ny-1);
+nx = 2^5;   dx = (b-a) / (nx-1);
+ny = 2^5;   dy = (d-c) / (ny-1);
 % 
 tx = linspace(a,b,nx);
 ty = linspace(c,d,ny);
@@ -80,10 +80,10 @@ omega   = tanh(100*omega);
 figure(1),
 surf(x, y, omega)
 shading interp
-lighting phong
-title('$\omega_{\mathrm{w}}(x,y)=\tanh(300\,\omega(x,y))$','Interpreter','latex')
+%lighting phong
+title('\omega_{{w}}(x,y)=tanh(300 \omega(x,y))','Interpreter','tex')
 axis equal
-camlight('left');
+%camlight('left');
 
 % Show basis
 figure(2),
@@ -108,10 +108,10 @@ toc
 figure(3),
 surf(x, y, u_appr)
 shading interp
-lighting phong
-title('Numerical solution $u_{appr}(x,y)$','Interpreter','latex')
+%lighting phong
+title('Numerical solution u_{appr}(x,y)','Interpreter','tex')
 axis equal
-camlight('left');
+%camlight('left');
 
 % hold on
 % stem3(x, y, u_appr)
@@ -119,8 +119,8 @@ camlight('left');
 figure(4),
 surf(x(iC,iC), y(iC,iC), lhs(iC,iC))
 shading interp
-lighting phong
+%lighting phong
 % material metal 
-title('Residual $\mathrm{res}(x,y)=\triangle u_{appr}(x,y)+1$','Interpreter','latex')
+title('Residual {res}(x,y)=\Delta u_{appr}(x,y)+1','Interpreter','tex')
 axis square
-camlight('left');
+%camlight('left');
