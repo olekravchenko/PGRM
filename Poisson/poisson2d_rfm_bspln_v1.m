@@ -37,6 +37,7 @@
 %     link: https://dspace.library.colostate.edu/bitstream/handle/11124/353/Beck_mines_0052N_10391.pdf?sequence=1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Notes: Petrov Galerkin Scheme Implementation with the usage of R(Rvachev)-functions method.
+% Bugs detected: lost omega in some functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear all; close all; clc
@@ -49,7 +50,7 @@ addpath('core_rfm')
 a = 0; b = 1;
 c = 0; d = 1;
 
-nx = 2^7;
+nx = 2^5;
 ny = nx;
 dx = (b-a) / (nx-1);
 dy = (d-c) / (ny-1);
@@ -70,15 +71,16 @@ omega = 0.5*(om12 + om3 - sqrt(om12.^2 + om3.^2));
 omega(omega<0) = 0;
 
 omega = tanh(300*omega);
+%omega = heaviside(omega);
 
 u_appr = 0*omega;
 
 figure(1),
 surf(x, y, omega)
 shading interp
-lighting phong
-camlight('left');
-title('$\omega_w(x,y)=\tanh(300\omega(x,y))$','Interpreter','latex')
+%lighting phong
+%camlight('left');
+title('\omega_w(x,y)=tanh(300\omega(x,y))','Interpreter','tex')
 axis equal
 
 figure(2),
@@ -98,17 +100,17 @@ for i = 1:nf+2
         tmp = bdspln_function(i-1, x, hf, nf).*bdspln_function(j-1, y, hf, nf);
         surf(x, y, omega .* tmp)
         shading interp
-        lighting phong
+%        lighting phong
         axis square
         axis off
         view(0,90)
-        xlabel('$x$','Interpreter','latex')
-        ylabel('$y$','Interpreter','latex')
-        title(['$\psi_{' int2str(k) '}=' '\omega \mathrm{B}_{3,' int2str(i-1) '}\mathrm{B}_{3,' int2str(j-1) '}$'],'Interpreter','latex')
+        xlabel('x','Interpreter','tex')
+        ylabel('y','Interpreter','tex')
+        title(['\psi_{' int2str(k) '}=' '\omega {B}_{3,' int2str(i-1) '}{B}_{3,' int2str(j-1) '}'],'Interpreter','tex')
 %         title(['(' int2str(i-1),',' int2str(j-1) ')'])
     end
 end
-% text(-5,-0.5,'B-spline basis function $\mathrm{B}_{3,k}(x,y)=\mathrm{B}_{3,i}(x)\mathrm{B}_{3,j}(y)$','Interpreter','latex')
+% text(-5,-0.5,'B-spline basis function {B}_{3,k}(x,y)={B}_{3,i}(x){B}_{3,j}(y)','Interpreter','tex')
 
 %% Assembling
 K   = (nf+2)^2;
@@ -136,11 +138,13 @@ end % for k
 % figure(2),
 % spy(A)
 
-C = cgs(A,B');
+%C = cgs(A,B');
+C = A\B';
 
 %% Reconstruction of numerical solution
 for k = ind
-    u_appr = u_appr + C(k)*squeeze(BF(k,:,:)).*omega;
+    u_appr = u_appr + C(k)*squeeze(BF(k,:,:))./omega; %replaced multyplying by dividing, recieved a good result
+%    u_appr = u_appr + C(k)*squeeze(BF(k,:,:)).*omega;
 end % for k
 
 tic
@@ -148,8 +152,8 @@ tic
 figure(3),
 surf(x, y, u_appr)
 shading interp
-lighting phong
-title('Numerical solution $u_{appr}(x,y)$','Interpreter','latex')
+%lighting phong
+title('Numerical solution u_{appr}(x,y)','Interpreter','tex')
 axis square
 
 %% Errors
@@ -160,6 +164,6 @@ iC = 1:nx;
 figure(4),
 surf(x(iC,iC), y(iC,iC), lhs(iC,iC))
 shading interp
-lighting phong
-title('Residual $res(x,y)=\triangle u_{appr}(x,y)+1$','Interpreter','latex')
+%lighting phong
+title('Residual res(x,y)=\Delta u_{appr}(x,y)+1','Interpreter','tex')
 axis square
