@@ -1,3 +1,16 @@
+/*			Petrov-Rvachev-Galerkin Method Solver			*/
+/*			Basis: Polynoms 							*/
+/*			Author: V.V.Bondarenko						*/
+/*			Date: 20.05.2016							*/
+/*			Version: 1.0.1							*/
+
+/*			ToDo:
+ *			1. Add auto-configurable R-function
+ *			2. Write description for each function
+ *			3. Improve integral and nabla*nabla calculation functions
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "B-splines.c"
@@ -5,10 +18,14 @@
 #include "af_fourier.c"
 #include <string.h>
 
-double a = 0., b = M_PI, h = M_PI/4.; 	//x&y a - min, b - max
-int Nsize = 25;		//size by x and y,		//step - step by x&y
-double graphics[1024][1024];
-double node[25][2];
+#define N 5
+
+double right_part_f(double x, double y)
+{
+/*	return 2.*(x*x+y*y-2.);*/
+	return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));
+/*	return 0.;*/
+}
 
 double traps(double (*f)(double), double x0, double x1) 
 //Trapezoidal rule integration for 1D
@@ -24,7 +41,7 @@ double traps(double (*f)(double), double x0, double x1)
 	return ret;
 }
 
-double integral2Dgrgr(double (*f)(double, double, int, int), double x0, double x1, double y0, double y1, int k1, int k2)
+double integralLeft(double (*f)(double, double, int, int), double x0, double x1, double y0, double y1, int k1, int k2)
 {
 	double i,j, stepx=(x1-x0)/50., stepy=(y1-y0)/50.;
 	double res = 0.;
@@ -39,7 +56,7 @@ double integral2Dgrgr(double (*f)(double, double, int, int), double x0, double x
 	return res;
 }
 
-double integral2Dfp(double (*f)(double, double, int), double x0, double x1, double y0, double y1, int k1)
+double integralRight(double (*f)(double, double, int), double x0, double x1, double y0, double y1, int m)
 {
 	double i,j, stepx=(x1-x0)/50., stepy=(y1-y0)/50.;
 	double res = 0.;
@@ -48,128 +65,106 @@ double integral2Dfp(double (*f)(double, double, int), double x0, double x1, doub
 	{
 		for(j=y0; j<y1; j+= stepy)
 		{
-			res += stepx*stepy*(*f)(i,j,k1);
+			res += stepx*stepy*(*f)(i,j,m);
 		}
 	}
 	return res;
-}
-
-double F(double x, double y)
-{
-	return -2.*sin(x)*sin(y);
 }
 
 double omega(double x, double y)
 {
-	double ret = (M_PI*M_PI - x*x)*(M_PI*M_PI - y*y);
-	if(ret >= 0.) return ret;
-	return 0.;
+//	double result = (M_PI*M_PI-x*x)*(M_PI*M_PI-y*y);
+	double result = (1.-x*x)*(1.-y*y);
+
+/*	if(result < 0.) */
+/*		return 0.;*/
+	return result;
 }
 
-double psi(double x, double y, int K)
+double phi(double x, double y, int n)
 {
-	int m = K/5; int n = K%5;
-	double M = omega(x,y);
-	return M*pow(x,m)*pow(y,n);
+	return pow(x,n%N)*pow(y,n/N);
 }
 
-double gradgrad(double x, double y, int K1, int K2)
+double basis(double (*f)(double, double,int),double x, double y, int n)
 {
-	int m1 = K1/5; int n1 = K1%5;
-	int m2 = K2/5; int n2 = K2%5;
-	if(abs(m1-m2)>2 || abs(n1-n2)>2)
-		return 0.;
-	double dxdy = 0.02, res;
-	res =  	0.25*(psi(x+dxdy,y,K1)-psi(x-dxdy,y,K1))*
-			(psi(x+dxdy,y,K2)-psi(x-dxdy,y,K2))/dxdy +
-		0.25*(psi(x,y+dxdy,K1)-psi(x,y-dxdy,K1))*
-			(psi(x,y+dxdy,K2)-psi(x,y-dxdy,K2))/dxdy;
+	return (*f)(x,y,n)*omega(x,y);
+}
+
+double left_under_int(double x, double y, int m, int n)
+{
+	double res, delta = 0.01;
+	//int i, j;
+	
+	res = 0.25/delta/delta*
+(	(basis(phi, x+delta, y, n)-basis(phi, x-delta, y, n))*
+	(basis(phi, x+delta, y, m)-basis(phi, x-delta, y, m))+
+ 	(basis(phi, x, y+delta, n)-basis(phi, x, y-delta, n))*
+ 	(basis(phi, x, y+delta, m)-basis(phi, x, y-delta, m))
+);
 	return res;
 }
 
-double integral_left(int K1, int K2)
+double right_under_int(double x, double y, int n)
 {
-	double res;
-	res = integral2Dgrgr(gradgrad,a,b,a,b,K1,K2);
-	return res;
+	return right_part_f(x,y)*basis(phi, x,y, n);
 }
 
-double fpsi(double x, double y, int k)
+void form_matrix(gsl_matrix * system, gsl_vector * RightPart, double x1, double x2, double y1, double y2)
 {
-	return F(x,y)*psi(x,y,k);
+	int i, j;
+	for(i = 0; i < N*N; i++)
+	{
+		gsl_vector_set(RightPart, i, -integralRight(right_under_int,x1,x2,y1,y2,i));
+		for(j = 0; j < N*N; j++)
+		{
+			gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
+		}
+	}
 }
 
-
-double integral_right(int K)
-{
-	return integral2Dfp(fpsi,a,b,a,b,K);
-}
-
-double reconstruct(gsl_vector *C, double x, double y)
+void solve_matrix_eq(gsl_vector * solution, gsl_matrix * system, gsl_vector * RightPart)
 {
 	int i;
-	double res=0.;
-	
-	for(i=0; i<Nsize; i++)
-	{
-		res += gsl_vector_get(C,i)*psi(x,y,i);
-	}
-	
-	return res;
-}
-
-void matrix_solver()
-{
-	int i, j,k,l, NNsize = Nsize*Nsize;
-	double pp =0.0;
-	gsl_matrix * system 	= gsl_matrix_alloc (Nsize,Nsize);
-	gsl_vector * coef	= gsl_vector_alloc (Nsize);
-	gsl_vector * rightpart	= gsl_vector_alloc (Nsize);
-	
-	for(i=0; i<Nsize;i++)
-	{
-		//if(i<3 && j<3)
-		gsl_vector_set(rightpart,i,integral_right(i));
-		for(j=0; j<Nsize; j++)
-		{
-			//if(i<3 && j<3)
-			gsl_matrix_set(system,i,j,integral_left(i,j));
-		}
-	}
-	FILE *op;
-	op = fopen("matrix", "w");
-	gsl_matrix_fprintf(op,system,"%g");
-	fclose(op);
-	
-	gsl_permutation * p = gsl_permutation_alloc (Nsize);
+	gsl_permutation * p = gsl_permutation_alloc (N*N);
 	gsl_linalg_LU_decomp (system, p, &i);
-	gsl_linalg_LU_solve (system, p, rightpart, coef);
-	gsl_vector_fprintf(stdout,rightpart,"%g");
-	printf("\n\n");
-	gsl_vector_fprintf(stdout,coef,"%g");
-	//FILE *op;
-	op = fopen("plot.b3", "w");
-	double X,Y;
-	for(i=0; i<64; i++)
-		for(j=0;j<64;j++)
-		{
-			X=a+(b-a)/32.*(double)(i-16.);
-			Y=a+(b-a)/32.*(double)(j-16.);
-			fprintf(op,"%f %f %f\n",X,Y,reconstruct(coef,X,Y));
-		}
+	gsl_linalg_LU_solve (system, p, RightPart, solution);
+}
+
+double reconstruct_at(gsl_vector *solution, double x, double y)
+{
+	int i; double result = 0.;
+	for(i=0; i<N*N; i++)
+	{
+		result += gsl_vector_get(solution, i)*basis(phi,x,y,i);
+	}
+	return result;
+}
+
+double plot_region(gsl_vector *solution, double x1, double x2, double y1, double y2)
+{
+	double	hx = (x2-x1)/64.,
+			hy = (y2-y1)/64.,
+			i,j;
+	FILE * op;
+	op = fopen("plot_region", "w");
+	for(i=x1; i<=x2; i+=hx)
+		for(j=y1; j<=y2; j+=hy)
+			fprintf(op, "%f %f %f\n", i,j, reconstruct_at(solution,i,j));
 	fclose(op);
 }
 
-
-int main (int arc, char** argv)
+int main()
 {
-/*	int i;	*/
-/*	for(i = 0; i<25 ; i++)*/
-/*	{*/
-/*		node[i][0] = a + h*((double)(i%5));*/
-/*		node[i][1] = a + h*((double)(i/5));*/
-/*	//	printf("%f %f\n",node[i][0],node[i][1]);*/
-/*	}*/
-	matrix_solver();
+	double a = -1., b =1.;
+	gsl_matrix *sys = gsl_matrix_alloc (N*N,N*N);;
+	gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
+			*solution	= gsl_vector_alloc(N*N);
+	
+	form_matrix(sys, rightpart, a,b, a,b);
+	solve_matrix_eq(solution, sys, rightpart);
+	
+	plot_region(solution, a,b, a,b);
+	
 	return 0;
 }

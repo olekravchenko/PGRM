@@ -9,7 +9,7 @@
 
 double right_part_f(double x, double y)
 {
-	return -2.*sin(x)*sin(y);
+	return 2.*(x*x+y*y-2.);
 }
 
 double traps(double (*f)(double), double x0, double x1) 
@@ -41,7 +41,7 @@ double integralLeft(double (*f)(double, double, int, int), double x0, double x1,
 	return res;
 }
 
-double integralRight(double (*f)(double, double), double x0, double x1, double y0, double y1)
+double integralRight(double (*f)(double, double, int), double x0, double x1, double y0, double y1, int m)
 {
 	double i,j, stepx=(x1-x0)/50., stepy=(y1-y0)/50.;
 	double res = 0.;
@@ -50,7 +50,7 @@ double integralRight(double (*f)(double, double), double x0, double x1, double y
 	{
 		for(j=y0; j<y1; j+= stepy)
 		{
-			res += stepx*stepy*(*f)(i,j);
+			res += stepx*stepy*(*f)(i,j,m);
 		}
 	}
 	return res;
@@ -58,7 +58,12 @@ double integralRight(double (*f)(double, double), double x0, double x1, double y
 
 double omega(double x, double y)
 {
-	return (M_PI*M_PI-x*x)*(M_PI*M_PI-y*y);
+//	double result = (M_PI*M_PI-x*x)*(M_PI*M_PI-y*y);
+	double result = (1.-x*x)*(1.-y*y);
+
+/*	if(result < 0.) */
+/*		return 0.;*/
+	return result;
 }
 
 double phi(double x, double y, int n)
@@ -66,7 +71,7 @@ double phi(double x, double y, int n)
 	return pow(x,n%N)*pow(y,n/N);
 }
 
-double basis(double (*f)(double, double),double x, double y, int n)
+double basis(double (*f)(double, double,int),double x, double y, int n)
 {
 	return (*f)(x,y,n)*omega(x,y);
 }
@@ -90,22 +95,61 @@ double right_under_int(double x, double y, int n)
 	return right_part_f(x,y)*basis(phi, x,y, n);
 }
 
-void form_matrix(gsl_matrix * system, gsl_vector * RightPart double x1, double x2, double y1, double y2)
+void form_matrix(gsl_matrix * system, gsl_vector * RightPart, double x1, double x2, double y1, double y2)
 {
 	int i, j;
-	for(i = 0; i < N; i++)
+	for(i = 0; i < N*N; i++)
 	{
-		gsl_vector_set(RightPart, integralRight());
-		for(j = 0; j < N; j++)
+		gsl_vector_set(RightPart, i, -integralRight(right_under_int,x1,x2,y1,y2,i));
+		for(j = 0; j < N*N; j++)
 		{
-			
+			gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
 		}
 	}
+}
 
+void solve_matrix_eq(gsl_vector * solution, gsl_matrix * system, gsl_vector * RightPart)
+{
+	int i;
+	gsl_permutation * p = gsl_permutation_alloc (N*N);
+	gsl_linalg_LU_decomp (system, p, &i);
+	gsl_linalg_LU_solve (system, p, RightPart, solution);
+}
+
+double reconstruct_at(gsl_vector *solution, double x, double y)
+{
+	int i; double result = 0.;
+	for(i=0; i<N*N; i++)
+	{
+		result += gsl_vector_get(solution, i)*basis(phi,x,y,i);
+	}
+	return result;
+}
+
+double plot_region(gsl_vector *solution, double x1, double x2, double y1, double y2)
+{
+	double	hx = (x2-x1)/64.,
+			hy = (y2-y1)/64.,
+			i,j;
+	FILE * op;
+	op = fopen("plot_region", "w");
+	for(i=x1; i<=x2; i+=hx)
+		for(j=y1; j<=y2; j+=hy)
+			fprintf(op, "%f %f %f\n", i,j, reconstruct_at(solution,i,j));
+	fclose(op);
 }
 
 int main()
 {
+	double a = -1., b =1.;
+	gsl_matrix *sys = gsl_matrix_alloc (N*N,N*N);;
+	gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
+			*solution	= gsl_vector_alloc(N*N);
+	
+	form_matrix(sys, rightpart, a,b, a,b);
+	solve_matrix_eq(solution, sys, rightpart);
+	
+	plot_region(solution, a,b, a,b);
 	
 	return 0;
 }

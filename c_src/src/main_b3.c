@@ -24,7 +24,8 @@ double traps(double (*f)(double), double x0, double x1)
 	return ret;
 }
 
-double integral2Dgrgr(double (*f)(double, double, int, int), double x0, double x1, double y0, double y1, int k1, int k2)
+double integral2Dgrgr(double (*f)(double, double, int, int), double x0, 
+				double x1, double y0, double y1, int k1, int k2)
 {
 	double i,j, stepx=(x1-x0)/50., stepy=(y1-y0)/50.;
 	double res = 0.;
@@ -39,7 +40,8 @@ double integral2Dgrgr(double (*f)(double, double, int, int), double x0, double x
 	return res;
 }
 
-double integral2Dfp(double (*f)(double, double, int), double x0, double x1, double y0, double y1, int k1)
+double integral2Dfp(double (*f)(double, double, int), double x0, double x1, 
+				double y0, double y1, int k1)
 {
 	double i,j, stepx=(x1-x0)/50., stepy=(y1-y0)/50.;
 	double res = 0.;
