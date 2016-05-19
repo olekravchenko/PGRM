@@ -5,10 +5,10 @@
 #include "af_fourier.c"
 #include <string.h>
 
-double a = -M_PI, b = M_PI, h = M_PI/3.; 	//x&y a - min, b - max
-int Nsize = 9;		//size by x and y,		//step - step by x&y
-double graphics[128][128];
-double node[9][2];
+double a = 0., b = M_PI, h = M_PI/4.; 	//x&y a - min, b - max
+int Nsize = 25;		//size by x and y,		//step - step by x&y
+double graphics[1024][1024];
+double node[25][2];
 
 double traps(double (*f)(double), double x0, double x1) 
 //Trapezoidal rule integration for 1D
@@ -89,9 +89,9 @@ double gradgrad(double x, double y, int K1, int K2)
 	if(abs(m1-m2)>2 || abs(n1-n2)>2)
 		return 0.;
 	double dxdy = h/32., res;
-	res =  0.25*(psi_b3(x+dxdy,y,K1)-psi_b3(x-dxdy,y,K1))*
+	res =  	0.25*(psi_b3(x+dxdy,y,K1)-psi_b3(x-dxdy,y,K1))*
 			(psi_b3(x+dxdy,y,K2)-psi_b3(x-dxdy,y,K2))/dxdy +
-		 0.25*(psi_b3(x,y+dxdy,K1)-psi_b3(x,y-dxdy,K1))*
+		0.25*(psi_b3(x,y+dxdy,K1)-psi_b3(x,y-dxdy,K1))*
 			(psi_b3(x,y+dxdy,K2)-psi_b3(x,y-dxdy,K2))/dxdy;
 	return res;
 }
@@ -114,12 +114,25 @@ double integral_right(int K)
 	return integral2Dfp(fpsi,a,b,a,b,K);
 }
 
+double reconstruct(gsl_vector *C, double x, double y)
+{
+	int i;
+	double res=0.;
+	
+	for(i=0; i<Nsize; i++)
+	{
+		res += gsl_vector_get(C,i)*psi_b3(x,y,i);
+	}
+	
+	return res;
+}
+
 void matrix_solver()
 {
 	int i, j,k,l, NNsize = Nsize*Nsize;
 	double pp =0.0;
 	gsl_matrix * system 	= gsl_matrix_alloc (Nsize,Nsize);
-	gsl_vector * coef		= gsl_vector_alloc (Nsize);
+	gsl_vector * coef	= gsl_vector_alloc (Nsize);
 	gsl_vector * rightpart	= gsl_vector_alloc (Nsize);
 	
 	for(i=0; i<Nsize;i++)
@@ -145,51 +158,27 @@ void matrix_solver()
 	gsl_vector_fprintf(stdout,coef,"%g");
 	//FILE *op;
 	op = fopen("plot.b3", "w");
-	for(k=0; k<Nsize; k++)
-	{
-		for(i=0;i<128;i++)
-			for(j=0; j<128; j++)
-			{
-				if(k==0)
-					graphics[i][j] =  psi_b3(a+i*2./128.,a+j*2./128.,0);
-				else 	graphics[i][j] += psi_b3(a+i*2./128.,a+j*2./128.,k);
-			}
-	}
-	
-		for(i=0;i<128;i++)
-			for(j=0; j<128; j++)
-			{
-				fprintf(op,"%f %f %f\n",a+i*2./64.,a+j*2./64.,graphics[i][j]);
-			}
+	double X,Y;
+	for(i=0; i<128; i++)
+		for(j=0;j<128;j++)
+		{
+			X=a+(b-a)/128.*(double)i;
+			Y=a+(b-a)/128.*(double)j;
+			fprintf(op,"%f %f %f\n",X,Y,reconstruct(coef,X,Y));
+		}
 	fclose(op);
 }
-
-/*			gsl_vector_set(b,0,0.0);*/
-/*			gsl_matrix_set(sys, 0,0,f_B_3(-1.0));*/
-/*			gsl_matrix_set(sys, 0,1,f_B_3(0.0));*/
-/*			gsl_matrix_set(sys, 0,2,f_B_3(1.0));*/
-
-void matrix_solver_v1()
-{
-	int i, j;
-	int NNsize = Nsize*Nsize;
-	
-	gsl_matrix * system 	= gsl_matrix_alloc (NNsize,NNsize);
-	gsl_vector * coef		= gsl_vector_alloc (NNsize);
-	gsl_vector * rightpart	= gsl_vector_alloc (NNsize);	
-}
-
 
 
 int main (int arc, char** argv)
 {
-	int i;
-	for(i = 0; i<9 ; i++)
+	int i;	
+	for(i = 0; i<25 ; i++)
 	{
-		node[i][0] = a + h*((double)(i%3));
-		node[i][1] = a + h*((double)(i/3));
-		//printf("%f %f\n",node[i][0],node[i][1]);
+		node[i][0] = a + h*((double)(i%5));
+		node[i][1] = a + h*((double)(i/5));
+		printf("%f %f\n",node[i][0],node[i][1]);
 	}
-	matrix_solver();
+	//matrix_solver();
 	return 0;
 }
