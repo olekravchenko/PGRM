@@ -6,10 +6,12 @@
 #include <string.h>
 
 #define N 5
-
+#define A -1.
+#define B 1.
 double right_part_f(double x, double y)
 {
-	return 2.*(x*x+y*y-2.);
+	return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));
+/*	return 2.*(x*x+y*y-2.);*/
 }
 
 double traps(double (*f)(double), double x0, double x1) 
@@ -68,7 +70,8 @@ double omega(double x, double y)
 
 double phi(double x, double y, int n)
 {
-	return pow(x,n%N)*pow(y,n/N);
+	return f_B_3(0.5*(x-(double)(n%N))/(B-A))*f_B_3(0.5*(y-(double)(n/N))/(B-A));
+	//return pow(x,n%N)*pow(y,n/N);
 }
 
 double basis(double (*f)(double, double,int),double x, double y, int n)
@@ -141,7 +144,7 @@ double plot_region(gsl_vector *solution, double x1, double x2, double y1, double
 
 int main()
 {
-	double a = -1., b =1.;
+	double a = A, b =B;
 	gsl_matrix *sys = gsl_matrix_alloc (N*N,N*N);;
 	gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
 			*solution	= gsl_vector_alloc(N*N);

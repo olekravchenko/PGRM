@@ -1,8 +1,8 @@
 /*			Petrov-Rvachev-Galerkin Method Solver			*/
-/*			Basis: Polynoms 							*/
-/*			Author: V.V.Bondarenko						*/
-/*			Date: 20.05.2016							*/
-/*			Version: 1.0.1							*/
+/*			Basis: Polynoms 					*/
+/*			Author: V.V.Bondarenko					*/
+/*			Date: 20.05.2016					*/
+/*			Version: 1.0.1						*/
 
 /*			ToDo:
  *			1. Add auto-configurable R-function
