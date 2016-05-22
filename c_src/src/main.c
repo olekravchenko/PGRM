@@ -5,7 +5,7 @@
 #include "af_fourier.c"
 #include <string.h>
 
-#define N 5
+#define N 6
 #define A -1.
 #define B 1.
 double right_part_f(double x, double y)
@@ -13,24 +13,19 @@ double right_part_f(double x, double y)
 	return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));
 /*	return 2.*(x*x+y*y-2.);*/
 }
-
-double traps(double (*f)(double), double x0, double x1) 
-//Trapezoidal rule integration for 1D
+double u_exact(double x, double y)
 {
-	double i;
-	double step =(x1-x0)/50.;
-	double ret = (*f)(x0);
-	for(i=x0+step;i<x1; i+=step)
-	{
-		ret += 2.*(*f)(i);
-	}
-	ret *=0.5*step;
-	return ret;
+	return (x*x*x*x-1.)*(y*y*y*y-1.);
 }
 
-double integralLeft(double (*f)(double, double, int, int), double x0, double x1, double y0, double y1, int k1, int k2)
+double integralLeft
+      (double (*f)(double, double, int, int), 
+      double x0, double x1, 
+      double y0, double y1, 
+      int k1, int k2)
+// [add description for each argument]
 {
-	double i,j, stepx=(x1-x0)/50., stepy=(y1-y0)/50.;
+	double i,j, stepx=(x1-x0)/100., stepy=(y1-y0)/100.;
 	double res = 0.;
 	
 	for(i=x0; i<x1; i+= stepx)
@@ -43,16 +38,21 @@ double integralLeft(double (*f)(double, double, int, int), double x0, double x1,
 	return res;
 }
 
-double integralRight(double (*f)(double, double, int), double x0, double x1, double y0, double y1, int m)
+double integralRight
+     (double (*f)(double, double, int), 
+      double x0, double x1, 
+      double y0, double y1, 
+      int m)
+// [add description for each argument]
 {
-	double i,j, stepx=(x1-x0)/50., stepy=(y1-y0)/50.;
+	double i,j, stepx=(x1-x0)/100., stepy=(y1-y0)/100.;
 	double res = 0.;
 	
 	for(i=x0; i<x1; i+= stepx)
 	{
 		for(j=y0; j<y1; j+= stepy)
-		{
-			res += stepx*stepy*(*f)(i,j,m);
+		{	
+		      res += stepx*stepy*(*f)(i,j,m);
 		}
 	}
 	return res;
@@ -63,12 +63,13 @@ double omega(double x, double y)
 //	double result = (M_PI*M_PI-x*x)*(M_PI*M_PI-y*y);
 	double result = (1.-x*x)*(1.-y*y);
 
-/*	if(result < 0.) */
-/*		return 0.;*/
+	if(result <= 0.) 
+		return 0.;
 	return result;
 }
 
 double phi(double x, double y, int n)
+// [compatify operators]
 {
 	return f_B_3(0.5*(x-(double)(n%N))/(B-A))*f_B_3(0.5*(y-(double)(n/N))/(B-A));
 	//return pow(x,n%N)*pow(y,n/N);
@@ -80,25 +81,32 @@ double basis(double (*f)(double, double,int),double x, double y, int n)
 }
 
 double left_under_int(double x, double y, int m, int n)
+// [add description for each argument]
 {
-	double res, delta = 0.01;
+	double res, delta = 0.001;
 	//int i, j;
 	
 	res = 0.25/delta/delta*
-(	(basis(phi, x+delta, y, n)-basis(phi, x-delta, y, n))*
-	(basis(phi, x+delta, y, m)-basis(phi, x-delta, y, m))+
- 	(basis(phi, x, y+delta, n)-basis(phi, x, y-delta, n))*
- 	(basis(phi, x, y+delta, m)-basis(phi, x, y-delta, m))
-);
+	(	(basis(phi, x+delta, y, n)-basis(phi, x-delta, y, n))*
+		(basis(phi, x+delta, y, m)-basis(phi, x-delta, y, m))+
+ 		(basis(phi, x, y+delta, n)-basis(phi, x, y-delta, n))*
+ 		(basis(phi, x, y+delta, m)-basis(phi, x, y-delta, m))
+	);
 	return res;
 }
 
 double right_under_int(double x, double y, int n)
+// [add description for each argument]
 {
 	return right_part_f(x,y)*basis(phi, x,y, n);
 }
 
-void form_matrix(gsl_matrix * system, gsl_vector * RightPart, double x1, double x2, double y1, double y2)
+void form_matrix
+     (gsl_matrix * system, 
+      gsl_vector * RightPart, 
+      double x1, double x2, 
+      double y1, double y2)
+// [add description for each argument]
 {
 	int i, j;
 	for(i = 0; i < N*N; i++)
@@ -111,7 +119,10 @@ void form_matrix(gsl_matrix * system, gsl_vector * RightPart, double x1, double 
 	}
 }
 
-void solve_matrix_eq(gsl_vector * solution, gsl_matrix * system, gsl_vector * RightPart)
+void solve_matrix_eq
+     (gsl_vector * solution, 
+      gsl_matrix * system, 
+      gsl_vector * RightPart)
 {
 	int i;
 	gsl_permutation * p = gsl_permutation_alloc (N*N);
@@ -120,6 +131,7 @@ void solve_matrix_eq(gsl_vector * solution, gsl_matrix * system, gsl_vector * Ri
 }
 
 double reconstruct_at(gsl_vector *solution, double x, double y)
+// [add description for each argument]
 {
 	int i; double result = 0.;
 	for(i=0; i<N*N; i++)
@@ -129,7 +141,11 @@ double reconstruct_at(gsl_vector *solution, double x, double y)
 	return result;
 }
 
-double plot_region(gsl_vector *solution, double x1, double x2, double y1, double y2)
+double plot_region
+     (gsl_vector *solution, 
+      double x1, double x2, 
+      double y1, double y2)
+// [add description for each argument]
 {
 	double	hx = (x2-x1)/64.,
 			hy = (y2-y1)/64.,
@@ -142,17 +158,37 @@ double plot_region(gsl_vector *solution, double x1, double x2, double y1, double
 	fclose(op);
 }
 
+double plot_region_error
+     (gsl_vector *solution, 
+      double x1, double x2, 
+      double y1, double y2)
+// [add description for each argument]
+{
+	double	hx = (x2-x1)/64.,
+			hy = (y2-y1)/64.,
+			i,j;
+	FILE * op;
+	op = fopen("plot_region_error", "w");
+	for(i=x1; i<=x2; i+=hx)
+		for(j=y1; j<=y2; j+=hy)
+			fprintf(op, "%f %f %f\n", i,j, fabs(reconstruct_at(solution,i,j)-u_exact(i,j)));
+	fclose(op);
+}
+
 int main()
 {
 	double a = A, b =B;
-	gsl_matrix *sys = gsl_matrix_alloc (N*N,N*N);;
+	gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
 	gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
 			*solution	= gsl_vector_alloc(N*N);
 	
-	form_matrix(sys, rightpart, a,b, a,b);
-	solve_matrix_eq(solution, sys, rightpart);
+	form_matrix		(sys, rightpart, a,b, a,b);
+	solve_matrix_eq	(solution, sys, rightpart);
 	
-	plot_region(solution, a,b, a,b);
+	plot_region		(solution, a,b, a,b);
+	plot_region_error	(solution, a,b, a,b);
+	
+	system("./Plot & ./Plot_err");
 	
 	return 0;
 }
