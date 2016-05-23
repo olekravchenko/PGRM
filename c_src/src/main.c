@@ -6,24 +6,27 @@
 #include <string.h>
 
 #define N 6
-#define A -1.
-#define B 1.
+#define A -M_PI
+#define B M_PI
 double right_part_f(double x, double y)
 {
-	return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));
+/*	return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));*/
 /*	return 2.*(x*x+y*y-2.);*/
+	return -2.*sin(x)*sin(y);
 }
 double u_exact(double x, double y)
 {
-	return (x*x*x*x-1.)*(y*y*y*y-1.);
+	return sin(x)*sin(y);
+/*	return (x*x*x*x-1.)*(y*y*y*y-1.);*/
 }
 
 double integralLeft
-      (double (*f)(double, double, int, int), 
+     (double (*f)(double, double, int, int), 
       double x0, double x1, 
       double y0, double y1, 
       int k1, int k2)
-// [add description for each argument]
+// Returns value of left part integral: 
+// I = \int_{x0}^{x1}\int_{y0}^{y1}\nabla\psi_{k1}\nabla\psi_{k2}dydx,
 {
 	double i,j, stepx=(x1-x0)/100., stepy=(y1-y0)/100.;
 	double res = 0.;
@@ -43,7 +46,8 @@ double integralRight
       double x0, double x1, 
       double y0, double y1, 
       int m)
-// [add description for each argument]
+// Returns value of integral in right part of equation:
+// \int_{x0}^{x1}\int_{y0}^{y1} f(x,y)\psi_m(x,y)dydx
 {
 	double i,j, stepx=(x1-x0)/100., stepy=(y1-y0)/100.;
 	double res = 0.;
@@ -59,9 +63,11 @@ double integralRight
 }
 
 double omega(double x, double y)
+// Returns value of R-function \omega(x,y)
+// ToDo: modify for random bound positions
 {
-//	double result = (M_PI*M_PI-x*x)*(M_PI*M_PI-y*y);
-	double result = (1.-x*x)*(1.-y*y);
+	double result = (x-A)*(x-B)*(y-A)*(y-B);
+//	double result = (1.-x*x)*(1.-y*y);
 
 	if(result <= 0.) 
 		return 0.;
@@ -69,19 +75,20 @@ double omega(double x, double y)
 }
 
 double phi(double x, double y, int n)
-// [compatify operators]
+// Returns value of n-th \phi basis function at point (x,y)
 {
 	return f_B_3(0.5*(x-(double)(n%N))/(B-A))*f_B_3(0.5*(y-(double)(n/N))/(B-A));
 	//return pow(x,n%N)*pow(y,n/N);
 }
 
 double basis(double (*f)(double, double,int),double x, double y, int n)
+// Returns value of n-th \psi-basis function, used further, at point (x,y)
 {
 	return (*f)(x,y,n)*omega(x,y);
 }
 
 double left_under_int(double x, double y, int m, int n)
-// [add description for each argument]
+// Returns \nabla\psi_m \nabla\psi_n for integral calculation
 {
 	double res, delta = 0.001;
 	//int i, j;
@@ -96,7 +103,7 @@ double left_under_int(double x, double y, int m, int n)
 }
 
 double right_under_int(double x, double y, int n)
-// [add description for each argument]
+// Return f(x,y)\psi_n (x,y)
 {
 	return right_part_f(x,y)*basis(phi, x,y, n);
 }
@@ -106,7 +113,11 @@ void form_matrix
       gsl_vector * RightPart, 
       double x1, double x2, 
       double y1, double y2)
-// [add description for each argument]
+// Forms SLE system
+// system 	- left part matrix form of system
+// RightPart- right part vector of coefficients
+// x1, x2	- sizes of rectangle by x
+// y1, y2	- sizes of rectangle by y
 {
 	int i, j;
 	for(i = 0; i < N*N; i++)
@@ -123,6 +134,7 @@ void solve_matrix_eq
      (gsl_vector * solution, 
       gsl_matrix * system, 
       gsl_vector * RightPart)
+//Solve SLE Ax=b, where A = system, b = RightPart, x = solution
 {
 	int i;
 	gsl_permutation * p = gsl_permutation_alloc (N*N);
@@ -131,7 +143,7 @@ void solve_matrix_eq
 }
 
 double reconstruct_at(gsl_vector *solution, double x, double y)
-// [add description for each argument]
+// Reconstucts value of solution at point (x,y)
 {
 	int i; double result = 0.;
 	for(i=0; i<N*N; i++)
@@ -145,7 +157,9 @@ double plot_region
      (gsl_vector *solution, 
       double x1, double x2, 
       double y1, double y2)
-// [add description for each argument]
+// Plot solution in rectangle region 
+// from x1 till x2 by x, and from y1 till y2 by y
+
 {
 	double	hx = (x2-x1)/64.,
 			hy = (y2-y1)/64.,
@@ -162,7 +176,8 @@ double plot_region_error
      (gsl_vector *solution, 
       double x1, double x2, 
       double y1, double y2)
-// [add description for each argument]
+// Plot abs error of solution in rectangle region 
+// from x1 till x2 by x, and from y1 till y2 by y
 {
 	double	hx = (x2-x1)/64.,
 			hy = (y2-y1)/64.,
@@ -177,7 +192,7 @@ double plot_region_error
 
 int main()
 {
-	double a = A, b =B;
+	double a = A, b = B;
 	gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
 	gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
 			*solution	= gsl_vector_alloc(N*N);
