@@ -41,10 +41,10 @@ addpath('core')
 addpath('core_rfm')
 
 %% Initialization
-a = -pi; b = -a;
-c = -pi; d = -c;
+a = -1; b = -a;
+c = -1; d = -c;
 
-nx = 2^5;
+nx = 2^6;
 ny = nx;
 dx = (b-a)/(nx-1);
 dy = (d-c)/(ny-1);
@@ -53,65 +53,30 @@ tx = a:dx:b;
 ty = c:dy:d;
 [x, y] = meshgrid(tx, ty);
 
+K   = 3;            % 
+nf  = K^2;          % Number of basis functions
+
 %% Input functions
-%rhs_func    = @(x,y) 2*x.*y.*exp(x+y).*(x+y+x.*y-3);    % Right hand side function
-%ua          = @(x,y) x.*(x-1).*y.*(y-1).*exp(x+y);      % Exact Solution
-
-rhs_func    = @(x,y) -2*sin(x).*sin(y);    % Right hand side function
-ua          = @(x,y) sin(x).*sin(y);      % Exact Solution
-
-
-
-
-%% Omega function
-% om1 = 0.5*(0.5 - (x - 0.5).^2 - (y - 0.5).^2 - ...
-%     sqrt(x.^2.*(x-1.0).^2 + y.^2.*(y-1.0).^2));
-% om2 = 1.5 - x - y;
-% om3 = y - 2*x + 1.5;
-% om12 = 0.5*(om1 + om2 - sqrt(om1.^2 + om2.^2));
-% omega = 0.5*(om12 + om3 - sqrt(om12.^2 + om3.^2));
-% omega = (0.25 - (x - 0.5).^2) .* (0.25 - (y - 0.5).^2);
-% omega(omega<0) = 0;
-% omega = x.*(x-b).*y.*(y-d);
-om1 = x + b; om2 = y + d; 
-om3 = b - x; om4 = d - y;
-om12 = r_con(om1, om2); 
-om34 = r_con(om3, om4);
-omega = r_con(om12, om34);
-
-u_appr = 0*omega;
-
-% om_ch = omega;
-% om_ch(om_ch>0) = 1.0;
-
-% figure(11),
-% surf(x, y, om_ch)
-% shading interp
-% lighting phong
-% title('Characteristic function of \omega(x,y)','Interpreter','latex')
-% axis square
-% % view(0,90)
-% % axis off
-% xlabel('x','Interpreter','latex')
-% ylabel('y','Interpreter','latex')
-% zlabel('\widetilde{\omega}(x,y)','Interpreter','latex')
-% 
-% u_appr = 0*omega;
+id_func = 1; id_omega = 1;
+[ua, rhs_func]  = GetFunc(id_func);
+omega           = GetOmega(id_omega, b, d);
+om              = omega(x,y);
+u_appr          = 0*om;
 
 figure(1),
-surf(x, y, omega)
+surf(x, y, om)
 shading interp;  axis square; %axis off; 
 title('\omega(x,y)','Interpreter','tex')
 % axis equal
 
 figure(2),
-nf = 4;
-for i = 1:nf
-    for j = 1:nf
-        k = (i-1)*nf + j;
-        subplot(nf,nf,k)
+% nf = 16;
+for i = 1:K
+    for j = 1:K
+        k = (i-1)*K + j;
+        subplot(K,K,k)
         tmp = basis_function(k, x, y);
-        surf(x, y, omega.*tmp)
+        surf(x, y, om.*tmp)
         shading interp;  axis square; axis off; 
 %         view(36,33)
         view(0,90)
@@ -123,7 +88,6 @@ end
 %text(-5,-0.5,'Basis function \psi_k(x,y)=x^iy^j','Interpreter','latex')
 
 %% Assembling
-K   = 16;
 A   = zeros(K,K);
 B   = zeros(1,K);
 BF  = zeros(K,nx,ny);
@@ -132,21 +96,22 @@ ind = 1:K;
 %% Computational Loop
 for l = ind
    BF(l,:,:)   = basis_function(l, x, y);
-   B(l)        = trapz(tx, trapz(ty, rhs_func(x,y).*omega.*squeeze(BF(l,:,:))));    
+   B(l)        = trapz(tx, trapz(ty, rhs_func(x,y).*om.*squeeze(BF(l,:,:))));    
    for k = ind                
-       tmp     = del2(omega.*squeeze(BF(l,:,:)), dx, dy);
-       A(k, l) = trapz(tx, trapz(ty, omega.*squeeze(BF(k,:,:)).*tmp));
+       tmp     = 4*del2(om.*squeeze(BF(k,:,:)), dx, dy);
+       A(k, l) = trapz(tx, trapz(ty, om.*squeeze(BF(l,:,:)).*tmp));
    end % for l
 end % for k
 
 % figure(2),
 % spy(A)
-
-C = cgs(A,B');
+% A = sparse(A);
+% C = cgs(A', B');
+C = A' \ B';
 
 %% Reconstruction of numerical solution
 for k = ind
-    u_appr = u_appr + C(k)*squeeze(BF(k,:,:)).*omega.*omega./dx;
+    u_appr = u_appr + C(k)*squeeze(BF(k,:,:)).*om;
 end % for k
 
 %% Plot the numerical solution
@@ -169,10 +134,12 @@ ylabel('y','Interpreter','tex')
 zlabel('u(x,y)','Interpreter','tex')
 
 %% Errors
-lhs = del2(u_appr, dx, dy) - rhs_func(x,y);
+lhs = abs(4*del2(u_appr, dx, dy) - rhs_func(x,y));
+
+disp(['Absolute error: ' num2str(max(max(lhs)))])
 
 figure(5),
 surf(x, y, lhs)
 shading interp;  
-title('Residual res(x,y)=\Delta u_{appr}(x,y)+1','Interpreter','tex')
+title('Residual res(x,y)=\Delta u_{appr}(x,y)-f(x,y)','Interpreter','tex')
 axis square
