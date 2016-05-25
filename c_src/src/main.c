@@ -5,20 +5,62 @@
 #include "af_fourier.c"
 #include <string.h>
 
-#define N 6
-#define A -M_PI
-#define B M_PI
-double right_part_f(double x, double y)
+#define N 2
+#include "right_parts.c"
+#include "basis_functions.c"
+
+
+
+
+
+
+double Simpson_int(double (*f)(double,double), double x0, double x1)
 {
-/*	return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));*/
-/*	return 2.*(x*x+y*y-2.);*/
-	return -2.*sin(x)*sin(y);
+	double 	i,
+			step,
+			res = 0.;
+	for(i = x0+step; i < x0-step; i+=step)
+	{
+		res += (*f)(i-step)+4.*(*f)(i)+(*f)(i+step);
+	}
+	return step/3.*res;
 }
-double u_exact(double x, double y)
+
+double Simpson_int_int(double (*f)(double,double),double x0, double x1, double y0, double y1)
 {
-	return sin(x)*sin(y);
-/*	return (x*x*x*x-1.)*(y*y*y*y-1.);*/
+	double	i,
+			step,
+			res = 0.;
+	for(i = x0+step; i < x0-step; i+=step)
+	{
+		res += (*f)(i-step)+4.*(*f)(i)+(*f)(i+step);
+	}
+	return step/3.*res;
 }
+
+
+
+double integralLeft_Simpson
+     (double (*f)(double, double, int, int), 
+      double x0,  double x1, 
+      double y0,  double y1, 
+      int k1, 	int k2)
+// Returns value of left part integral: 
+// I = \int_{x0}^{x1}\int_{y0}^{y1}\nabla\psi_{k1}\nabla\psi_{k2}dydx,
+{
+	double i,j, stepx=(x1-x0)/64., stepy=(y1-y0)/64.;
+	double res = 0.;
+	
+	for(i=x0+stepx; i<x1-stepx; i+= stepx)
+	{
+		for(j=y0; j<y1; j+= stepy)
+		{
+			res += stepx*stepy/3.*((*f)(i-stepx,j,k1,k2)+4.*(*f)(i,j,k1,k2)+(*f)(i+stepx,j,k1,k2));
+		}
+	}
+	return res;
+}
+
 
 double integralLeft
      (double (*f)(double, double, int, int), 
@@ -28,7 +70,7 @@ double integralLeft
 // Returns value of left part integral: 
 // I = \int_{x0}^{x1}\int_{y0}^{y1}\nabla\psi_{k1}\nabla\psi_{k2}dydx,
 {
-	double i,j, stepx=(x1-x0)/100., stepy=(y1-y0)/100.;
+	double i,j, stepx=(x1-x0)/64., stepy=(y1-y0)/64.;
 	double res = 0.;
 	
 	for(i=x0; i<x1; i+= stepx)
@@ -66,19 +108,12 @@ double omega(double x, double y)
 // Returns value of R-function \omega(x,y)
 // ToDo: modify for random bound positions
 {
-	double result = (x-A)*(x-B)*(y-A)*(y-B);
+	double result = (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
 //	double result = (1.-x*x)*(1.-y*y);
 
 	if(result <= 0.) 
 		return 0.;
 	return result;
-}
-
-double phi(double x, double y, int n)
-// Returns value of n-th \phi basis function at point (x,y)
-{
-	return f_B_3(0.5*(x-(double)(n%N))/(B-A))*f_B_3(0.5*(y-(double)(n/N))/(B-A));
-	//return pow(x,n%N)*pow(y,n/N);
 }
 
 double basis(double (*f)(double, double,int),double x, double y, int n)
@@ -90,7 +125,7 @@ double basis(double (*f)(double, double,int),double x, double y, int n)
 double left_under_int(double x, double y, int m, int n)
 // Returns \nabla\psi_m \nabla\psi_n for integral calculation
 {
-	double res, delta = 0.001;
+	double res, delta = 0.000001;
 	//int i, j;
 	
 	res = 0.25/delta/delta*
@@ -137,6 +172,7 @@ void solve_matrix_eq
 //Solve SLE Ax=b, where A = system, b = RightPart, x = solution
 {
 	int i;
+
 	gsl_permutation * p = gsl_permutation_alloc (N*N);
 	gsl_linalg_LU_decomp (system, p, &i);
 	gsl_linalg_LU_solve (system, p, RightPart, solution);
@@ -165,10 +201,46 @@ double plot_region
 			hy = (y2-y1)/64.,
 			i,j;
 	FILE * op;
-	op = fopen("plot_region", "w");
+	op = fopen("../plot_data/plot_region", "w");
 	for(i=x1; i<=x2; i+=hx)
 		for(j=y1; j<=y2; j+=hy)
 			fprintf(op, "%f %f %f\n", i,j, reconstruct_at(solution,i,j));
+	fclose(op);
+}
+
+double plot_exact_solution
+     (double x1, double x2, 
+      double y1, double y2)
+// Plot solution in rectangle region 
+// from x1 till x2 by x, and from y1 till y2 by y
+
+{
+	double	hx = (x2-x1)/64.,
+			hy = (y2-y1)/64.,
+			i,j;
+	FILE * op;
+	op = fopen("../plot_data/plot_exact_solution", "w");
+	for(i=x1; i<=x2; i+=hx)
+		for(j=y1; j<=y2; j+=hy)
+			fprintf(op, "%f %f %f\n", i,j, u_exact(i,j));
+	fclose(op);
+}
+
+double plot_omega
+     (double x1, double x2, 
+      double y1, double y2)
+// Plot solution in rectangle region 
+// from x1 till x2 by x, and from y1 till y2 by y
+
+{
+	double	hx = (x2-x1)/64.,
+			hy = (y2-y1)/64.,
+			i,j;
+	FILE * op;
+	op = fopen("../plot_data/plot_plot_omega", "w");
+	for(i=x1; i<=x2; i+=hx)
+		for(j=y1; j<=y2; j+=hy)
+			fprintf(op, "%f %f %f\n", i,j, omega(i,j));
 	fclose(op);
 }
 
@@ -183,7 +255,7 @@ double plot_region_error
 			hy = (y2-y1)/64.,
 			i,j;
 	FILE * op;
-	op = fopen("plot_region_error", "w");
+	op = fopen("../plot_data/plot_region_error", "w");
 	for(i=x1; i<=x2; i+=hx)
 		for(j=y1; j<=y2; j+=hy)
 			fprintf(op, "%f %f %f\n", i,j, fabs(reconstruct_at(solution,i,j)-u_exact(i,j)));
@@ -192,18 +264,31 @@ double plot_region_error
 
 int main()
 {
-	double a = A, b = B;
+	//double a = A, b = B;
+	init_eq(1);
+	init_basis(2);
+/*	right_part_f = &f;*/
+/*	u_exact 	 = &u;*/
 	gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
 	gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
 			*solution	= gsl_vector_alloc(N*N);
 	
-	form_matrix		(sys, rightpart, a,b, a,b);
+	form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
+	
+	FILE *op;
+	op = fopen("./matrix", "w");
+	gsl_matrix_fprintf(op, sys, "%f");
+	fclose(op);
+	
+	
 	solve_matrix_eq	(solution, sys, rightpart);
 	
-	plot_region		(solution, a,b, a,b);
-	plot_region_error	(solution, a,b, a,b);
-	
-	system("./Plot & ./Plot_err");
-	
+	plot_region		(solution, X0,X1, Y0,Y1);
+	plot_region_error	(solution, X0,X1, Y0,Y1);
+	plot_exact_solution	(X0,X1, Y0,Y1);
+	plot_omega			(X0,X1, Y0,Y1);
+
+	system("./Plot & ./Plot_err & ./Plot_exact & ./Plot_omega");
+	//printf("%f\n", integrals(omega,X0,X1,Y0,Y1));
 	return 0;
 }
