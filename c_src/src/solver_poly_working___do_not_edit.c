@@ -5,7 +5,7 @@
 #include "af_fourier.c"
 #include <string.h>
 
-#define N 6
+#define N 4
 #include "right_parts.c"
 #include "basis_functions.c"
 
@@ -18,7 +18,7 @@ double Simpson_int(double (*f)(double,double, int, int), double x0, double x1,
                                     double y_c, int k1, int k2)
 {
 	double 	i,
-			step = (x1-x0)/512.,
+			step = (x1-x0)/256.,
 			res = 0.;
       const int   q_of_layers = (int)((x1-x0)/step) + 1;// - (int)((x1-x0)/step)%2;
 	int         k;
@@ -45,7 +45,7 @@ double integralLeft(double (*f)(double,double, int, int),
                   double x0, double x1, double y0, double y1, int k1, int k2)
 {
 	double	i,
-			step = (y1-y0)/512.,
+			step = (y1-y0)/256.,
 			res = 0.;
 	const int   q_of_layers = (int)((y1-y0)/step) + 1; //-(int)((y1-y0)/step)%2;
 	int         k;
@@ -296,7 +296,7 @@ int main()
 {
 	//double a = A, b = B;
 	init_eq(1);
-	init_basis(1);
+	init_basis(2);
 	
 	gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
 	gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
