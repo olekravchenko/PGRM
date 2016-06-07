@@ -4,13 +4,14 @@
 #include <gsl/gsl_linalg.h>
 #include "af_fourier.c"
 #include <string.h>
-
-#define N 6
+int N;
+double intStep;
+//#define N 6
 #include "right_parts.c"
 #include "basis_functions.c"
 
 
-
+double diff_step;// = pow(2.,-8);
 
 
 
@@ -18,7 +19,7 @@ double Simpson_int(double (*f)(double,double, int, int), double x0, double x1,
                                     double y_c, int k1, int k2)
 {
 	double 	i,
-			step = (x1-x0)/512.,
+			step = (x1-x0)/intStep,
 			res = 0.;
       const int   q_of_layers = (int)((x1-x0)/step) + 1;// - (int)((x1-x0)/step)%2;
 	int         k;
@@ -45,7 +46,7 @@ double integralLeft(double (*f)(double,double, int, int),
                   double x0, double x1, double y0, double y1, int k1, int k2)
 {
 	double	i,
-			step = (y1-y0)/512.,
+			step = (y1-y0)/intStep,
 			res = 0.;
 	const int   q_of_layers = (int)((y1-y0)/step) + 1; //-(int)((y1-y0)/step)%2;
 	int         k;
@@ -72,7 +73,7 @@ double Simpson_right(double (*f)(double,double, int), double x0, double x1,
                                     double y_c, int k1)
 {
 	double 	i,
-			step = (x1-x0)/128.,
+			step = (x1-x0)/256.,
 			res = 0.;
       const int   q_of_layers = (int)((x1-x0)/step) + 1;// - (int)((x1-x0)/step)%2;
 	int         k;
@@ -106,7 +107,7 @@ double integralRight
 // \int_{x0}^{x1}\int_{y0}^{y1} f(x,y)\psi_m(x,y)dydx
 {
 	double	i,
-			step = (y1-y0)/128.,
+			step = (y1-y0)/256.,
 			res = 0.;
 	const int   q_of_layers = (int)((y1-y0)/step) + 1; //-(int)((y1-y0)/step)%2;
 	int         k;
@@ -152,10 +153,33 @@ double basis(double (*f)(double, double,int),double x, double y, int n)
 	return (*f)(x,y,n)*omega(x,y);
 }
 
+
+//testing variant
 double left_under_int(double x, double y, int m, int n)
+{
+	double res;
+	double 	omega_px = omega(x + diff_step, y),
+			omega_mx = omega(x - diff_step, y),
+			omega_py = omega(x, y + diff_step),
+			omega_my = omega(x, y - diff_step);
+	
+	res = 0.25/diff_step/diff_step*
+	(	phi(x+diff_step,y,n)*phi(x+diff_step,y,m)*omega_px*omega_px
+	    -(phi(x+diff_step,y,m)*phi(x-diff_step,y,n)+phi(x+diff_step,y,n)*phi(x-diff_step,y,m))*omega_px*omega_mx
+	     +phi(x-diff_step,y,n)*phi(x-diff_step,y,m)*omega_mx*omega_mx
+	     +
+	      phi(x,y+diff_step,n)*phi(x,y+diff_step,m)*omega_py*omega_py
+	    -(phi(x,y+diff_step,m)*phi(x,y-diff_step,n)+phi(x,y+diff_step,n)*phi(x,y-diff_step,m))*omega_py*omega_my
+	     +phi(x,y-diff_step,n)*phi(x,y-diff_step,m)*omega_my*omega_my	
+	);
+	return res;
+}
+
+
+double left_under_int_old(double x, double y, int m, int n)
 // Returns \nabla\psi_m \nabla\psi_n for integral calculation
 {
-	double res, delta = 0.0000000001;
+	double res, delta = diff_step;
 	//int i, j;
 	
 	res = 0.25/delta/delta*
@@ -190,7 +214,10 @@ void form_matrix
 		gsl_vector_set(RightPart, i, -integralRight(right_under_int,x1,x2,y1,y2,i));
 		for(j = 0; j < N*N; j++)
 		{
-			gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
+			//if(abs(i-j)<=5)
+				gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
+			//else  gsl_matrix_set(system, i,j, 0);
+/*			printf("%d %d\n",i,j);*/
 		}
 	}
 }
@@ -206,6 +233,10 @@ void solve_matrix_eq
 	gsl_permutation * p = gsl_permutation_alloc (N*N);
 	gsl_linalg_LU_decomp (system, p, &i);
 	gsl_linalg_LU_solve (system, p, RightPart, solution);
+/*	FILE *op;*/
+/*	op = fopen("coeffs", "w");*/
+/*	gsl_vector_fprintf(op, solution, "%3.3g");*/
+/*	fclose(op);*/
 }
 
 double reconstruct_at(gsl_vector *solution, double x, double y)
@@ -292,11 +323,29 @@ double plot_region_error
 	fclose(op);
 }
 
-int main()
+void errors_to_stdio
+     (gsl_vector *solution, 
+      double x1, double x2, 
+      double y1, double y2)
+{
+	double	hx = (x2-x1)/64.,
+			hy = (y2-y1)/64.,
+			i,j,maxerr=0.,err;
+
+	for(i=x1; i<=x2; i+=hx)
+		for(j=y1; j<=y2; j+=hy)
+			if((err = fabs(reconstruct_at(solution,i,j)-u_exact(i,j)))>maxerr) maxerr = err;
+	printf("%d %g %f\n",N*N,intStep,maxerr);
+}
+
+int main(int argc, char **argv)
 {
 	//double a = A, b = B;
-	init_eq(1);
-	init_basis(1);
+	N=atoi(argv[1]);
+	intStep = (double) atoi(argv[2]);
+	init_eq(atoi(argv[3]));
+	init_basis(atoi(argv[4]));
+	diff_step = pow(2.,-9);
 	
 	gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
 	gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
@@ -309,17 +358,17 @@ int main()
 	gsl_matrix_fprintf(op, sys, "%f");
 	fclose(op);
 	
-	
 	solve_matrix_eq	(solution, sys, rightpart);
 	
-	plot_region		(solution, X0,X1, Y0,Y1);
-	plot_region_error	(solution, X0,X1, Y0,Y1);
-	plot_exact_solution	(X0,X1, Y0,Y1);
-	plot_omega			(X0,X1, Y0,Y1);
+	errors_to_stdio	(solution, X0,X1, Y0,Y1);
+//	plot_region		(solution, X0,X1, Y0,Y1);
+//	plot_region_error	(solution, X0,X1, Y0,Y1);
+//	plot_exact_solution	(X0,X1, Y0,Y1);
+//	plot_omega			(X0,X1, Y0,Y1);
 
-	system("./Plot");
-	system("./Plot_err");
+//	system("./Plot");
+//	system("./Plot_err");
 //	system("./Plot_exact");
-//	system("./Plot_omega");
+	//system("./Plot_omega");
 	return 0;
 }
