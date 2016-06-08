@@ -5,13 +5,13 @@
 #include "af_fourier.c"
 #include <string.h>
 int N;
-double intStep;
-//#define N 6
+double intStep, glob_delta;
+
 #include "right_parts.c"
 #include "basis_functions.c"
 
 
-double diff_step;// = pow(2.,-8);
+double diff_step;
 
 
 
@@ -19,26 +19,16 @@ double Simpson_int(double (*f)(double,double, int, int), double x0, double x1,
                                     double y_c, int k1, int k2)
 {
 	double 	i,
-			step = (x1-x0)/intStep,
-			res = 0.;
-      const int   q_of_layers = (int)((x1-x0)/step) + 1;// - (int)((x1-x0)/step)%2;
+			step = (x1-x0)/intStep;
+			//res = 0.;
+      const int   q_of_layers = (int)((x1-x0)/step) + 1;
 	int         k;
-	double      integrals_by_layer[q_of_layers];
-	
-	for(k = 0; k < q_of_layers; k++)
-	{
-	      integrals_by_layer[k] = (*f)((double)k*step + x0, y_c, k1, k2);
-	}
-	
-	res = integrals_by_layer[0];
+	double res = (*f)(x0, y_c, k1, k2) + 
+	             (*f)((double)(q_of_layers-1)*step + x0, y_c, k1, k2);
 	for(k = 1; k < q_of_layers-1; k++)
 	{
-            if(k%2 == 0)
-                  res += 2.*integrals_by_layer[k];
-            else
-                  res += 4.*integrals_by_layer[k];
+            res += 2.*(double)(1+k%2)*(*f)((double)k*step + x0, y_c, k1, k2);
 	}
-	res +=integrals_by_layer[q_of_layers-1];
 	return step/3.*res;
 }
 //Simpson_int_int
@@ -46,26 +36,16 @@ double integralLeft(double (*f)(double,double, int, int),
                   double x0, double x1, double y0, double y1, int k1, int k2)
 {
 	double	i,
-			step = (y1-y0)/intStep,
-			res = 0.;
+			step = (y1-y0)/intStep;
+			//res = 0.;
 	const int   q_of_layers = (int)((y1-y0)/step) + 1; //-(int)((y1-y0)/step)%2;
 	int         k;
-	double      integrals_by_layer[q_of_layers];
-	
-	for(k = 0; k < q_of_layers; k++)
-	{
-	      integrals_by_layer[k] = Simpson_int((*f),x0,x1,y0+(double)k*step, k1,k2);
-	}
-	
-	res = integrals_by_layer[0];
+	double res = Simpson_int((*f),x0,x1,y0, k1,k2) + 
+	           Simpson_int((*f),x0,x1,y0+(double)(q_of_layers-1)*step, k1,k2);
 	for(k = 1; k < q_of_layers-1; k++)
 	{
-            if(k%2 == 0)
-                  res += 2.*integrals_by_layer[k];
-            else
-                  res += 4.*integrals_by_layer[k];
+            res += 2.*(double)(1+k%2)*Simpson_int((*f),x0,x1,y0+(double)k*step, k1,k2);
 	}
-	res +=integrals_by_layer[q_of_layers-1];
 	return step/3.*res;
 }
 
@@ -73,26 +53,16 @@ double Simpson_right(double (*f)(double,double, int), double x0, double x1,
                                     double y_c, int k1)
 {
 	double 	i,
-			step = (x1-x0)/256.,
-			res = 0.;
+			step = (x1-x0)/64.;
+			//res = 0.;
       const int   q_of_layers = (int)((x1-x0)/step) + 1;// - (int)((x1-x0)/step)%2;
 	int         k;
-	double      integrals_by_layer[q_of_layers];
-	
-	for(k = 0; k < q_of_layers; k++)
-	{
-	      integrals_by_layer[k] = (*f)((double)k*step + x0, y_c, k1);
-	}
-	
-	res = integrals_by_layer[0];
+	double res = (*f)(x0, y_c, k1) + 
+	             (*f)((double)(q_of_layers-1)*step + x0, y_c, k1);
 	for(k = 1; k < q_of_layers-1; k++)
 	{
-            if(k%2 == 0)
-                  res += 2.*integrals_by_layer[k];
-            else
-                  res += 4.*integrals_by_layer[k];
+            res += 2.*(double)(1+k%2)*(*f)((double)k*step + x0, y_c, k1);
 	}
-	res +=integrals_by_layer[q_of_layers-1];
 	return step/3.*res;
 }
 
@@ -107,26 +77,15 @@ double integralRight
 // \int_{x0}^{x1}\int_{y0}^{y1} f(x,y)\psi_m(x,y)dydx
 {
 	double	i,
-			step = (y1-y0)/256.,
-			res = 0.;
+			step = (y1-y0)/64.;
+			//res = 0.;
 	const int   q_of_layers = (int)((y1-y0)/step) + 1; //-(int)((y1-y0)/step)%2;
 	int         k;
-	double      integrals_by_layer[q_of_layers];
-	
-	for(k = 0; k < q_of_layers; k++)
-	{
-	      integrals_by_layer[k] = Simpson_right((*f),x0,x1,y0+(double)k*step, k1);
-	}
-	
-	res = integrals_by_layer[0];
+	double res = Simpson_right((*f),x0,x1,y0, k1) + Simpson_right((*f),x0,x1,y0+(double)(q_of_layers-1)*step, k1);
 	for(k = 1; k < q_of_layers-1; k++)
 	{
-            if(k%2 == 0)
-                  res += 2.*integrals_by_layer[k];
-            else
-                  res += 4.*integrals_by_layer[k];
+            res += 2.*(double)(1+k%2)*Simpson_right((*f),x0,x1,y0+(double)k*step, k1);
 	}
-	res +=integrals_by_layer[q_of_layers-1];
 	return step/3.*res;
 }
 
@@ -140,11 +99,8 @@ double omega(double x, double y)
 // Returns value of R-function \omega(x,y)
 // ToDo: modify for random bound positions
 {
-	double result = (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
-      
-	//if(result <= 0.) 
-	//	return 0.;
-	return result;
+	return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
+	//return result;
 }
 
 double basis(double (*f)(double, double,int),double x, double y, int n)
@@ -157,22 +113,26 @@ double basis(double (*f)(double, double,int),double x, double y, int n)
 //testing variant
 double left_under_int(double x, double y, int m, int n)
 {
-	double res;
+
 	double 	omega_px = omega(x + diff_step, y),
 			omega_mx = omega(x - diff_step, y),
 			omega_py = omega(x, y + diff_step),
-			omega_my = omega(x, y - diff_step);
+			omega_my = omega(x, y - diff_step),
+			phim_px  = phi(x+diff_step,y,m),
+			phim_py  = phi(x,y+diff_step,m),
+			phim_mx  = phi(x-diff_step,y,m),
+			phim_my  = phi(x,y-diff_step,m),
+			phin_px  = phi(x+diff_step,y,n),
+			phin_py  = phi(x,y+diff_step,n),
+			phin_mx  = phi(x-diff_step,y,n),
+			phin_my  = phi(x,y-diff_step,n);
 	
-	res = 0.25/diff_step/diff_step*
-	(	phi(x+diff_step,y,n)*phi(x+diff_step,y,m)*omega_px*omega_px
-	    -(phi(x+diff_step,y,m)*phi(x-diff_step,y,n)+phi(x+diff_step,y,n)*phi(x-diff_step,y,m))*omega_px*omega_mx
-	     +phi(x-diff_step,y,n)*phi(x-diff_step,y,m)*omega_mx*omega_mx
-	     +
-	      phi(x,y+diff_step,n)*phi(x,y+diff_step,m)*omega_py*omega_py
-	    -(phi(x,y+diff_step,m)*phi(x,y-diff_step,n)+phi(x,y+diff_step,n)*phi(x,y-diff_step,m))*omega_py*omega_my
-	     +phi(x,y-diff_step,n)*phi(x,y-diff_step,m)*omega_my*omega_my	
+	return 0.25*glob_delta*glob_delta*
+	(     (omega_px*phin_px - omega_mx*phin_mx)*
+	      (omega_px*phim_px - omega_mx*phim_mx)+
+	      (omega_py*phin_py - omega_my*phin_my)*
+	      (omega_py*phim_py - omega_my*phim_my)
 	);
-	return res;
 }
 
 
@@ -214,10 +174,7 @@ void form_matrix
 		gsl_vector_set(RightPart, i, -integralRight(right_under_int,x1,x2,y1,y2,i));
 		for(j = 0; j < N*N; j++)
 		{
-			//if(abs(i-j)<=5)
-				gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
-			//else  gsl_matrix_set(system, i,j, 0);
-/*			printf("%d %d\n",i,j);*/
+			gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
 		}
 	}
 }
@@ -233,10 +190,6 @@ void solve_matrix_eq
 	gsl_permutation * p = gsl_permutation_alloc (N*N);
 	gsl_linalg_LU_decomp (system, p, &i);
 	gsl_linalg_LU_solve (system, p, RightPart, solution);
-/*	FILE *op;*/
-/*	op = fopen("coeffs", "w");*/
-/*	gsl_vector_fprintf(op, solution, "%3.3g");*/
-/*	fclose(op);*/
 }
 
 double reconstruct_at(gsl_vector *solution, double x, double y)
@@ -343,9 +296,11 @@ int main(int argc, char **argv)
 	//double a = A, b = B;
 	N=atoi(argv[1]);
 	intStep = (double) atoi(argv[2]);
+	
 	init_eq(atoi(argv[3]));
 	init_basis(atoi(argv[4]));
 	diff_step = pow(2.,-9);
+	glob_delta = 1./diff_step;
 	
 	gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
 	gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
@@ -353,10 +308,10 @@ int main(int argc, char **argv)
 	
 	form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
 	
-	FILE *op;
-	op = fopen("./matrix", "w");
-	gsl_matrix_fprintf(op, sys, "%f");
-	fclose(op);
+/*	FILE *op;*/
+/*	op = fopen("./matrix", "w");*/
+/*	gsl_matrix_fprintf(op, sys, "%f");*/
+/*	fclose(op);*/
 	
 	solve_matrix_eq	(solution, sys, rightpart);
 	
@@ -369,6 +324,6 @@ int main(int argc, char **argv)
 //	system("./Plot");
 //	system("./Plot_err");
 //	system("./Plot_exact");
-	//system("./Plot_omega");
+//	system("./Plot_omega");
 	return 0;
 }
