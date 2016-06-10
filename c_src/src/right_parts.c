@@ -24,51 +24,51 @@ static double (*u_s)(double, double);
 
 void init_eq(int id)
 {
-	if(id == 1)
-	{
-		right_part_f = &f1;
-		u_exact 	 = &u1;
-		X0 = -1.;
-		X1 =  1.;
-		Y0 = -1.;
-		Y1 =  1.;
-	}
-	
-	if(id == 2)
-	{
-		right_part_f = &f2;
-		u_exact 	 = &u2;
-		X0 = -1.;
-		X1 =  1.;
-		Y0 = -1.;
-		Y1 =  1.;
-	}
-	
-	if(id == 3)
-	{
-		right_part_f = &f3;
-		u_exact 	 = &u3;
-		X0 = 0.;
-		X1 =  2.*M_PI;
-		Y0 = 0.;
-		Y1 =  2.*M_PI;
-	}
-	if(id == 4)
-	{
-		right_part_f = &f4;
-		u_exact 	 = &u4;
-		X0 = -5.;
-		X1 =  5.;
-		Y0 = -1.;
-		Y1 =  1.;
-	}
-	if(id == 5)
-	{
-		right_part_f = &f5;
-		u_exact 	 = &u5;
-		X0 =  0.;
-		X1 =  3.;
-		Y0 =  0.;
-		Y1 =  3.;
-	}
+    if(id == 1)
+    {
+        right_part_f = &f1;
+        u_exact 	 = &u1;
+        X0 = -1.;
+        X1 =  1.;
+        Y0 = -1.;
+        Y1 =  1.;
+    }
+
+    if(id == 2)
+    {
+        right_part_f = &f2;
+        u_exact 	 = &u2;
+        X0 = -1.;
+        X1 =  1.;
+        Y0 = -1.;
+        Y1 =  1.;
+    }
+
+    if(id == 3)
+    {
+        right_part_f = &f3;
+        u_exact 	 = &u3;
+        X0 = 0.;
+        X1 =  2.*M_PI;
+        Y0 = 0.;
+        Y1 =  2.*M_PI;
+    }
+    if(id == 4)
+    {
+        right_part_f = &f4;
+        u_exact 	 = &u4;
+        X0 = -5.;
+        X1 =  5.;
+        Y0 = -1.;
+        Y1 =  1.;
+    }
+    if(id == 5)
+    {
+        right_part_f = &f5;
+        u_exact 	 = &u5;
+        X0 =  0.;
+        X1 =  3.;
+        Y0 =  0.;
+        Y1 =  3.;
+    }
 }
