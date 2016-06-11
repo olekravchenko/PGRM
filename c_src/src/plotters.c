@@ -11,10 +11,6 @@ double reconstruct_at(gsl_vector *solution,
     return result;
 }
 
-    //	system("./Plot");
-    //	system("./Plot_err");
-    //	system("./Plot_exact");
-    //	system("./Plot_omega");
 
 void plot_region(gsl_vector *solution,
                  double x1, double x2,
