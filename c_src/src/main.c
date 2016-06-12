@@ -20,13 +20,13 @@ double omega(double x, double y)
 // Returns value of R-function \omega(x,y)
 // ToDo: modify for random bound positions
 {
-    return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
+	return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
 }
 
 double basis(double x, double y, int n)
 // Returns value of n-th \psi-basis function, used further, at point (x,y)
 {
-	return phi(x,y,n)*omega(x,y);
+    return phi(x,y,n)*omega(x,y);
 }
 #include "plotters.c"
 #include "simpson_integrals.c"
@@ -60,13 +60,13 @@ typedef struct rectangle_area {
     double y1,y2;
 } rectangle_area;
 
-typedef struct parallel_arg{
+typedef struct parallel_arg {
     rectangle_area area;
     int i, j;
     double result;
 } parallel_arg;
 
-typedef struct parallel_arg2{
+typedef struct parallel_arg2 {
     rectangle_area area;
     int threadId;
     double **result;
@@ -86,8 +86,8 @@ void *parallel_pre_former2(void *arg)
     int i, j;
     for(i = 0; i<N*N/16; i++)
     {
-	for(j = 0; j<N*N; j++)
-	    a->result[i+id*N*N/16][j] = integralLeft(left_under_int,a->area.x1,a->area.x2,a->area.y1,a->area.y2,i+id*N*N/16,j);
+        for(j = 0; j<N*N; j++)
+            a->result[i+id*N*N/16][j] = integralLeft(left_under_int,a->area.x1,a->area.x2,a->area.y1,a->area.y2,i+id*N*N/16,j);
     }
     //a->result = integralLeft(left_under_int,a->area.x1,a->area.x2,a->area.y1,a->area.y2,a->i,a->j);
     return 0;
@@ -110,26 +110,26 @@ void form_matrix_parallel(gsl_matrix * system,
     general_area.x2 = x2;
     general_area.y1 = y1;
     general_area.y2 = y2;
-    
+
     double **prematrixarray;
     init2DArr(&prematrixarray, N*N, N*N);
     pthread_t threads[16];
-    
+
     for(i = 0; i < 16; i++)
     {
-	arg[i].area = general_area;
-	arg[i].threadId = i;
-	arg[i].result = prematrixarray;
-	return_code=pthread_create(&threads[i],NULL,parallel_pre_former2, (void*)&arg[i]);
+        arg[i].area = general_area;
+        arg[i].threadId = i;
+        arg[i].result = prematrixarray;
+        return_code=pthread_create(&threads[i],NULL,parallel_pre_former2, (void*)&arg[i]);
     }
-    
+
     for(k = 0; k < 16; k++)
     {
-	return_code = pthread_join(threads[k], NULL);
-	
-	for(i = 0; i<N*N/16; i++)
-	    for(j = 0; j < N*N; j++)
-		prematrixarray[i+k*N*N/16][j]=arg[i].result[i+k*N*N/16][j];
+        return_code = pthread_join(threads[k], NULL);
+
+        for(i = 0; i<N*N/16; i++)
+            for(j = 0; j < N*N; j++)
+                prematrixarray[i+k*N*N/16][j]=arg[i].result[i+k*N*N/16][j];
     }
     return_code++;
     for(i = 0; i < N*N; i++)
@@ -157,7 +157,7 @@ void form_matrix_parallel_v1_with_bug(gsl_matrix * system,
     general_area.x2 = x2;
     general_area.y1 = y1;
     general_area.y2 = y2;
-    
+
     double **prematrixarray;
     init2DArr(&prematrixarray, N*N, N*N);
     pthread_t threads[N*N][N*N];
@@ -199,15 +199,15 @@ void form_matrix (gsl_matrix * system,
 // x1, x2	- sizes of rectangle by x
 // y1, y2	- sizes of rectangle by y
 {
-	int i, j;
-	for(i = 0; i < N*N; i++)
-	{
-		gsl_vector_set(RightPart, i, -integralRight(right_part_f,basis,x1,x2,y1,y2,i));
-		for(j = 0; j < N*N; j++)
-		{
-			gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
-		}
-	}
+    int i, j;
+    for(i = 0; i < N*N; i++)
+    {
+        gsl_vector_set(RightPart, i, -integralRight(right_part_f,basis,x1,x2,y1,y2,i));
+        for(j = 0; j < N*N; j++)
+        {
+            gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
+        }
+    }
 }
 
 void solve_matrix_eq(gsl_vector * solution,
@@ -236,20 +236,20 @@ int main(int argc, char **argv)
     glob_delta = 1./diff_step;
 
     gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
-    gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
-                  *solution	= gsl_vector_alloc(N*N);
+    gsl_vector  *rightpart	= gsl_vector_alloc(N*N);
+    //*solution	= gsl_vector_alloc(N*N);
     solution_glob = gsl_vector_alloc(N*N);
     //form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
     form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
 
-    FILE *op;
-    op = fopen("./matrix", "w");
-    gsl_matrix_fprintf(op, sys, "%f");
-    fclose(op);
+    //FILE *op;
+    //op = fopen("./matrix", "w");
+    //gsl_matrix_fprintf(op, sys, "%f");
+    //fclose(op);
 
-    solve_matrix_eq	(solution, sys, rightpart);
-    solution_glob = solution;
-    errors_to_stdio	(solution, X0,X1, Y0,Y1);
+    solve_matrix_eq	(solution_glob, sys, rightpart);
+    //solution_glob = solution;
+    errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
     //plot_region		(solution, X0,X1, Y0,Y1);
     //plot_region_error	(solution, X0,X1, Y0,Y1);
     //plot_exact_solution	(X0,X1, Y0,Y1);
