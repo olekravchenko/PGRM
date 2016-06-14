@@ -52,8 +52,7 @@ double left_under_int(double x, double y, int m, int n)
            (     (omega_px*phin_px - omega_mx*phin_mx)*
                  (omega_px*phim_px - omega_mx*phim_mx)+
                  (omega_py*phin_py - omega_my*phin_my)*
-                 (omega_py*phim_py - omega_my*phim_my)
-           );
+                 (omega_py*phim_py - omega_my*phim_my));
 }
 typedef struct rectangle_area {
     double x1,x2;
@@ -225,6 +224,15 @@ void solve_matrix_eq(gsl_vector * solution,
 
 
 int main(int argc, char **argv)
+/*
+ * requires 4 arguments to launch:
+ * 
+ * 1. N - quantity of basis functions per side. 
+ * 2. intStep - quantity of integration nodes.
+ * 3. id of example equation in right_parts.c.
+ * 4. id of basis functions.
+ * 
+ */
 {
     //double a = A, b = B;
     N = atoi(argv[1]);
