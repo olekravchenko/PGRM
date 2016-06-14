@@ -232,6 +232,12 @@ int main(int argc, char **argv)
  * 3. id of example equation in right_parts.c.
  * 4. id of basis functions.
  * 
+ * Typical launch command (one of the best for testing):
+ * 	./bin/main 8 64 3 3
+ * 
+ * To build a program completly:
+ * [path_to_PGRM/c_src]/build
+ * or just double click on build script the same way as usual program.
  */
 {
     //double a = A, b = B;
