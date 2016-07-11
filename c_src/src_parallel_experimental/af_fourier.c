@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-#define MaxProduct 50
+#define MaxProduct 10
 /*	fourier-calculated atomic functions		*/
 /*	version 0.1					*/
 /*							*/

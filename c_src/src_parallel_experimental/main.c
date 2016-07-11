@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "B-splines.c"
 #include <gsl/gsl_linalg.h>
-#include "af_fourier.c"
+#include "af_morse_thue.c"
 #include <string.h>
 #include <pthread.h>
 #include "smplDynArray.c"
@@ -21,6 +21,9 @@ double omega(double x, double y)
 // ToDo: modify for random bound positions
 {
 	return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
+	/*double h = (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
+	if(h>=10.)	return 10.;
+	else 		return h;*/
 }
 
 double basis(double x, double y, int n)
@@ -297,10 +300,10 @@ int main(int argc, char **argv)
     solve_matrix_eq	(solution_glob, sys, rightpart);
     //solution_glob = solution;
     errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
-    //plot_region		(solution_glob, X0,X1, Y0,Y1);
-    //plot_region_error	(solution_glob, X0,X1, Y0,Y1);
+    plot_region		(solution_glob, X0,X1, Y0,Y1);
+    plot_region_error	(solution_glob, X0,X1, Y0,Y1);
     //plot_exact_solution	(X0,X1, Y0,Y1);
-    //plot_omega		(X0,X1, Y0,Y1);
+    plot_omega		(X0,X1, Y0,Y1);
 
     return 0;
 }
