@@ -39,21 +39,15 @@ double cubic_b_splines (double x, double y, int n)
            f_B_3(0.5*cubic_stepy*(y-cubic_stepy*(double)(n/(N))));
 }
 
-double up_basis (double x, double y, int n)
+
+double fup_basis (double x, double y, int n)
 {
     cubic_stepx = (X1-X0)/(double)(N-1);
     cubic_stepy = (Y1-Y0)/(double)(N-1);
-    return f_up(0.5*cubic_stepx*(x-cubic_stepx*(double)(n%(N))))*
-           f_up(0.5*cubic_stepy*(y-cubic_stepy*(double)(n/(N))));
+    return f_fup3_poly(0.3333333333333*cubic_stepx*(x-cubic_stepx*(double)(n%(N))))*
+           f_fup3_poly(0.3333333333333*cubic_stepy*(y-cubic_stepy*(double)(n/(N))));
+           //0.6666666666*
 }
-
-//double fup_basis (double x, double y, int n)
-//{
-    //cubic_stepx = (X1-X0)/(double)(N-1);
-    //cubic_stepy = (Y1-Y0)/(double)(N-1);
-    //return f_cup(0.5*cubic_stepx*(x-cubic_stepx*(double)(n%(N))))*
-           //f_cup(0.5*cubic_stepy*(y-cubic_stepy*(double)(n/(N))));
-//}
 
 void init_basis(int id)
 {
@@ -63,9 +57,6 @@ void init_basis(int id)
         phi = &polynomial;
     if(id == 3)
         phi = &chebishov_2d;
-    if(id == 4)
-	{	
-		init_up();
-		phi = &up_basis;
-	}
+	if(id == 4)
+		phi = &fup_basis;
 }

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "B-splines.c"
 #include <gsl/gsl_linalg.h>
-#include "af_morse_thue.c"
+#include "af_poly.c"
 #include <string.h>
 #include <pthread.h>
 #include "smplDynArray.c"
@@ -29,8 +29,9 @@ double omega(double x, double y)
 double basis(double x, double y, int n)
 // Returns value of n-th \psi-basis function, used further, at point (x,y)
 {
-    return phi(x,y,n)*omega(x,y);
+		return phi(x,y,n)*omega(x,y);
 }
+
 #include "plotters.c"
 #include "simpson_integrals.c"
 #include "error_functions.c"
@@ -66,21 +67,11 @@ double left_under_int(double x, double y, int m, int n)
             omega_mx = omega(x - diff_step, y),
             omega_py = omega(x, y + diff_step),
             omega_my = omega(x, y - diff_step),
-            /*phim_px  = phi(x+diff_step,y,m),
-            phim_py  = phi(x,y+diff_step,m),
-            phim_mx  = phi(x-diff_step,y,m),
-            phim_my  = phi(x,y-diff_step,m);*/
             phin_px  = phi(x+diff_step,y,n),
             phin_py  = phi(x,y+diff_step,n),
             phin_mx  = phi(x-diff_step,y,n),
             phin_my  = phi(x,y-diff_step,n);
 
-    /*return 0.25*glob_delta*glob_delta*
-           (     (omega_px*phin_px - omega_mx*phin_mx)*
-                 (omega_px*phim_px - omega_mx*phim_mx)+
-                 (omega_py*phin_py - omega_my*phin_my)*
-                 (omega_py*phim_py - omega_my*phim_my));
-    */
     return omega_0*phi(x,y,m)*glob_delta*glob_delta*
 			(omega_px*phin_px + omega_mx*phin_mx + 
 			omega_py*phin_py + omega_my*phin_my - 4.*omega_0*phi(x,y,n));
@@ -172,54 +163,6 @@ void form_matrix_parallel(gsl_matrix * system,
         gsl_vector_set(RightPart, i, integralRight(right_part_f,basis,x1,x2,y1,y2,i));
         for(j = 0; j < N*N; j++)
             gsl_matrix_set(system, i,j, prematrixarray[i][j]);
-    }
-    free2DArr(&prematrixarray, N*N);
-}
-void form_matrix_parallel_v1_with_bug(gsl_matrix * system,
-                                      gsl_vector * RightPart,
-                                      double x1, double x2,
-                                      double y1, double y2)
-// Forms SLE system
-// system 	- left part matrix form of system
-// RightPart- right part vector of coefficients
-// x1, x2	- sizes of rectangle by x
-// y1, y2	- sizes of rectangle by y
-{
-    int i, j, return_code;
-    parallel_arg arg[N*N][N*N];
-    rectangle_area general_area;
-    general_area.x1 = x1;
-    general_area.x2 = x2;
-    general_area.y1 = y1;
-    general_area.y2 = y2;
-
-    double **prematrixarray;
-    init2DArr(&prematrixarray, N*N, N*N);
-    pthread_t threads[N*N][N*N];
-    for(i = 0; i < N*N; i++)
-        for(j = 0; j < N*N; j++)
-        {
-            arg[i][j].area = general_area;
-            arg[i][j].i = i;
-            arg[i][j].j = j;
-            return_code = pthread_create(&threads[i][j],NULL,parallel_pre_former, (void*)&arg[i][j]);
-        }
-
-    for(i = 0; i < N*N; i++)
-        for(j = 0; j < N*N; j++)
-        {
-            return_code = pthread_join(threads[i][j], NULL);
-            prematrixarray[i][j] = arg[i][j].result;
-        }
-    return_code++;
-    for(i = 0; i < N*N; i++)
-    {
-        gsl_vector_set(RightPart, i, -integralRight(right_part_f,basis,x1,x2,y1,y2,i));
-        for(j = 0; j < N*N; j++)
-        {
-            //gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
-            gsl_matrix_set(system, i,j, prematrixarray[i][j]);
-        }
     }
     free2DArr(&prematrixarray, N*N);
 }

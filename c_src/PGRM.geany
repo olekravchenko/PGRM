@@ -29,22 +29,24 @@ long_line_column=90
 
 [files]
 current_page=5
-FILE_NAME_0=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_fluid_experimental%2Faf_fourier.c;0;4
-FILE_NAME_1=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_fluid_experimental%2Faf_morse_thue.c;0;4
-FILE_NAME_2=526;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_fluid_experimental%2Fbasis_functions.c;0;4
-FILE_NAME_3=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_fluid_experimental%2FB-splines.c;0;4
-FILE_NAME_4=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_fluid_experimental%2Ferror_functions.c;0;4
-FILE_NAME_5=1509;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_fluid_experimental%2Fmain.c;0;4
-FILE_NAME_6=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_fluid_experimental%2Fsimpson_integrals.c;0;4
-FILE_NAME_7=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_fluid_experimental%2FsmplDynArray.c;0;4
-FILE_NAME_8=365;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_fluid_experimental%2Fright_parts.c;0;4
+FILE_NAME_0=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2Faf_fourier.c;0;4
+FILE_NAME_1=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2Faf_morse_thue.c;0;4
+FILE_NAME_2=1434;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2Fbasis_functions.c;0;4
+FILE_NAME_3=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2FB-splines.c;0;4
+FILE_NAME_4=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2Ferror_functions.c;0;4
+FILE_NAME_5=107;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2Fmain.c;0;4
+FILE_NAME_6=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2Fplotters.c;0;4
+FILE_NAME_7=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2Fright_parts.c;0;4
+FILE_NAME_8=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2Fsimpson_integrals.c;0;4
+FILE_NAME_9=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2FsmplDynArray.c;0;4
+FILE_NAME_10=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fvbondarenko%2Fprojects%2FPGRM%2Fc_src%2Fsrc_parallel_experimental%2Faf_poly.c;0;4
 
 [VTE]
 last_dir=/home/vbondarenko/projects/CollocM/2d/src
 
 [build-menu]
 EX_00_LB=_Execute
-EX_00_CM=time "./%e" 5 64 6 3
+EX_00_CM=time "./%e" 8 64 3 4
 EX_00_WD=
 CFT_00_LB=_Compile
 CFT_00_CM=gcc -Wall -c "%f" -L/usr/local/lib -lgsl -lgslcblas -lm -g -O3 -pthread
