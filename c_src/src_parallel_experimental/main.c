@@ -21,9 +21,6 @@ double omega(double x, double y)
 // ToDo: modify for random bound positions
 {
 	return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
-	/*double h = (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
-	if(h>=10.)	return 10.;
-	else 		return h;*/
 }
 
 double basis(double x, double y, int n)
@@ -92,7 +89,6 @@ void *parallel_pre_former2(void *arg)
         for(j = 0; j<N*N; j++)
             a->result[i+id*N*N/16][j] = integralLeft(left_under_int,a->area.x1,a->area.x2,a->area.y1,a->area.y2,i+id*N*N/16,j);
     }
-    //a->result = integralLeft(left_under_int,a->area.x1,a->area.x2,a->area.y1,a->area.y2,a->i,a->j);
     return 0;
 }
 
@@ -221,10 +217,11 @@ int main(int argc, char **argv)
     solve_matrix_eq	(solution_glob, sys, rightpart);
     //solution_glob = solution;
     errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
-    plot_region		(solution_glob, X0,X1, Y0,Y1);
-    plot_region_error	(solution_glob, X0,X1, Y0,Y1);
+    multiplot		(solution_glob, X0,X1, Y0,Y1);
+    //plot_region		(solution_glob, X0,X1, Y0,Y1);
+    //plot_region_error	(solution_glob, X0,X1, Y0,Y1);
     //plot_exact_solution	(X0,X1, Y0,Y1);
-    plot_omega		(X0,X1, Y0,Y1);
+    //plot_omega		(X0,X1, Y0,Y1);
 
     return 0;
 }

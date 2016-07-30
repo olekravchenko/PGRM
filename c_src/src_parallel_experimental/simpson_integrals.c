@@ -1,42 +1,43 @@
-double Simpson_int(double (*f)(double,double, int, int),
-                   double x0, double x1,
-                   double y_c,
-                   int k1, int k2)
-{
-    double	 step = (x1-x0)/intStep;
-    
-    const int   q_of_layers = (int)((x1-x0)/step) + 1;
-    int         k;
-    
-    double res = (*f)(x0, y_c, k1, k2) +
-                 (*f)((double)(q_of_layers-1)*step + x0, y_c, k1, k2);
-
-    for(k = 1; k < q_of_layers-1; k++)
-    {
-        res += 2.*(double)(1+k%2)*(*f)((double)k*step + x0, y_c, k1, k2);
-    }
-    return step/3.*res;
-}
-//Simpson_int_int
 double integralLeft(double (*f)(double,double, int, int),
-                    double x0,double x1,
-                    double y0,double y1,
-                    int k1,int k2)
+                        double x0,double x1,
+                        double y0,double y1,
+                        int k1,int k2)
 {
-    double step = (y1-y0)/intStep;
-    
-    const int   q_of_layers = (int)((y1-y0)/step) + 1; //-(int)((y1-y0)/step)%2;
-    int         k;
-    
-    double res = Simpson_int((*f),x0,x1,y0, k1,k2) +
-                 Simpson_int((*f),x0,x1,y0+(double)(q_of_layers-1)*step, k1,k2);
-    
-    for(k = 1; k < q_of_layers-1; k++)
+    double stepy = (y1-y0)/intStep;
+    double stepx = (x1-x0)/intStep;
+
+    const int   q_y = (int)((y1-y0)/stepy) + 1;
+	const int	q_x = (int)((x1-x0)/stepx) + 1; //-(int)((y1-y0)/step)%2;
+    int         k,i;
+	int 		kx = 1, ky = 1;
+	double res = 0.;
+    for(k = 0; k < q_y; k++)
     {
-        res += 2.*(double)(1+k%2)*Simpson_int((*f),x0,x1,y0+(double)k*step, k1,k2);
+		if(k==0 || k==q_y-1)
+			ky = 1;
+		else if(k%2==1)
+			ky = 4;
+		else 
+			ky = 2;
+		for (i = 0; i < q_x; i++)
+		{
+			if(i==0 || i==q_x-1)
+				kx = 1;
+			else if(i%2==1)
+				kx = 4;
+			else
+				kx = 2;
+			res += ((double)ky*kx)*(*f)((double)i*stepx + x0, y0+(double)k*stepy, k1, k2);
+
+				
+		}
     }
-    return step/3.*res;
+    return stepx*stepy/9.*res;
 }
+
+
+
+
 
 //double (*f)(double,double, int),
 double Simpson_right(double (*right_f)(double, double),
