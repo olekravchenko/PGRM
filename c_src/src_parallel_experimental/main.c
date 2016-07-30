@@ -35,29 +35,7 @@ double basis(double x, double y, int n)
 #include "plotters.c"
 #include "simpson_integrals.c"
 #include "error_functions.c"
-//testing variant
-double left_under_int_old(double x, double y, int m, int n)
-{//classical weak formulation
- // \Nabla \phi_m \Nabla \phi_n
-    double  omega_px = omega(x + diff_step, y),
-            omega_mx = omega(x - diff_step, y),
-            omega_py = omega(x, y + diff_step),
-            omega_my = omega(x, y - diff_step),
-            phim_px  = phi(x+diff_step,y,m),
-            phim_py  = phi(x,y+diff_step,m),
-            phim_mx  = phi(x-diff_step,y,m),
-            phim_my  = phi(x,y-diff_step,m),
-            phin_px  = phi(x+diff_step,y,n),
-            phin_py  = phi(x,y+diff_step,n),
-            phin_mx  = phi(x-diff_step,y,n),
-            phin_my  = phi(x,y-diff_step,n);
 
-    return 0.25*glob_delta*glob_delta*
-           (     (omega_px*phin_px - omega_mx*phin_mx)*
-                 (omega_px*phim_px - omega_mx*phim_mx)+
-                 (omega_py*phin_py - omega_my*phin_my)*
-                 (omega_py*phim_py - omega_my*phim_my));
-}
 
 double left_under_int(double x, double y, int m, int n)
 {
