@@ -1,8 +1,0 @@
-#!/bin/bash
-
-#gcc -L/usr/local/lib "main.c" -lgsl -lgslcblas -lm -g -O3 -o ../bin/solver
-gcc -c -I/usr/local/include "main.c" -g -O3 -o ../bin/main.o
-gcc -c basis_functions.c -lm -g -O3 -o ../bin/basis_functions.o
-gcc -o ../bin/solver ../bin/main.o ../bin/basis_functions.o -lgsl -lcblas -lm
-
-cp ../bin/solver ~/bin
