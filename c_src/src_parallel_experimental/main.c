@@ -30,7 +30,7 @@ double basis(double x, double y, int n)
 }
 
 #include "plotters.c"
-#include "simpson_integrals.c"
+#include "gauss_integrals.c"
 #include "error_functions.c"
 
 
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
     //double a = A, b = B;
     N = atoi(argv[1]);
     intStep = (double) atoi(argv[2]);
-
+	initGaussInt();
     init_eq(atoi(argv[3]));
     init_basis(atoi(argv[4]));
     diff_step = pow(2.,-9);
