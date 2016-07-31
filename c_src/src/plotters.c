@@ -23,26 +23,26 @@ void multiplot(gsl_vector *solution,
     op = fopen("../plot_data/plot_region", "w");
     for(i=x1; i<=x2; i+=hx)
         for(j=y1; j<=y2; j+=hy)
-            fprintf(op, "%f %f %f\n", i,j, reconstruct_at(solution,i,j));
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
     fclose(op);
 
     op = fopen("../plot_data/plot_exact_solution", "w");
     for(i=x1; i<=x2; i+=hx)
         for(j=y1; j<=y2; j+=hy)
-            fprintf(op, "%f %f %f\n", i,j, u_exact(i,j));
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, u_exact(i,j));
     fclose(op);
 
     op = fopen("../plot_data/plot_plot_omega", "w");
 
     for(i=x1; i<=x2; i+=hx)
         for(j=y1; j<=y2; j+=hy)
-            fprintf(op, "%f %f %f\n", i,j, omega(i,j));
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, omega(i,j));
     fclose(op);
 
     op = fopen("../plot_data/plot_region_error", "w");
     for(i=x1; i<=x2; i+=hx)
         for(j=y1; j<=y2; j+=hy)
-            fprintf(op, "%f %f %f\n", i,j, fabs(reconstruct_at(solution,i,j)-u_exact(i,j)));
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, fabs(reconstruct_at(solution,i,j)-u_exact(i,j)));
     fclose(op);
 
     i = system("../bin/plotter_experimental.py &");
@@ -64,7 +64,7 @@ void plot_region(gsl_vector *solution,
     op = fopen("../plot_data/plot_region", "w");
     for(i=x1; i<=x2; i+=hx)
         for(j=y1; j<=y2; j+=hy)
-            fprintf(op, "%f %f %f\n", i,j, reconstruct_at(solution,i,j));
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
     fclose(op);
     i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");
 }
@@ -84,7 +84,7 @@ void plot_exact_solution(double x1, double x2,
 
     for(i=x1; i<=x2; i+=hx)
         for(j=y1; j<=y2; j+=hy)
-            fprintf(op, "%f %f %f\n", i,j, u_exact(i,j));
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, u_exact(i,j));
     fclose(op);
     i = system("../bin/plotter.py ../plot_data/plot_exact_solution Exact &");
 }
@@ -105,7 +105,7 @@ void plot_omega
 
     for(i=x1; i<=x2; i+=hx)
         for(j=y1; j<=y2; j+=hy)
-            fprintf(op, "%f %f %f\n", i,j, omega(i,j));
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, omega(i,j));
     fclose(op);
     i = system("../bin/plotter.py ../plot_data/plot_plot_omega Omega &");
 }
@@ -124,7 +124,7 @@ void plot_region_error(gsl_vector *solution,
     op = fopen("../plot_data/plot_region_error", "w");
     for(i=x1; i<=x2; i+=hx)
         for(j=y1; j<=y2; j+=hy)
-            fprintf(op, "%f %f %f\n", i,j, fabs(reconstruct_at(solution,i,j)-u_exact(i,j)));
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, fabs(reconstruct_at(solution,i,j)-u_exact(i,j)));
     fclose(op);
     i = system("../bin/plotter.py ../plot_data/plot_region_error Error &");
 }

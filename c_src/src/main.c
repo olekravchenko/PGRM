@@ -154,7 +154,7 @@ void form_matrix (gsl_matrix * system,
     int i, j;
     for(i = 0; i < N*N; i++)
     {
-        gsl_vector_set(RightPart, i, -integralRight(right_part_f,basis,x1,x2,y1,y2,i));
+        gsl_vector_set(RightPart, i, integralRight(right_part_f,basis,x1,x2,y1,y2,i));
         for(j = 0; j < N*N; j++)
         {
             gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
@@ -206,8 +206,8 @@ int main(int argc, char **argv)
     gsl_vector  *rightpart	= gsl_vector_alloc(N*N);
     //*solution	= gsl_vector_alloc(N*N);
     solution_glob = gsl_vector_alloc(N*N);
-    //form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
-    form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
+    form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
+    //form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
 
     //FILE *op;
     //op = fopen("./matrix", "w");
