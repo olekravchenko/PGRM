@@ -19,7 +19,17 @@ double chebishov_1d(double x, int n)
         return 8.*x*x*(x*x-1.)+1.;
     if(n == 5)
         return 4.*x*x*x*(4.*x*x-5.)+5.*x;
-    if(n > 5)
+    if(n == 6)
+		return -1. + x*x*(18. + x*x*(-48. + 32.*x*x));
+	if(n == 7)
+        return x*(-7. + x*x*(56. + x*x*(-112. + 64.*x*x)));
+    if(n == 8)
+		return 1. + x*x*(-32. + x*x*(160. + x*x*(-256. + 128.*x*x)));
+    if(n == 9)
+		return x*(9. + x*x*(-120. + x*x*(432. + x*x*(-576. + 256.*x*x))));
+    if(n == 10)
+		return -1. + x*x*(50. + x*x*(-400. + x*x*(1120. + x*x*(-1280. + 512.*x*x))));
+    if(n > 10)
         return 2.*x*chebishov_1d(x,n-1)-chebishov_1d(x,n-2);    
     return 0.;
 }
