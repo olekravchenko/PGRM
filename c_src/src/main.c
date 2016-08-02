@@ -20,7 +20,14 @@ double omega(double x, double y)
 // Returns value of R-function \omega(x,y)
 // ToDo: modify for random bound positions
 {
-	return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
+	//return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
+	return (442 - 225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+     Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y) - 
+     225*Sqrt(Power(-2 + x*x + y*y + 
+          Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y),2) + 
+        Power(-8 + 225*x*x + 225*y*y + 
+           Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y),2)/50625.))/225.;
 }
 
 double basis(double x, double y, int n)
@@ -128,9 +135,9 @@ int main(int argc, char **argv)
 
     solve_matrix_eq	(solution_glob, sys, rightpart);
     //solution_glob = solution;
-    errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
-    multiplot		(solution_glob, X0,X1, Y0,Y1);
-    //plot_region		(solution_glob, X0,X1, Y0,Y1);
+    //errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
+    //multiplot		(solution_glob, X0,X1, Y0,Y1);
+    plot_region		(solution_glob, X0,X1, Y0,Y1);
     //plot_region_error	(solution_glob, X0,X1, Y0,Y1);
     //plot_exact_solution	(X0,X1, Y0,Y1);
     //plot_omega		(X0,X1, Y0,Y1);

@@ -2,6 +2,119 @@ double (*right_part_f)(double, double);
 double (*u_exact)(double, double);
 double X0, X1, Y0, Y1;
 //int N;
+#define Power pow
+#define Sqrt sqrt
+double f6(double x, double y)
+{
+	return -(225.*y*(405000.*Power((-2.*x*(-1. + x*x))/
+           Sqrt(2. - 2.*x*x + x*x*x*x - 2.*y*y + y*y*y*y) + 
+          (-8.*x + 450.*x*x*x)/
+           Sqrt(32. - 1800.*x*x + 50625.*x*x*x*x - 1800.*y*y + 
+             50625.*y*y*y*y),2)*(-0.035555555555555556 + x*x + y*y + 
+          Sqrt(32. - 1800.*x*x + 50625.*x*x*x*x - 1800.*y*y + 
+             50625.*y*y*y*y)/225.) + 
+       405000.*Power((-2.*y*(-1. + y*y))/
+           Sqrt(2. - 2.*x*x + x*x*x*x - 2.*y*y + y*y*y*y) + 
+          (-8.*y + 450.*y*y*y)/
+           Sqrt(32. - 1800.*x*x + 50625.*x*x*x*x - 1800.*y*y + 
+             50625.*y*y*y*y),2)*(-0.035555555555555556 + x*x + y*y + 
+          Sqrt(32. - 1800.*x*x + 50625.*x*x*x*x - 1800.*y*y + 
+             50625.*y*y*y*y)/225.) - 
+       225.*((16.*Power(-x + x*x*x,2))/
+           Power(2. - 2.*x*x + x*x*x*x - 2.*y*y + y*y*y*y,1.5) + 
+          (8. - 24.*x*x)/
+           Sqrt(2. - 2.*x*x + x*x*x*x - 2.*y*y + y*y*y*y) - 
+          (3600.*Power(-4.*x + 225.*x*x*x,2))/
+           Power(32. - 1800.*x*x + 50625.*x*x*x*x - 1800.*y*y + 
+             50625.*y*y*y*y,1.5) + 
+          (8.*(-4. + 675.*x*x))/
+           Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y))*(-0.035555555555555556 + x*x + y*y + 
+          Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y)/225.)*
+        (442 - 225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+          Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y)
+          ) - 225*((16*Power(-y + y*y*y,2))/
+           Power(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y,1.5) + 
+          (8 - 24*y*y)/
+           Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) - 
+          (3600*Power(-4*y + 225*y*y*y,2))/
+           Power(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y,1.5) + 
+          (8*(-4 + 675*y*y))/
+           Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y))*(-0.035555555555555556 + x*x + y*y + 
+          Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y)/225.)*
+        (442 - 225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+          Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y)
+          ) + 4*(2 - (900*Power(-4*x + 225*x*x*x,2))/
+           Power(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y,1.5) + 
+          (2*(-4 + 675*x*x))/
+           Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y))*Power(442 - 
+          225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+          Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y)
+          ,2) + 4*(2 - (900*Power(-4*y + 225*y*y*y,2))/
+           Power(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y,1.5) + 
+          (2*(-4 + 675*y*y))/
+           Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y))*Power(442 - 
+          225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+          Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y)
+          ,2) + (16*(-4 + 225*y*y + 
+            Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+              50625*y*y*y*y))*Power(442 - 
+            225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+            Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+              50625*y*y*y*y),2))/
+        Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y)\
+        + (7200*x*x*(-4 + 225*x*x + 
+            Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+              50625*y*y*y*y))*(442 - 
+            225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+            Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+              50625*y*y*y*y))*(4*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + 
+               y*y*y*y) - Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 
+              1800*y*y + 50625*y*y*y*y) + 
+            x*x*(-225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + 
+                  y*y*y*y) + Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 
+                 1800*y*y + 50625*y*y*y*y))))/
+        (Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)*
+          (32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y)) + 
+       (7200*y*y*(-4 + 225*y*y + 
+            Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+              50625*y*y*y*y))*(442 - 
+            225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+            Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+              50625*y*y*y*y))*(4*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + 
+               y*y*y*y) - Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 
+              1800*y*y + 50625*y*y*y*y) + 
+            y*y*(-225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + 
+                  y*y*y*y) + Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 
+                 1800*y*y + 50625*y*y*y*y))))/
+        (Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)*
+          (32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y)) + 
+       (16*(-8 + 225*x*x + 225*y*y + 
+            Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+              50625*y*y*y*y))*(442 - 
+            225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+            Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+              50625*y*y*y*y))*(4*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + 
+               y*y*y*y) - Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 
+              1800*y*y + 50625*y*y*y*y) + 
+            y*y*(-225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + 
+                  y*y*y*y) + Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 
+                 1800*y*y + 50625*y*y*y*y))))/
+        (Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)*
+          Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y)
+          )))/(4.*Power(442 - 225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + 
+          y*y*y*y) + Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+         50625*y*y*y*y),3));
+}
+
 double f5(double x, double y) {return exp(x+y)*2. - 2.*exp(x+y)*((x-X0)*(x-X1)*(y-Y0)*(y-Y1)+(x-X0)*(x-X1)*(y-Y0)+(x-X0)*(x-X1)*(y-Y1)+(x-X0)*(x-X1)+(x-X0)*(y-Y0)*(y-Y1)+(x-X1)*(y-Y0)*(y-Y1)+(y-Y0)*(y-Y1));}
 double u5(double x, double y) {return exp(x+y);}
 
@@ -71,4 +184,14 @@ void init_eq(int id)
         Y0 =  0.;
         Y1 =  3.;
     }
+    if(id == 6)
+    {
+        right_part_f = &f6;
+        u_exact 	 = &u5;
+        X0 =  -1.;
+        X1 =  1.;
+        Y0 =  -1.;
+        Y1 =  1.;
+    }    
+
 }
