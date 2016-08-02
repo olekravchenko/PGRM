@@ -8,7 +8,7 @@ double reconstruct_at(gsl_vector *solution,
     {
         result += gsl_vector_get(solution, i)*basis(x,y,i);
     }
-    return result;
+    return result+f_boundary(x,y);
 }
 
 void multiplot(gsl_vector *solution,

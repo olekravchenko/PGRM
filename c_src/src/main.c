@@ -15,12 +15,11 @@ double intStep, glob_delta;
 double diff_step;
 
 
-
+/*
 double omega(double x, double y)
 // Returns value of R-function \omega(x,y)
 // ToDo: modify for random bound positions
 {
-	//return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
 	return (442 - 225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
      Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y) - 
      225*Sqrt(Power(-2 + x*x + y*y + 
@@ -28,7 +27,7 @@ double omega(double x, double y)
         Power(-8 + 225*x*x + 225*y*y + 
            Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
              50625*y*y*y*y),2)/50625.))/225.;
-}
+}*/
 
 double basis(double x, double y, int n)
 // Returns value of n-th \psi-basis function, used further, at point (x,y)

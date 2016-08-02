@@ -1,5 +1,7 @@
 double (*right_part_f)(double, double);
 double (*u_exact)(double, double);
+double (*f_boundary)(double, double);
+double (*omega)(double, double);
 double X0, X1, Y0, Y1;
 //int N;
 #define Power pow
@@ -114,6 +116,23 @@ double f6(double x, double y)
           y*y*y*y) + Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
          50625*y*y*y*y),3));
 }
+double bf6(double x, double y)
+{
+	return (y*(-8 + 225*x*x + 225*y*y + 
+       Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y)))/
+   (442 - 225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+     Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y));
+}
+double o6(double x, double y)
+{
+	return (442 - 225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+     Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y) - 
+     225*Sqrt(Power(-2 + x*x + y*y + 
+          Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y),2) + 
+        Power(-8 + 225*x*x + 225*y*y + 
+           Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
+             50625*y*y*y*y),2)/50625.))/225.;
+}
 
 double f5(double x, double y) {return exp(x+y)*2. - 2.*exp(x+y)*((x-X0)*(x-X1)*(y-Y0)*(y-Y1)+(x-X0)*(x-X1)*(y-Y0)+(x-X0)*(x-X1)*(y-Y1)+(x-X0)*(x-X1)+(x-X0)*(y-Y0)*(y-Y1)+(x-X1)*(y-Y0)*(y-Y1)+(y-Y0)*(y-Y1));}
 double u5(double x, double y) {return exp(x+y);}
@@ -135,12 +154,16 @@ static double (*f_s)(double, double);
 static double (*u_s)(double, double);
 */
 
+double laplace_f(double x, double y){return 0.;}
+double omega_rectangle(double x, double y){return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);}
 void init_eq(int id)
 {
     if(id == 1)
     {
         right_part_f = &f1;
         u_exact 	 = &u1;
+        f_boundary	 = &laplace_f;
+        omega		 = &omega_rectangle;
         X0 = -1.;
         X1 =  1.;
         Y0 = -1.;
@@ -151,6 +174,8 @@ void init_eq(int id)
     {
         right_part_f = &f2;
         u_exact 	 = &u2;
+        f_boundary	 = &laplace_f;
+        omega		 = &omega_rectangle;
         X0 = -1.;
         X1 =  1.;
         Y0 = -1.;
@@ -161,6 +186,8 @@ void init_eq(int id)
     {
         right_part_f = &f3;
         u_exact 	 = &u3;
+        f_boundary	 = &laplace_f;
+        omega		 = &omega_rectangle;
         X0 = 0.;
         X1 =  2.*M_PI;
         Y0 = 0.;
@@ -170,6 +197,8 @@ void init_eq(int id)
     {
         right_part_f = &f4;
         u_exact 	 = &u4;
+        f_boundary	 = &laplace_f;
+        omega		 = &omega_rectangle;
         X0 = -5.;
         X1 =  5.;
         Y0 = -1.;
@@ -179,6 +208,8 @@ void init_eq(int id)
     {
         right_part_f = &f5;
         u_exact 	 = &u5;
+        f_boundary	 = &laplace_f;
+        omega		 = &omega_rectangle;
         X0 =  0.;
         X1 =  3.;
         Y0 =  0.;
@@ -188,6 +219,8 @@ void init_eq(int id)
     {
         right_part_f = &f6;
         u_exact 	 = &u5;
+        f_boundary	 = &bf6;
+        omega		 = &o6;
         X0 =  -1.;
         X1 =  1.;
         Y0 =  -1.;
