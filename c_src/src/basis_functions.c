@@ -97,9 +97,15 @@ void init_basis(int id)
     //	if(id == 1)
     phi = &cubic_b_splines;
     if(id == 2)
-        phi = &polynomial;
+    {
+	    phi = &polynomial;
+	}
     if(id == 3)
+    {
         phi = &chebishov_2d;
+	}
 	if(id == 4)
+	{
 		phi = &chebishov_2dU;
+	}
 }
