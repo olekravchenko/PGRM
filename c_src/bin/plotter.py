@@ -23,7 +23,7 @@ X, Y = np.meshgrid(xi, yi)
 Z = griddata(x, y, z, xi, yi)
 
 surf = ax.plot_surface(X, Y, Z, rstride=2, cstride=2, cmap=cm.jet,
-                       linewidth=0.02, antialiased=True)
+                       linewidth=0.02, antialiased=False)
 
 ax.set_zlim3d(np.min(Z), np.max(Z))
 fig.colorbar(surf)
