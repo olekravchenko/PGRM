@@ -15,25 +15,21 @@ double intStep, glob_delta;
 double diff_step;
 
 
-/*
-double omega(double x, double y)
-// Returns value of R-function \omega(x,y)
-// ToDo: modify for random bound positions
-{
-	return (442 - 225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
-     Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y) - 
-     225*Sqrt(Power(-2 + x*x + y*y + 
-          Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y),2) + 
-        Power(-8 + 225*x*x + 225*y*y + 
-           Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 
-             50625*y*y*y*y),2)/50625.))/225.;
-}*/
-
 double basis(double x, double y, int n)
 // Returns value of n-th \psi-basis function, used further, at point (x,y)
 {
-		return phi(x,y,n)*omega(x,y);
+    return phi(x,y,n)*omega(x,y);
+
 }
+
+//double basis(double x, double y, int n)
+//{
+    //return basis1(x,y,n)-omega(x,y)*
+           //((omega(x+glob_delta,y)-omega(x-glob_delta,y))*(basis1(x+glob_delta,y,n)-basis1(x-glob_delta,y,n))*0.25/glob_delta/glob_delta+
+            //(omega(x,y+glob_delta)-omega(x,y-glob_delta))*(basis1(x,y+glob_delta,n)-basis1(x,y-glob_delta,n))*0.25/glob_delta/glob_delta);
+//}
+
+
 
 #include "plotters.c"
 #include "gauss_integrals.c" //todo: reduce file to single function
