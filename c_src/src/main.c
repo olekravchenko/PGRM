@@ -15,19 +15,19 @@ double intStep, glob_delta;
 double diff_step;
 
 
-double basis(double x, double y, int n)
+double basis1(double x, double y, int n)
 // Returns value of n-th \psi-basis function, used further, at point (x,y)
 {
     return phi(x,y,n)*omega(x,y);
 
 }
 
-//double basis(double x, double y, int n)
-//{
-    //return basis1(x,y,n)-omega(x,y)*
-           //((omega(x+glob_delta,y)-omega(x-glob_delta,y))*(basis1(x+glob_delta,y,n)-basis1(x-glob_delta,y,n))*0.25/glob_delta/glob_delta+
-            //(omega(x,y+glob_delta)-omega(x,y-glob_delta))*(basis1(x,y+glob_delta,n)-basis1(x,y-glob_delta,n))*0.25/glob_delta/glob_delta);
-//}
+double basis(double x, double y, int n)
+{
+    return basis1(x,y,n)-omega(x,y)*
+           ((omega(x+glob_delta,y)-omega(x-glob_delta,y))*(basis1(x+glob_delta,y,n)-basis1(x-glob_delta,y,n))*0.25/glob_delta/glob_delta+
+            (omega(x,y+glob_delta)-omega(x,y-glob_delta))*(basis1(x,y+glob_delta,n)-basis1(x,y-glob_delta,n))*0.25/glob_delta/glob_delta);
+}
 
 
 
