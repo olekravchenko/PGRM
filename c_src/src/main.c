@@ -29,6 +29,13 @@ double basis(double x, double y, int n)
 			glob_delta*glob_delta*0.25;
 }
 
+//Mixed boundary problem
+double basis2(double x, double y)
+{
+	return 0.;
+	//requires two omega functions
+	//now it'll be the main target
+}
 
 
 #include "plotters.c"
