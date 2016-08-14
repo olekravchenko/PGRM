@@ -1,11 +1,26 @@
-double (*right_part_f)(double, double);
-double (*u_exact)(double, double);
-double (*f_boundary)(double, double);
-double (*omega)(double, double);
+double (*right_part_f)	(double, double);
+double (*u_exact)		(double, double);
+double (*f_boundary)	(double, double);
+double (*omega)			(double, double);
+double (*omega2)		(double, double);
 double X0, X1, Y0, Y1;
 //int N;
 #define Power pow
 #define Sqrt sqrt
+
+double o9(double x, double y)
+{
+	return 0.5*(1.-x*x);
+}
+double o9_2(double x, double y)
+{
+	return 0.5*(1.-y*y);
+}
+double bf9(double x, double y)
+{
+	return x;
+}
+
 
 double f_num(double x, double y)
 {
