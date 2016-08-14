@@ -324,5 +324,15 @@ void init_eq(int id)
         Y0 =  -1.;
         Y1 =  1.;
     }    
-
+	if(id == 9)
+	{
+        right_part_f = &f_num;
+        u_exact 	 = &u5;
+        f_boundary	 = &bf9;
+        omega		 = &o9;
+        omega2		 = &o9_2;
+        X0 =  -1.;
+        X1 =  1.;
+        Y0 =  -1.;
+        Y1 =  1.;	}
 }
