@@ -32,7 +32,7 @@ double basis2(double x, double y, int n)
 //Mixed boundary problem
 double basis(double x, double y, int n)
 {
-	return 	phi(x,y,n)-omega(x,y)*omega2(x,y)/(omega(x,y)+omega2(x,y))*
+	return 	basis1(x,y,n)-omega(x,y)*omega2(x,y)/(omega(x,y)+omega2(x,y))*
 			((omega2(x+diff_step,y)-omega2(x-diff_step,y))*(basis1(x+diff_step,y,n)-basis1(x-diff_step,y,n))
 			+(omega2(x,y+diff_step)-omega2(x,y-diff_step))*(basis1(x,y+diff_step,n)-basis1(x,y-diff_step,n)))*
 			glob_delta*glob_delta*0.25;

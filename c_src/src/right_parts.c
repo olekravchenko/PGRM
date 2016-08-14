@@ -8,6 +8,29 @@ double X0, X1, Y0, Y1;
 #define Power pow
 #define Sqrt sqrt
 
+double o10_2(double x, double y)
+{
+	return 0.4 + 2.5*x*x + 2.*y*y - 
+   2.5*Sqrt(0.0416 + x*x*x*x - 0.16*y*y + 1.04*y*y*y*y + 
+      x*x*(-0.08 + 2.*y*y));
+}
+double bf10(double x, double y)
+{
+	return x - (6.25*x*(-1. + x*x)*
+      (0.19999999999999996 + 1.25*x*x + 1.*y*y - 
+        1.25*Sqrt(0.0416 + x*x*x*x - 0.16*y*y + 1.04*y*y*y*y + 
+           x*x*(-0.08 + 2.*y*y)))*
+      (-0.04 + 1.*x*x + 1.*y*y - 
+        1.*Sqrt(0.0416 + x*x*x*x - 0.16*y*y + 1.04*y*y*y*y + 
+           x*x*(-0.08 + 2.*y*y))))/
+    (Sqrt(0.25*Power(-1. + y*y,2) + 
+        (25*Power(-0.04 + x*x + y*y,2))/4.)*
+      (0.45 + 1.*x*x + 1.*y*y - 
+        1.25*Sqrt(0.0416 + x*x*x*x - 0.16*y*y + 1.04*y*y*y*y + 
+           x*x*(-0.08 + 2.*y*y))));
+}
+
+
 double o9(double x, double y)
 {
 	return 0.5*(1.-x*x);
@@ -334,5 +357,18 @@ void init_eq(int id)
         X0 =  -1.;
         X1 =  1.;
         Y0 =  -1.;
-        Y1 =  1.;	}
+        Y1 =  1.;	
+    }
+	if(id == 10)
+	{
+        right_part_f = &f_num;
+        u_exact 	 = &u5;
+        f_boundary	 = &bf10;
+        omega		 = &o9;
+        omega2		 = &o10_2;
+        X0 =  -1.;
+        X1 =  1.;
+        Y0 =  -1.;
+        Y1 =  1.;	
+    }
 }
