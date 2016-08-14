@@ -5,7 +5,7 @@ double polynomial (double x, double y, int n)
     return pow(x,n%N)*pow(y,n/N);
 }
 
-double chebishov_1d(double x, int n)
+double chebyshev_1d(double x, int n)
 {
     if(n == 0)
         return 1.;
@@ -30,16 +30,16 @@ double chebishov_1d(double x, int n)
     if(n == 10)
 		return -1. + x*x*(50. + x*x*(-400. + x*x*(1120. + x*x*(-1280. + 512.*x*x))));
     if(n > 10)
-        return 2.*x*chebishov_1d(x,n-1)-chebishov_1d(x,n-2);    
+        return 2.*x*chebyshev_1d(x,n-1)-chebyshev_1d(x,n-2);    
     return 0.;
 }
 
-double chebishov_2d(double x, double y, int n)
+double chebyshev_2d(double x, double y, int n)
 {
-    return chebishov_1d(x/(X1-X0),n%N)*chebishov_1d(y/(Y1-Y0),n/N);
+    return chebyshev_1d(x/(X1-X0),n%N)*chebyshev_1d(y/(Y1-Y0),n/N);
 }
 
-double chebishov_1dU(double x, int n)
+double chebyshev_1dU(double x, int n)
 {
 	if(n == 0)
 		return 1.;
@@ -64,12 +64,12 @@ double chebishov_1dU(double x, int n)
 	if(n == 10)
 		return -1. + x*x*(60. + x*x*(-560. + x*x*(1792. + x*x*(-2304. + 1024.*x*x))));
     if(n > 10)
-        return 2.*x*chebishov_1dU(x,n-1)-chebishov_1dU(x,n-2);
+        return 2.*x*chebyshev_1dU(x,n-1)-chebyshev_1dU(x,n-2);
     return 0.;	
 }
-double chebishov_2dU(double x, double y, int n)
+double chebyshev_2dU(double x, double y, int n)
 {
-    return chebishov_1dU(x/(X1-X0),n%N)*chebishov_1dU(y/(Y1-Y0),n/N);
+    return chebyshev_1dU(x/(X1-X0),n%N)*chebyshev_1dU(y/(Y1-Y0),n/N);
 }
 
 double cubic_stepx, cubic_stepy;
@@ -102,10 +102,10 @@ void init_basis(int id)
 	}
     if(id == 3)
     {
-        phi = &chebishov_2d;
+        phi = &chebyshev_2d;
 	}
 	if(id == 4)
 	{
-		phi = &chebishov_2dU;
+		phi = &chebyshev_2dU;
 	}
 }

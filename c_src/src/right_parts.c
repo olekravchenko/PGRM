@@ -7,36 +7,64 @@ double X0, X1, Y0, Y1;
 #define Power pow
 #define Sqrt sqrt
 
+double f_num(double x, double y)
+{
+	return -(f_boundary(x+diff_step,y)+f_boundary(x-diff_step,y)+
+			f_boundary(x,y+diff_step)+f_boundary(x,y-diff_step)-
+			4.*f_boundary(x,y))*glob_delta*glob_delta;
+}
+
 double f7(double x, double y)
 {
-	return -((x*(Power(x,12) - 2*Power(y,12) + Power(y,4)*(60 - 44*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) - 16*(-1 + Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-         Power(y,10)*(9 + Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + Power(x,10)*(-7 - 3*Power(y,2) + Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) - 
-         2*Power(y,8)*(3 + 4*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 8*Power(y,2)*(-6 + 5*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-         Power(y,6)*(-24 + 26*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-         2*Power(x,6)*(5*Power(y,6) + Power(y,2)*(24 - 10*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-            13*(-2 + Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + Power(y,4)*(-33 + 2*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4)))) + 
-         Power(x,8)*(22 + 8*Power(y,4) - 8*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4)) + Power(y,2)*(5 + 3*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4)))) + 
-         Power(x,4)*(76 + 9*Power(y,8) - 44*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4)) - 24*Power(y,4)*(-7 + Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-            18*Power(y,2)*(-8 + 3*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + Power(y,6)*(-54 + 4*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4)))) + 
-         Power(x,2)*(9*Power(y,10) + 3*Power(y,8)*(-21 + Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) - 
-            4*Power(y,6)*(-42 + 5*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 8*(-8 + 5*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) - 
-            8*Power(y,2)*(-23 + 9*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + Power(y,4)*(-260 + 54*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))))))/
-     (Power(-2 + Power(x,2) + Power(y,2),3)*Power(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4),1.5)));
+	return (x*(-8*Power(x,2)*(-1 + Power(y,2))*(-2 + Power(x,2) + Power(y,2))*
+        (1 + (-1 + Power(x,2))/
+           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
+       4*(-1 + Power(y,2))*Power(-2 + Power(x,2) + Power(y,2),2)*
+        (1 + (-1 + Power(x,2))/
+           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
+       (-1 + Power(y,2))*Power(-2 + Power(x,2) + Power(y,2),2)*
+        (2 - (4*Power(-x + Power(x,3),2))/
+           Power(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4),1.5) + 
+          (-2 + 6*Power(x,2))/
+           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) - 
+       8*Power(y,2)*(-1 + Power(y,2))*(-2 + Power(x,2) + Power(y,2))*
+        (1 + (-1 + Power(y,2))/
+           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
+       8*Power(y,2)*Power(-2 + Power(x,2) + Power(y,2),2)*
+        (1 + (-1 + Power(y,2))/
+           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
+       (-1 + Power(y,2))*Power(-2 + Power(x,2) + Power(y,2),2)*
+        (2 - (4*Power(-y + Power(y,3),2))/
+           Power(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4),1.5) + 
+          (-2 + 6*Power(y,2))/
+           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
+       8*Power(x,2)*(-1 + Power(y,2))*
+        (-2 + Power(x,2) + Power(y,2) + 
+          Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
+       8*Power(y,2)*(-1 + Power(y,2))*
+        (-2 + Power(x,2) + Power(y,2) + 
+          Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) - 
+       8*Power(y,2)*(-2 + Power(x,2) + Power(y,2))*
+        (-2 + Power(x,2) + Power(y,2) + 
+          Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) - 
+       8*(-1 + Power(y,2))*(-2 + Power(x,2) + Power(y,2))*
+        (-2 + Power(x,2) + Power(y,2) + 
+          Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
+       2*Power(-2 + Power(x,2) + Power(y,2),2)*
+        (-2 + Power(x,2) + Power(y,2) + 
+          Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4)))))/
+   (2.*Power(-2 + Power(x,2) + Power(y,2),3));
 }
 double bf7(double x, double y)
 {
-	return -(x*(1 - Power(y,2))*((1 - Power(x,2))/2. + (1 - Power(y,2))/2. - Sqrt(Power(1 - Power(x,2),2)/4. + Power(1 - Power(y,2),2)/4.)))/(2.*((1 - Power(x,2))/2. + (1 - Power(y,2))/2.));
+	return -(x*(-1 + Power(y,2))*(-2 + Power(x,2) + Power(y,2) + 
+        Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))))/
+   (2.*(-2 + Power(x,2) + Power(y,2)));
 }
 double o7(double x, double y)
 {
-	return (52 + 195*Power(x,2) + 195*Power(y,2) - 
-     30*Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4)) + 
-     Sqrt(32 - 1800*Power(x,2) + 50625*Power(x,4) - 1800*Power(y,2) + 50625*Power(y,4)) - 
-     60*Sqrt(Power(-2 + Power(x,2) + Power(y,2) + 
-           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4)),2)/4. + 
-        Power(-8 + 225*Power(x,2) + 225*Power(y,2) + 
-           Sqrt(32 - 1800*Power(x,2) + 50625*Power(x,4) - 1800*Power(y,2) + 
-             50625*Power(y,4)),2)/3600.))/60.;
+	return (2 - Power(x,2) - Power(y,2) - Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + 
+       Power(y,4)))/2.;
 }
 
 double f6(double x, double y)
@@ -262,6 +290,17 @@ void init_eq(int id)
     if(id == 7)
     {
         right_part_f = &f7;
+        u_exact 	 = &u5;
+        f_boundary	 = &bf7;
+        omega		 = &o7;
+        X0 =  -1.;
+        X1 =  1.;
+        Y0 =  -1.;
+        Y1 =  1.;
+    }    
+    if(id == 8)
+    {
+        right_part_f = &f_num;
         u_exact 	 = &u5;
         f_boundary	 = &bf7;
         omega		 = &o7;

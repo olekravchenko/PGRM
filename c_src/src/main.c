@@ -8,25 +8,25 @@
 #include "smplDynArray.c"
 int N;
 double intStep, glob_delta;
+double diff_step;
 
 #include "right_parts.c"
 #include "basis_functions.c"
 
-double diff_step;
 
 
 double basis1(double x, double y, int n)
 // Returns value of n-th \psi-basis function, used further, at point (x,y)
 {
     return phi(x,y,n)*omega(x,y);
-
 }
 
 double basis(double x, double y, int n)
 {
-    return basis1(x,y,n)-omega(x,y)*
-           ((omega(x+glob_delta,y)-omega(x-glob_delta,y))*(basis1(x+glob_delta,y,n)-basis1(x-glob_delta,y,n))*0.25/glob_delta/glob_delta+
-            (omega(x,y+glob_delta)-omega(x,y-glob_delta))*(basis1(x,y+glob_delta,n)-basis1(x,y-glob_delta,n))*0.25/glob_delta/glob_delta);
+	return 	phi(x,y,n)-omega(x,y)*
+			((omega(x+diff_step,y)-omega(x-diff_step,y))*(phi(x+diff_step,y,n)-phi(x-diff_step,y,n))
+			+(omega(x,y+diff_step)-omega(x,y-diff_step))*(phi(x,y+diff_step,n)-phi(x,y-diff_step,n)))*
+			glob_delta*glob_delta*0.25;
 }
 
 
@@ -36,23 +36,31 @@ double basis(double x, double y, int n)
 #include "error_functions.c" 
 
 
+//double left_under_int(double x, double y, int m, int n)
+//{
+ //// \phi_m \Delta \phi_n 
+    //double  omega_0  = omega(x,y),
+			//omega_px = omega(x + diff_step, y),
+            //omega_mx = omega(x - diff_step, y),
+            //omega_py = omega(x, y + diff_step),
+            //omega_my = omega(x, y - diff_step),
+            //phin_px  = phi(x+diff_step,y,n),
+            //phin_py  = phi(x,y+diff_step,n),
+            //phin_mx  = phi(x-diff_step,y,n),
+            //phin_my  = phi(x,y-diff_step,n);
+
+    //return omega_0*phi(x,y,m)*glob_delta*glob_delta*
+			//(omega_px*phin_px + omega_mx*phin_mx + 
+			//omega_py*phin_py + omega_my*phin_my - 4.*omega_0*phi(x,y,n));
+    
+//}
 double left_under_int(double x, double y, int m, int n)
 {
  // \phi_m \Delta \phi_n 
-    double  omega_0  = omega(x,y),
-			omega_px = omega(x + diff_step, y),
-            omega_mx = omega(x - diff_step, y),
-            omega_py = omega(x, y + diff_step),
-            omega_my = omega(x, y - diff_step),
-            phin_px  = phi(x+diff_step,y,n),
-            phin_py  = phi(x,y+diff_step,n),
-            phin_mx  = phi(x-diff_step,y,n),
-            phin_my  = phi(x,y-diff_step,n);
-
-    return omega_0*phi(x,y,m)*glob_delta*glob_delta*
-			(omega_px*phin_px + omega_mx*phin_mx + 
-			omega_py*phin_py + omega_my*phin_my - 4.*omega_0*phi(x,y,n));
-    
+    return basis(x,y,m)*(
+			basis(x+diff_step,y,n)+basis(x-diff_step,y,n)+
+			basis(x,y+diff_step,n)+basis(x,y-diff_step,n)
+			-4.*basis(x,y,n))*glob_delta*glob_delta;
 }
 
 /*
@@ -127,6 +135,11 @@ int main(int argc, char **argv)
     solution_glob = gsl_vector_alloc(N*N);
     form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
     //form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
+	FILE* matr_op;
+	matr_op = fopen("matrix.txt","w");
+	gsl_matrix_fprintf(matr_op,sys,"%3.3f");
+	fclose(matr_op);
+
 
     solve_matrix_eq	(solution_glob, sys, rightpart);
     //solution_glob = solution;
