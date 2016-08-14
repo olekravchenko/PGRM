@@ -7,20 +7,20 @@
 #include <pthread.h>
 #include "smplDynArray.c"
 int N;
-double intStep, glob_delta;
-double diff_step;
+double intStep, glob_delta, diff_step;
 
 #include "right_parts.c"
 #include "basis_functions.c"
 
 
-
+//Dirichlet problem structure
 double basis1(double x, double y, int n)
 // Returns value of n-th \psi-basis function, used further, at point (x,y)
 {
     return phi(x,y,n)*omega(x,y);
 }
 
+//Neumann problem structure
 double basis(double x, double y, int n)
 {
 	return 	phi(x,y,n)-omega(x,y)*

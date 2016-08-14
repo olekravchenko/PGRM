@@ -7,6 +7,7 @@ double polynomial (double x, double y, int n)
 
 double chebyshev_1d(double x, int n)
 {
+	n++;
     if(n == 0)
         return 1.;
     if(n == 1)
@@ -81,7 +82,13 @@ double cubic_b_splines (double x, double y, int n)
     return f_B_3(0.5*cubic_stepx*(x-cubic_stepx*(double)(n%(N))))*
            f_B_3(0.5*cubic_stepy*(y-cubic_stepy*(double)(n/(N))));
 }
-
+double cubic_b_splines_2 (double x, double y, int n)
+{
+    cubic_stepx = (X1-X0)/(double)(N-1);
+    cubic_stepy = (Y1-Y0)/(double)(N-1);
+    return f_B_3(N/(X1-X0)*cubic_stepx*(x-X0-cubic_stepx*(double)(n%(N))))*
+           f_B_3(N/(Y1-Y0)*cubic_stepy*(y-Y0-cubic_stepy*(double)(n/(N))));
+}
 
 double fup_basis (double x, double y, int n)
 {
@@ -107,5 +114,9 @@ void init_basis(int id)
 	if(id == 4)
 	{
 		phi = &chebyshev_2dU;
+	}
+    if(id == 5)
+    {
+	    phi = &cubic_b_splines_2;
 	}
 }

@@ -8,8 +8,9 @@ double reconstruct_at(gsl_vector *solution,
     {
         result += gsl_vector_get(solution, i)*basis(x,y,i);
     }
+    result+=f_boundary(x,y);
     if(result==result)
-		return result+f_boundary(x,y);
+		return result;
 	else 
 		return 0.;
 }
@@ -67,7 +68,9 @@ void plot_region(gsl_vector *solution,
     op = fopen("../plot_data/plot_region", "w");
     for(i=x1; i<=x2; i+=hx)
         for(j=y1; j<=y2; j+=hy)
+        {
             fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
+		}
     fclose(op);
     i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");
 }

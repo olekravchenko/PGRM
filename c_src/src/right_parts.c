@@ -16,55 +16,55 @@ double f_num(double x, double y)
 
 double f7(double x, double y)
 {
-	return (x*(-8*Power(x,2)*(-1 + Power(y,2))*(-2 + Power(x,2) + Power(y,2))*
-        (1 + (-1 + Power(x,2))/
-           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-       4*(-1 + Power(y,2))*Power(-2 + Power(x,2) + Power(y,2),2)*
-        (1 + (-1 + Power(x,2))/
-           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-       (-1 + Power(y,2))*Power(-2 + Power(x,2) + Power(y,2),2)*
+	return (x*(-8*x*x*(-1 + y*y)*(-2 + x*x + y*y)*
+        (1 + (-1 + x*x)/
+           Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) + 
+       4*(-1 + y*y)*Power(-2 + x*x + y*y,2)*
+        (1 + (-1 + x*x)/
+           Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) + 
+       (-1 + y*y)*Power(-2 + x*x + y*y,2)*
         (2 - (4*Power(-x + Power(x,3),2))/
-           Power(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4),1.5) + 
-          (-2 + 6*Power(x,2))/
-           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) - 
-       8*Power(y,2)*(-1 + Power(y,2))*(-2 + Power(x,2) + Power(y,2))*
-        (1 + (-1 + Power(y,2))/
-           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-       8*Power(y,2)*Power(-2 + Power(x,2) + Power(y,2),2)*
-        (1 + (-1 + Power(y,2))/
-           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-       (-1 + Power(y,2))*Power(-2 + Power(x,2) + Power(y,2),2)*
+           Power(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y,1.5) + 
+          (-2 + 6*x*x)/
+           Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) - 
+       8*y*y*(-1 + y*y)*(-2 + x*x + y*y)*
+        (1 + (-1 + y*y)/
+           Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) + 
+       8*y*y*Power(-2 + x*x + y*y,2)*
+        (1 + (-1 + y*y)/
+           Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) + 
+       (-1 + y*y)*Power(-2 + x*x + y*y,2)*
         (2 - (4*Power(-y + Power(y,3),2))/
-           Power(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4),1.5) + 
-          (-2 + 6*Power(y,2))/
-           Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-       8*Power(x,2)*(-1 + Power(y,2))*
-        (-2 + Power(x,2) + Power(y,2) + 
-          Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-       8*Power(y,2)*(-1 + Power(y,2))*
-        (-2 + Power(x,2) + Power(y,2) + 
-          Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) - 
-       8*Power(y,2)*(-2 + Power(x,2) + Power(y,2))*
-        (-2 + Power(x,2) + Power(y,2) + 
-          Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) - 
-       8*(-1 + Power(y,2))*(-2 + Power(x,2) + Power(y,2))*
-        (-2 + Power(x,2) + Power(y,2) + 
-          Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))) + 
-       2*Power(-2 + Power(x,2) + Power(y,2),2)*
-        (-2 + Power(x,2) + Power(y,2) + 
-          Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4)))))/
-   (2.*Power(-2 + Power(x,2) + Power(y,2),3));
+           Power(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y,1.5) + 
+          (-2 + 6*y*y)/
+           Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) + 
+       8*x*x*(-1 + y*y)*
+        (-2 + x*x + y*y + 
+          Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) + 
+       8*y*y*(-1 + y*y)*
+        (-2 + x*x + y*y + 
+          Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) - 
+       8*y*y*(-2 + x*x + y*y)*
+        (-2 + x*x + y*y + 
+          Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) - 
+       8*(-1 + y*y)*(-2 + x*x + y*y)*
+        (-2 + x*x + y*y + 
+          Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) + 
+       2*Power(-2 + x*x + y*y,2)*
+        (-2 + x*x + y*y + 
+          Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y))))/
+   (2.*Power(-2 + x*x + y*y,3));
 }
 double bf7(double x, double y)
 {
-	return -(x*(-1 + Power(y,2))*(-2 + Power(x,2) + Power(y,2) + 
-        Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + Power(y,4))))/
-   (2.*(-2 + Power(x,2) + Power(y,2)));
+	return -(x*(-1 + y*y)*(-2 + x*x + y*y + 
+        Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)))/
+   (2.*(-2 + x*x + y*y));
 }
 double o7(double x, double y)
 {
-	return (2 - Power(x,2) - Power(y,2) - Sqrt(2 - 2*Power(x,2) + Power(x,4) - 2*Power(y,2) + 
-       Power(y,4)))/2.;
+	return (2 - x*x - y*y - Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + 
+       y*y*y*y))/2.;
 }
 
 double f6(double x, double y)
