@@ -9,38 +9,8 @@
 int N;
 double intStep, glob_delta, diff_step;
 
-#include "right_parts.c"
+#include "tasks.c"
 #include "basis_functions.c"
-
-
-//Dirichlet problem structure
-double basis1(double x, double y, int n)
-// Returns value of n-th \psi-basis function, used further, at point (x,y)
-{
-    return phi(x,y,n)*omega(x,y);
-}
-
-//Neumann problem structure
-double basis2(double x, double y, int n)
-{
-	return 	phi(x,y,n)-omega(x,y)*
-			((omega(x+diff_step,y)-omega(x-diff_step,y))*(phi(x+diff_step,y,n)-phi(x-diff_step,y,n))
-			+(omega(x,y+diff_step)-omega(x,y-diff_step))*(phi(x,y+diff_step,n)-phi(x,y-diff_step,n)))*
-			glob_delta*glob_delta*0.25;
-}
-
-//Mixed boundary problem
-double basis(double x, double y, int n)
-{
-	return 	basis1(x,y,n)-omega(x,y)*omega2(x,y)/(omega(x,y)+omega2(x,y))*
-			((omega2(x+diff_step,y)-omega2(x-diff_step,y))*(basis1(x+diff_step,y,n)-basis1(x-diff_step,y,n))
-			+(omega2(x,y+diff_step)-omega2(x,y-diff_step))*(basis1(x,y+diff_step,n)-basis1(x,y-diff_step,n)))*
-			glob_delta*glob_delta*0.25;
-	//requires two omega functions
-	//now it'll be the main target
-}
-
-
 #include "plotters.c"
 #include "gauss_integrals.c" //todo: reduce file to single function
 #include "error_functions.c" 

@@ -1,5 +1,3 @@
-double (*phi)(double, double, int);
-
 double polynomial (double x, double y, int n)
 {
     return pow(x,n%N)*pow(y,n/N);
