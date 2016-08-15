@@ -45,25 +45,6 @@ double basis(double x, double y, int n)
 #include "gauss_integrals.c" //todo: reduce file to single function
 #include "error_functions.c" 
 
-
-//double left_under_int(double x, double y, int m, int n)
-//{
- //// \phi_m \Delta \phi_n 
-    //double  omega_0  = omega(x,y),
-			//omega_px = omega(x + diff_step, y),
-            //omega_mx = omega(x - diff_step, y),
-            //omega_py = omega(x, y + diff_step),
-            //omega_my = omega(x, y - diff_step),
-            //phin_px  = phi(x+diff_step,y,n),
-            //phin_py  = phi(x,y+diff_step,n),
-            //phin_mx  = phi(x-diff_step,y,n),
-            //phin_my  = phi(x,y-diff_step,n);
-
-    //return omega_0*phi(x,y,m)*glob_delta*glob_delta*
-			//(omega_px*phin_px + omega_mx*phin_mx + 
-			//omega_py*phin_py + omega_my*phin_my - 4.*omega_0*phi(x,y,n));
-    
-//}
 double left_under_int(double x, double y, int m, int n)
 {
  // \phi_m \Delta \phi_n 

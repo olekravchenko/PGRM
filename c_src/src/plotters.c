@@ -3,16 +3,24 @@ double reconstruct_at(gsl_vector *solution,
 // Reconstucts value of solution at point (x,y)
 {
     int i;
-    double result = 0.;
+    double result = 0.;//, BoundaryConditions = f_boundary(x,y);
+
+    if(x==X0 && y==Y0)
+        return reconstruct_at(solution, x+5.*diff_step,y+5.*diff_step);
+    else if(x==X0 && y==Y1)
+        return reconstruct_at(solution, x+5.*diff_step,y-5.*diff_step);
+    else if(x==X1 && y==Y0)
+        return reconstruct_at(solution, x-5.*diff_step,y+5.*diff_step);
+    else if(x==X1 && y==Y1)
+        return reconstruct_at(solution, x-5.*diff_step,y-5.*diff_step);
     for(i=0; i<N*N; i++)
     {
         result += gsl_vector_get(solution, i)*basis(x,y,i);
     }
+
     result+=f_boundary(x,y);
-    if(result==result)
-		return result;
-	else 
-		return 0.;
+    return result;
+
 }
 
 void multiplot(gsl_vector *solution,
