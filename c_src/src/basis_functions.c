@@ -71,7 +71,7 @@ double chebyshev_2dU(double x, double y, int n)
     return chebyshev_1dU(x/(X1-X0),n%N)*chebyshev_1dU(y/(Y1-Y0),n/N);
 }
 
-double cubic_stepx, cubic_stepy;
+double cubic_stepx, cubic_stepy, hsupp;
 
 double cubic_b_splines (double x, double y, int n)
 {
@@ -84,9 +84,25 @@ double cubic_b_splines_2 (double x, double y, int n)
 {
     cubic_stepx = (X1-X0)/(double)(N-1);
     cubic_stepy = (Y1-Y0)/(double)(N-1);
-    return f_B_3(N/(X1-X0)*cubic_stepx*(x-X0-cubic_stepx*(double)(n%(N))))*
-           f_B_3(N/(Y1-Y0)*cubic_stepy*(y-Y0-cubic_stepy*(double)(n/(N))));
+    return f_B_3((N-1)/(X1-X0)*(x-X0-cubic_stepx*(double)(n%(N))))*
+           f_B_3((N-1)/(Y1-Y0)*(y-Y0-cubic_stepy*(double)(n/(N))));
 }
+double cubic_b_splines_3 (double x, double y, int n)
+{
+	cubic_stepx = (X1-X0)/(double)(N+1);
+	cubic_stepy = (Y1-Y0)/(double)(N+1);
+	return  f_B_3((x-X0-cubic_stepx*(double)(1+n/N))/cubic_stepx)*
+			f_B_3((y-Y0-cubic_stepy*(double)(1+n%N))/cubic_stepy);
+}
+double fup3_poly_colloc (double x, double y, int n)
+{
+	cubic_stepx = (X1-X0)/(double)(N+1);
+	cubic_stepy = (Y1-Y0)/(double)(N+1);
+	return  f_fup3_poly((x-X0-cubic_stepx*(double)(1+n/N))/cubic_stepx)*
+			f_fup3_poly((y-Y0-cubic_stepy*(double)(1+n%N))/cubic_stepy);
+}
+
+
 
 double fup_basis (double x, double y, int n)
 {
@@ -115,6 +131,20 @@ void init_basis(int id)
 	}
     if(id == 5)
     {
-	    phi = &cubic_b_splines_2;
+		FiniteBasis = true;
+		hsupp		= 2.;
+	    phi 		= &cubic_b_splines_2;
+	}
+    if(id == 6)
+    {
+		FiniteBasis = true;
+		hsupp		= 2.;
+	    phi 		= &cubic_b_splines_3;
+	}
+    if(id == 7)
+    {
+		FiniteBasis = true;
+		hsupp		= 2.;
+	    phi 		= &fup3_poly_colloc;
 	}
 }

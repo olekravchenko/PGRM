@@ -6,7 +6,9 @@
 #include <string.h>
 #include <pthread.h>
 #include "smplDynArray.c"
+#include <stdbool.h>
 int N;
+bool FiniteBasis = false;
 double intStep, glob_delta, diff_step;
 
 #include "tasks.c"
@@ -18,8 +20,15 @@ double intStep, glob_delta, diff_step;
 double left_under_int(double x, double y, int m, int n)
 {
  // \phi_m \Delta \phi_n 
-    return basis(x,y,m)*(
+    return  basis(x,y,m)*(
 			basis(x+diff_step,y,n)+basis(x-diff_step,y,n)+
+			basis(x,y+diff_step,n)+basis(x,y-diff_step,n)
+			-4.*basis(x,y,n))*glob_delta*glob_delta;
+}
+double laplacian(double x, double y, int n)
+{
+ // \phi_m \Delta \phi_n 
+    return (basis(x+diff_step,y,n)+basis(x-diff_step,y,n)+
 			basis(x,y+diff_step,n)+basis(x,y-diff_step,n)
 			-4.*basis(x,y,n))*glob_delta*glob_delta;
 }
@@ -47,6 +56,28 @@ void form_matrix (gsl_matrix * system,
         for(j = 0; j < N*N; j++)
         {
             gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
+        }
+    }
+}
+void form_matrix_colloc (gsl_matrix * system,
+                         gsl_vector * RightPart,
+                         double x1, double x2,
+                         double y1, double y2)
+// Forms SLE system
+// system 	- left part matrix form of system
+// RightPart- right part vector of coefficients
+// x1, x2	- sizes of rectangle by x
+// y1, y2	- sizes of rectangle by y
+{
+    int i, j;
+    for(i = 0; i < N*N; i++)
+    {
+        gsl_vector_set(RightPart, i, right_part_f(X0+cubic_stepx*(double)(1+i/N),
+												  Y0+cubic_stepy*(double)(1+i%N)));
+        for(j = 0; j < N*N; j++)
+        {
+            gsl_matrix_set(system, i,j, laplacian(X0+cubic_stepx*(double)(1+i/N),
+												  Y0+cubic_stepy*(double)(1+i%N),j));
         }
     }
 }
@@ -94,7 +125,8 @@ int main(int argc, char **argv)
     gsl_vector  *rightpart	= gsl_vector_alloc(N*N);
     //*solution	= gsl_vector_alloc(N*N);
     solution_glob = gsl_vector_alloc(N*N);
-    form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
+    //form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
+    form_matrix_colloc		(sys, rightpart, X0,X1, Y0,Y1);
     //form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
 	FILE* matr_op;
 	matr_op = fopen("matrix.txt","w");
@@ -106,6 +138,7 @@ int main(int argc, char **argv)
     //solution_glob = solution;
     //errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
     //multiplot		(solution_glob, X0,X1, Y0,Y1);
+    
     plot_region		(solution_glob, X0,X1, Y0,Y1);
     //plot_region_error	(solution_glob, X0,X1, Y0,Y1);
     //plot_exact_solution	(X0,X1, Y0,Y1);

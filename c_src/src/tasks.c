@@ -5,7 +5,6 @@ double (*omega)			(double, double);
 double (*omega2)		(double, double);
 double (*basis)			(double, double, int);
 double (*phi)			(double, double, int);
-
 double X0, X1, Y0, Y1;
 
 //Dirichlet problem structure
@@ -276,11 +275,6 @@ double u2(double x, double y) {return (x*x-1.)*(y*y-1.);}
 double f1(double x, double y) {return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));}
 double u1(double x, double y) {return (x*x*x*x-1.)*(y*y*y*y-1.);}
 
-/*
-static double (*f_s)(double, double);
-static double (*u_s)(double, double);
-*/
-
 double laplace_f(double x, double y){return 0.;}
 double omega_rectangle(double x, double y){return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);}
 void init_eq(int id)
@@ -292,6 +286,7 @@ void init_eq(int id)
         u_exact 	 = &u1;
         f_boundary	 = &laplace_f;
         omega		 = &omega_rectangle;
+        omega2		 = &omega_rectangle;
         X0 = -1.;
         X1 =  1.;
         Y0 = -1.;
@@ -316,6 +311,7 @@ void init_eq(int id)
         u_exact 	 = &u3;
         f_boundary	 = &laplace_f;
         omega		 = &omega_rectangle;
+        omega2		 = &omega_rectangle;
         X0 = 0.;
         X1 =  2.*M_PI;
         Y0 = 0.;
@@ -338,6 +334,7 @@ void init_eq(int id)
         u_exact 	 = &u5;
         f_boundary	 = &laplace_f;
         omega		 = &omega_rectangle;
+        omega2		 = &omega_rectangle;
         X0 =  0.;
         X1 =  3.;
         Y0 =  0.;
@@ -349,10 +346,11 @@ void init_eq(int id)
         u_exact 	 = &u5;
         f_boundary	 = &bf6;
         omega		 = &o6;
+        omega2		 = &o6;
         X0 =  -1.;
-        X1 =  1.;
+        X1 =   1.;
         Y0 =  -1.;
-        Y1 =  1.;
+        Y1 =   1.;
     }    
     if(id == 7)
     {
@@ -362,9 +360,9 @@ void init_eq(int id)
         f_boundary	 = &bf7;
         omega		 = &o7;
         X0 =  -1.;
-        X1 =  1.;
+        X1 =   1.;
         Y0 =  -1.;
-        Y1 =  1.;
+        Y1 =   1.;
     }    
     if(id == 8)
     {
@@ -373,10 +371,11 @@ void init_eq(int id)
         u_exact 	 = &u5;
         f_boundary	 = &bf7;
         omega		 = &o7;
+        omega2		 = &o7;
         X0 =  -1.;
-        X1 =  1.;
+        X1 =   1.;
         Y0 =  -1.;
-        Y1 =  1.;
+        Y1 =   1.;
     }    
 	if(id == 9)
 	{
@@ -387,9 +386,9 @@ void init_eq(int id)
         omega		 = &o9;
         omega2		 = &o9_2;
         X0 =  -1.;
-        X1 =  1.;
+        X1 =   1.;
         Y0 =  -1.;
-        Y1 =  1.;	
+        Y1 =   1.;	
     }
 	if(id == 10)
 	{
@@ -400,8 +399,8 @@ void init_eq(int id)
         omega		 = &o9;
         omega2		 = &o10_2;
         X0 =  -1.;
-        X1 =  1.;
+        X1 =   1.;
         Y0 =  -1.;
-        Y1 =  1.;	
+        Y1 =   1.;
     }
 }
