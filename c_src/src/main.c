@@ -6,12 +6,14 @@
 #include <string.h>
 #include <pthread.h>
 #include "smplDynArray.c"
-#include <stdbool.h>
-int N;
-bool FiniteBasis = false;
-double intStep, glob_delta, diff_step;
+//#include <stdbool.h>
+//int N;
+//bool FiniteBasis = false;
+//double intStep, glob_delta, diff_step;
 
-#include "tasks.c"
+//Definitions moved to tasks.h
+//ToDo: reduce usage of global variables
+#include "tasks.h"
 #include "basis_functions.c"
 #include "plotters.c"
 #include "gauss_integrals.c" //todo: reduce file to single function
@@ -22,13 +24,6 @@ double left_under_int(double x, double y, int m, int n)
  // \phi_m \Delta \phi_n 
     return  basis(x,y,m)*(
 			basis(x+diff_step,y,n)+basis(x-diff_step,y,n)+
-			basis(x,y+diff_step,n)+basis(x,y-diff_step,n)
-			-4.*basis(x,y,n))*glob_delta*glob_delta;
-}
-double laplacian(double x, double y, int n)
-{
- // \phi_m \Delta \phi_n 
-    return (basis(x+diff_step,y,n)+basis(x-diff_step,y,n)+
 			basis(x,y+diff_step,n)+basis(x,y-diff_step,n)
 			-4.*basis(x,y,n))*glob_delta*glob_delta;
 }
@@ -56,28 +51,6 @@ void form_matrix (gsl_matrix * system,
         for(j = 0; j < N*N; j++)
         {
             gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
-        }
-    }
-}
-void form_matrix_colloc (gsl_matrix * system,
-                         gsl_vector * RightPart,
-                         double x1, double x2,
-                         double y1, double y2)
-// Forms SLE system
-// system 	- left part matrix form of system
-// RightPart- right part vector of coefficients
-// x1, x2	- sizes of rectangle by x
-// y1, y2	- sizes of rectangle by y
-{
-    int i, j;
-    for(i = 0; i < N*N; i++)
-    {
-        gsl_vector_set(RightPart, i, right_part_f(X0+cubic_stepx*(double)(1+i/N),
-												  Y0+cubic_stepy*(double)(1+i%N)));
-        for(j = 0; j < N*N; j++)
-        {
-            gsl_matrix_set(system, i,j, laplacian(X0+cubic_stepx*(double)(1+i/N),
-												  Y0+cubic_stepy*(double)(1+i%N),j));
         }
     }
 }
@@ -124,14 +97,13 @@ int main(int argc, char **argv)
     gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
     gsl_vector  *rightpart	= gsl_vector_alloc(N*N);
     //*solution	= gsl_vector_alloc(N*N);
-    solution_glob = gsl_vector_alloc(N*N);
-    //form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
-    form_matrix_colloc		(sys, rightpart, X0,X1, Y0,Y1);
+    solution_glob 			= gsl_vector_alloc(N*N);
+    form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
     //form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
-	FILE* matr_op;
-	matr_op = fopen("matrix.txt","w");
-	gsl_matrix_fprintf(matr_op,sys,"%3.3f");
-	fclose(matr_op);
+	//FILE* matr_op;
+	//matr_op = fopen("matrix.txt","w");
+	//gsl_matrix_fprintf(matr_op,sys,"%3.3f");
+	//fclose(matr_op);
 
 
     solve_matrix_eq	(solution_glob, sys, rightpart);
