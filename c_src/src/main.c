@@ -84,6 +84,8 @@ int main(int argc, char **argv)
  * To build a program completly:
  * [path_to_PGRM/c_src]/build
  * or just double click on build script the same way as usual program.
+ * 
+ * ToDo: add normal argument processing
  */
 {
     N 			= atoi(argv[1]);
