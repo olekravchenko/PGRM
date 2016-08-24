@@ -25,14 +25,27 @@
 
 \section{Method description}
 %description of Petrov-Galerkin Method in general
-
 \subsection{RFM and structures of solution}
+%short introduction in R-functions and to idea of structures
 \subsection{Dirichlet problem}
+%decription of Kantorovich structure
 \subsection{Neumann problem}
+%development and description of stucture for Neumann problem
 \subsection{Mixed boundary problem}
+%description of mixed boundary problem structure(possibly with development)
+
 
 \section{Code description}
+\subsection{Structure of code}
+Current implementation of PGRM consists of two main parts, which will be described further: Core and Task parts.
+\subsubsection{Core part}
+Includes the most part of code resporsible for solving Poissons equation. Includes further files: [file list]
+\subsubsection{Task part}
+\subsection{Desfunction of functions}
+\subsubsection{Core part}
+\subsubsection{Task part}
 
-\section{Interface description}
+\section{Build instructions}
 
+\section{Usage example}
 \end{document}
