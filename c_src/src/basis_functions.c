@@ -94,12 +94,12 @@ double cubic_b_splines_3 (double x, double y, int n)
 	return  f_B_3((x-X0-cubic_stepx*(double)(1+n/N))/cubic_stepx)*
 			f_B_3((y-Y0-cubic_stepy*(double)(1+n%N))/cubic_stepy);
 }
-double fup3_poly_colloc (double x, double y, int n)
+double fup3_poly (double x, double y, int n)
 {
-	cubic_stepx = (X1-X0)/(double)(N+1);
-	cubic_stepy = (Y1-Y0)/(double)(N+1);
-	return  f_fup3_poly((x-X0-cubic_stepx*(double)(1+n/N))/cubic_stepx)*
-			f_fup3_poly((y-Y0-cubic_stepy*(double)(1+n%N))/cubic_stepy);
+    cubic_stepx = (X1-X0)/(double)(N-1);
+    cubic_stepy = (Y1-Y0)/(double)(N-1);
+	return  f_fup3_poly((N-1)/(X1-X0)*(x-X0-cubic_stepx*(double)(n%(N))))*
+			f_fup3_poly((N-1)/(Y1-Y0)*(y-Y0-cubic_stepy*(double)(n/(N))));
 }
 
 
@@ -131,20 +131,20 @@ void init_basis(int id)
 	}
     if(id == 5)
     {
-		FiniteBasis = true;
+		//FiniteBasis = true;
 		hsupp		= 2.;
 	    phi 		= &cubic_b_splines_2;
 	}
     if(id == 6)
     {
-		FiniteBasis = true;
+		//FiniteBasis = true;
 		hsupp		= 2.;
 	    phi 		= &cubic_b_splines_3;
 	}
     if(id == 7)
     {
-		FiniteBasis = true;
+		//FiniteBasis = true;
 		hsupp		= 2.;
-	    phi 		= &fup3_poly_colloc;
+	    phi 		= &fup3_poly;
 	}
 }

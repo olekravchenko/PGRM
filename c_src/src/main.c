@@ -17,15 +17,20 @@
 #include "basis_functions.c"
 #include "plotters.c"
 #include "gauss_integrals.c" //todo: reduce file to single function
-#include "error_functions.c" 
+
+
+//#include "error_functions.c" 
+//ToDo: avoid usage of globally defined
+//		re-write code in error_functions.c
+
 
 double left_under_int(double x, double y, int m, int n)
 {
  // \phi_m \Delta \phi_n 
-    return  basis(x,y,m)*(
-			basis(x+diff_step,y,n)+basis(x-diff_step,y,n)+
-			basis(x,y+diff_step,n)+basis(x,y-diff_step,n)
-			-4.*basis(x,y,n))*glob_delta*glob_delta;
+    return  stucture(x,y,m)*(
+			stucture(x+diff_step,y,n)+stucture(x-diff_step,y,n)+
+			stucture(x,y+diff_step,n)+stucture(x,y-diff_step,n)
+			-4.*stucture(x,y,n))*glob_delta*glob_delta;
 }
 
 /*
@@ -47,7 +52,7 @@ void form_matrix (gsl_matrix * system,
     int i, j;
     for(i = 0; i < N*N; i++)
     {
-        gsl_vector_set(RightPart, i, integralRight(right_part_f,basis,x1,x2,y1,y2,i));
+        gsl_vector_set(RightPart, i, integralRight(right_part_f,stucture,x1,x2,y1,y2,i));
         for(j = 0; j < N*N; j++)
         {
             gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
@@ -86,18 +91,18 @@ int main(int argc, char **argv)
  */
 {
     //double a = A, b = B;
-    N = atoi(argv[1]);
-    intStep = (double) atoi(argv[2]);
+    N 			= atoi(argv[1]);
+    intStep 	= (double) atoi(argv[2]);
 	initGaussInt();
     init_eq(atoi(argv[3]));
     init_basis(atoi(argv[4]));
-    diff_step = pow(2.,-9);
-    glob_delta = 1./diff_step;
+    diff_step 	= pow(2.,-9);
+    glob_delta 	= 1./diff_step;
 
     gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
-    gsl_vector  *rightpart	= gsl_vector_alloc(N*N);
-    //*solution	= gsl_vector_alloc(N*N);
-    solution_glob 			= gsl_vector_alloc(N*N);
+    gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
+				*solution	= gsl_vector_alloc(N*N);
+    //solution_glob 			= gsl_vector_alloc(N*N);
     form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
     //form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
 	//FILE* matr_op;
@@ -106,12 +111,12 @@ int main(int argc, char **argv)
 	//fclose(matr_op);
 
 
-    solve_matrix_eq	(solution_glob, sys, rightpart);
+    solve_matrix_eq	(solution, sys, rightpart);
     //solution_glob = solution;
     //errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
     //multiplot		(solution_glob, X0,X1, Y0,Y1);
     
-    plot_region		(solution_glob, X0,X1, Y0,Y1);
+    plot_region		(solution, X0,X1, Y0,Y1);
     //plot_region_error	(solution_glob, X0,X1, Y0,Y1);
     //plot_exact_solution	(X0,X1, Y0,Y1);
     //plot_omega		(X0,X1, Y0,Y1);

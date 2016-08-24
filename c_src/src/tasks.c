@@ -1,12 +1,12 @@
 #include <math.h>
 #include "tasks.h"
 //Dirichlet problem structure
-double basis1(double x, double y, int n)
+double stucture1(double x, double y, int n)
 {
     return phi(x,y,n)*omega(x,y);
 }
 //Neumann problem structure
-double basis2(double x, double y, int n)
+double stucture2(double x, double y, int n)
 {
 	return 	phi(x,y,n)-omega(x,y)*
 			((omega(x+diff_step,y)-omega(x-diff_step,y))*(phi(x+diff_step,y,n)-phi(x-diff_step,y,n))
@@ -14,11 +14,11 @@ double basis2(double x, double y, int n)
 			glob_delta*glob_delta*0.25;
 }
 //Mixed boundary problem
-double basisM(double x, double y, int n)
+double stuctureM(double x, double y, int n)
 {
-	return 	basis1(x,y,n)-omega(x,y)*omega2(x,y)/(omega(x,y)+omega2(x,y))*
-			((omega2(x+diff_step,y)-omega2(x-diff_step,y))*(basis1(x+diff_step,y,n)-basis1(x-diff_step,y,n))
-			+(omega2(x,y+diff_step)-omega2(x,y-diff_step))*(basis1(x,y+diff_step,n)-basis1(x,y-diff_step,n)))*
+	return 	stucture1(x,y,n)-omega(x,y)*omega2(x,y)/(omega(x,y)+omega2(x,y))*
+			((omega2(x+diff_step,y)-omega2(x-diff_step,y))*(stucture1(x+diff_step,y,n)-stucture1(x-diff_step,y,n))
+			+(omega2(x,y+diff_step)-omega2(x,y-diff_step))*(stucture1(x,y+diff_step,n)-stucture1(x,y-diff_step,n)))*
 			glob_delta*glob_delta*0.25;
 }
 #define Power pow
@@ -272,7 +272,7 @@ double laplace_f(double x, double y){return 0.;}
 double omega_rectangle(double x, double y){return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);}
 void init_eq(int id)
 {
-	basis = &basis1;
+	stucture = &stucture1;
     if(id == 1)
     {
         right_part_f = &f1;
@@ -347,7 +347,7 @@ void init_eq(int id)
     }    
     if(id == 7)
     {
-		basis		 = &basis2;
+		stucture		 = &stucture2;
         right_part_f = &f7;
         u_exact 	 = &u5;
         f_boundary	 = &bf7;
@@ -359,7 +359,7 @@ void init_eq(int id)
     }    
     if(id == 8)
     {
-		basis		 = &basis2;
+		stucture		 = &stucture2;
         right_part_f = &f_num;
         u_exact 	 = &u5;
         f_boundary	 = &bf7;
@@ -372,7 +372,7 @@ void init_eq(int id)
     }    
 	if(id == 9)
 	{
-		basis		 = &basisM;
+		stucture		 = &stuctureM;
         right_part_f = &f_num;
         u_exact 	 = &u5;
         f_boundary	 = &bf9;
@@ -385,7 +385,7 @@ void init_eq(int id)
     }
 	if(id == 10)
 	{
-		basis		 = &basisM;
+		stucture		 = &stuctureM;
         right_part_f = &f_num;
         u_exact 	 = &u5;
         f_boundary	 = &bf10;
