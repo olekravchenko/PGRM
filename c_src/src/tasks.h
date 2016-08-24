@@ -9,7 +9,6 @@ double (*stucture)		(double, double, int);
 double (*phi)			(double, double, int);
 double X0, X1, Y0, Y1;
 int N;
-//bool FiniteBasis = false;
 double intStep, glob_delta, diff_step;
 
 void init_eq(int);

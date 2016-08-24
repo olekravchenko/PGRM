@@ -6,10 +6,6 @@
 #include <string.h>
 #include <pthread.h>
 #include "smplDynArray.c"
-//#include <stdbool.h>
-//int N;
-//bool FiniteBasis = false;
-//double intStep, glob_delta, diff_step;
 
 //Definitions moved to tasks.h
 //ToDo: reduce usage of global variables
@@ -90,7 +86,6 @@ int main(int argc, char **argv)
  * or just double click on build script the same way as usual program.
  */
 {
-    //double a = A, b = B;
     N 			= atoi(argv[1]);
     intStep 	= (double) atoi(argv[2]);
 	initGaussInt();
@@ -105,6 +100,7 @@ int main(int argc, char **argv)
     //solution_glob 			= gsl_vector_alloc(N*N);
     form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
     //form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
+    
 	//FILE* matr_op;
 	//matr_op = fopen("matrix.txt","w");
 	//gsl_matrix_fprintf(matr_op,sys,"%3.3f");
@@ -112,7 +108,6 @@ int main(int argc, char **argv)
 
 
     solve_matrix_eq	(solution, sys, rightpart);
-    //solution_glob = solution;
     //errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
     //multiplot		(solution_glob, X0,X1, Y0,Y1);
     

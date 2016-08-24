@@ -347,7 +347,7 @@ void init_eq(int id)
     }    
     if(id == 7)
     {
-		stucture		 = &stucture2;
+		stucture	 = &stucture2;
         right_part_f = &f7;
         u_exact 	 = &u5;
         f_boundary	 = &bf7;
@@ -359,7 +359,7 @@ void init_eq(int id)
     }    
     if(id == 8)
     {
-		stucture		 = &stucture2;
+		stucture	 = &stucture2;
         right_part_f = &f_num;
         u_exact 	 = &u5;
         f_boundary	 = &bf7;
@@ -372,7 +372,7 @@ void init_eq(int id)
     }    
 	if(id == 9)
 	{
-		stucture		 = &stuctureM;
+		stucture	 = &stuctureM;
         right_part_f = &f_num;
         u_exact 	 = &u5;
         f_boundary	 = &bf9;
@@ -385,7 +385,7 @@ void init_eq(int id)
     }
 	if(id == 10)
 	{
-		stucture		 = &stuctureM;
+		stucture	 = &stuctureM;
         right_part_f = &f_num;
         u_exact 	 = &u5;
         f_boundary	 = &bf10;

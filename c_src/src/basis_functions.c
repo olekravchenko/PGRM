@@ -71,7 +71,7 @@ double chebyshev_2dU(double x, double y, int n)
     return chebyshev_1dU(x/(X1-X0),n%N)*chebyshev_1dU(y/(Y1-Y0),n/N);
 }
 
-double cubic_stepx, cubic_stepy, hsupp;
+double cubic_stepx, cubic_stepy;
 
 double cubic_b_splines (double x, double y, int n)
 {
@@ -131,20 +131,14 @@ void init_basis(int id)
 	}
     if(id == 5)
     {
-		//FiniteBasis = true;
-		hsupp		= 2.;
 	    phi 		= &cubic_b_splines_2;
 	}
     if(id == 6)
     {
-		//FiniteBasis = true;
-		hsupp		= 2.;
 	    phi 		= &cubic_b_splines_3;
 	}
     if(id == 7)
     {
-		//FiniteBasis = true;
-		hsupp		= 2.;
 	    phi 		= &fup3_poly;
 	}
 }
