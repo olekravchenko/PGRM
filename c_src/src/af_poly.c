@@ -30,7 +30,7 @@ double f_up_poly(double x)
 	return 0.;
 }
 
-double f_fup3_poly(double x)
+double f_fup3_poly(double x)//ToDo: apply HornerForm
 {
 	x = fabs(x);
 	if(2.75 <= x && x < 3.)

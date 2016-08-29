@@ -24,7 +24,151 @@ double stuctureM(double x, double y, int n)
 #define Power pow
 #define Sqrt sqrt
 
+double o13(double x, double y)
+{
+	return 0.35 + 3.25*x*x + 2.5*x*y + 
+   3.75*y*y + 
+   Sqrt(0.012500000000000008 + 
+     7.8125*x*x*x*x + 18.75*x*x*x*y - 
+     0.5000000000000001*y*y + 
+     18.75*x*y*y*y + 7.8125*y*y*y*y + 
+     x*x*(-0.5000000000000001 + 
+        46.875*y*y)) - 
+   1.*Sqrt(Power(-1 + x*x,2)/4. + 
+      Power(-0.15000000000000002 + 
+        3.75*x*x + 2.5*x*y + 
+        3.75*y*y + 
+        Sqrt(0.012500000000000008 + 
+          7.8125*x*x*x*x + 
+          18.75*x*x*x*y - 
+          0.5000000000000001*y*y + 
+          18.75*x*y*y*y + 
+          7.8125*y*y*y*y + 
+          x*x*
+           (-0.5000000000000001 + 
+             46.875*y*y)),2));
+}
+double bf13(double x, double y)
+{
+	return (0.15384615384615383 - 
+     0.15384615384615383*x*x)/
+   (0.10769230769230766 + 1.*x*x + 
+     0.7692307692307692*x*y + 
+     1.1538461538461537*y*y + 
+     0.30769230769230765*
+      Sqrt(0.012500000000000008 + 
+        7.8125*x*x*x*x + 
+        18.75*x*x*x*y - 
+        0.5000000000000001*y*y + 
+        18.75*x*y*y*y + 
+        7.8125*y*y*y*y + 
+        x*x*
+         (-0.5000000000000001 + 
+           46.875*y*y)));
+}
 
+double o12(double x, double y)
+{
+	return 0.4 + 4.5*x*x + 5.*y*y + 
+   Sqrt(0.005000000000000003 + 
+     12.5*x*x*x*x - 
+     0.5000000000000001*y*y + 
+     12.5*y*y*y*y + 
+     x*x*(-0.5000000000000001 + 
+        75.*y*y)) - 
+   1.*Sqrt(Power(-1 + x*x,2)/4. + 
+      Power(-0.10000000000000002 + 
+        5.*x*x + 5.*y*y + 
+        Sqrt(0.005000000000000003 + 
+          12.5*x*x*x*x - 
+          0.5000000000000001*y*y + 
+          12.5*y*y*y*y + 
+          x*x*
+           (-0.5000000000000001 + 
+             75.*y*y)),2));
+}
+double o12_2(double x, double y)
+{
+	return (1 - y*y)/2.;
+}
+double bf12(double x, double y)
+{
+	return (0.11111111111111112 - 
+     0.11111111111111112*x*x)/
+   (0.08888888888888888 + 1.*x*x + 
+     1.1111111111111112*y*y + 
+     0.22222222222222224*
+      Sqrt(0.005000000000000003 + 
+        12.5*x*x*x*x - 
+        0.5000000000000001*y*y + 
+        12.5*y*y*y*y + 
+        x*x*
+         (-0.5000000000000001 + 75.*y*y)
+        ));
+}
+
+
+double o11(double x, double y)
+{
+	return  0.25 + x - 1.*y*y - 
+   1.*Sqrt(x*x - 
+      1.*x*(-0.25 + y*y) + 
+      1.*Power(-0.25 + y*y,2));
+}
+
+double o11_2(double x, double y)
+{
+	return  2. - x;
+}
+
+double bf11(double x, double y)
+{
+	return (-8.75*(-0.04000000000000001 + y*y)*
+     (-0.1 - 0.2857142857142857*x + 
+       1.*y*y + 
+       0.2857142857142857*
+        Sqrt(x*x - 
+          1.*x*(-0.25 + y*y) + 
+          1.*Power(-0.25 + y*y,2)) - 
+       0.2857142857142857*
+        Sqrt(6.25*Power(-0.04000000000000001 + 
+             y*y,2) - 
+          2.5*(-0.04000000000000001 + 
+             y*y)*
+           (0.25 + x - 1.*y*y - 
+             1.*Sqrt(x*x - 
+                1.*x*(-0.25 + y*y) + 
+                1.*Power(-0.25 + y*y,2))
+             ) + Power(-0.25 - 1.*x + 
+            1.*y*y + 
+            Sqrt(x*x - 
+              1.*x*(-0.25 + y*y) + 
+              1.*Power(-0.25 + y*y,2)),
+           2))))/
+   (-0.25 - 2.*x + 1.*y*y + 
+     1.*Sqrt(x*x - 
+        1.*x*(-0.25 + y*y) + 
+        1.*Power(-0.25 + y*y,2)) - 
+     1.*Sqrt(x*x - 
+        2.5*x*(-0.04000000000000001 + 
+           y*y) + 
+        6.25*Power(-0.04000000000000001 + 
+           y*y,2)) - 
+     1.*Sqrt(6.25*Power(-0.04000000000000001 + 
+           y*y,2) - 
+        2.5*(-0.04000000000000001 + 
+           y*y)*
+         (0.25 + x - 1.*y*y - 
+           1.*Sqrt(x*x - 
+              1.*x*(-0.25 + y*y) + 
+              1.*Power(-0.25 + y*y,2)))\
+         + Power(-0.25 - 1.*x + 
+          1.*y*y + 
+          Sqrt(x*x - 
+            1.*x*(-0.25 + y*y) + 
+            1.*Power(-0.25 + y*y,2)),2))
+     );
+}
 
 
 
@@ -81,7 +225,7 @@ double f7(double x, double y)
         (1 + (-1 + x*x)/
            Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) + 
        (-1 + y*y)*Power(-2 + x*x + y*y,2)*
-        (2 - (4*Power(-x + Power(x,3),2))/
+        (2 - (4*Power(-x + x*x*x,2))/
            Power(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y,1.5) + 
           (-2 + 6*x*x)/
            Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) - 
@@ -92,7 +236,7 @@ double f7(double x, double y)
         (1 + (-1 + y*y)/
            Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) + 
        (-1 + y*y)*Power(-2 + x*x + y*y,2)*
-        (2 - (4*Power(-y + Power(y,3),2))/
+        (2 - (4*Power(-y + y*y*y,2))/
            Power(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y,1.5) + 
           (-2 + 6*y*y)/
            Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) + 
@@ -396,4 +540,43 @@ void init_eq(int id)
         Y0 =  -1.;
         Y1 =   1.;
     }
+	if(id == 11)
+	{
+		stucture	 = &stuctureM;
+        right_part_f = &f_num;
+        u_exact 	 = &u5;
+        f_boundary	 = &bf11;
+        omega		 = &o11;
+        omega2		 = &o11_2;
+        X0 =   0.;
+        X1 =   2.;
+        Y0 =  -0.5;
+        Y1 =   0.5;
+    }
+    if(id == 12)
+	{
+		stucture	 = &stuctureM;
+        right_part_f = &f_num;
+        u_exact 	 = &u5;
+        f_boundary	 = &bf12;
+        omega		 = &o12;
+        omega2		 = &o12_2;
+        X0 =  -1.;
+        X1 =   1.;
+        Y0 =  -1.;
+        Y1 =   1.;
+    }  
+    if(id == 13)
+	{	//doesn't work with basises: 1,
+		stucture	 = &stuctureM;
+        right_part_f = &f_num;
+        u_exact 	 = &u5;
+        f_boundary	 = &bf13;
+        omega		 = &o13;
+        omega2		 = &o12_2;
+        X0 =  -1.;
+        X1 =   1.;
+        Y0 =  -1.;
+        Y1 =   1.;
+    }  
 }

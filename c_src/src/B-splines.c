@@ -6,7 +6,9 @@ double f_B_3(double X)
 	if(absV<2)
 	{
 		if(absV>=1)
+		{
 			return 0.25*(2.0-absV)*(2.0-absV)*(2.0-absV); 
+		}
 		else
 			return 1.0 - 1.5*absV*absV*(1.0 - 0.5*absV);
 	}

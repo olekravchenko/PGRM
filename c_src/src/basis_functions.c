@@ -5,7 +5,7 @@ double polynomial (double x, double y, int n)
 
 double chebyshev_1d(double x, int n)
 {
-	n++;
+	//n++;
     if(n == 0)
         return 1.;
     if(n == 1)
@@ -40,28 +40,29 @@ double chebyshev_2d(double x, double y, int n)
 
 double chebyshev_1dU(double x, int n)
 {
+	double xx = x*x;
 	if(n == 0)
 		return 1.;
 	if(n == 1)
 		return 2.*x;
 	if(n == 2)
-		return -1. + 4.*x*x;
+		return -1. + 4.*xx;
 	if(n == 3)
-		return x*(-4. + 8.*x*x);
+		return x*(-4. + 8.*xx);
 	if(n == 4)
-		return 1. + x*x*(-12. + 16.*x*x);
+		return 1. + xx*(-12. + 16.*xx);
 	if(n == 5)
-		return x*(6. + x*x*(-32. + 32.*x*x));
+		return x*(6. + xx*(-32. + 32.*xx));
 	if(n == 6)
-		return -1. + x*x*(24. + x*x*(-80. + 64.*x*x));
+		return -1. + xx*(24. + xx*(-80. + 64.*xx));
 	if(n == 7)
-		return x*(-8. + x*x*(80. + x*x*(-192. + 128.*x*x)));
+		return x*(-8. + xx*(80. + xx*(-192. + 128.*xx)));
 	if(n == 8)
-		return 1. + x*x*(-40. + x*x*(240. + x*x*(-448. + 256.*x*x)));
+		return 1. + xx*(-40. + xx*(240. + xx*(-448. + 256.*xx)));
 	if(n == 9) 
-		return x*(10. + x*x*(-160. + x*x*(672. + x*x*(-1024. + 512.*x*x))));
+		return x*(10. + xx*(-160. + xx*(672. + xx*(-1024. + 512.*xx))));
 	if(n == 10)
-		return -1. + x*x*(60. + x*x*(-560. + x*x*(1792. + x*x*(-2304. + 1024.*x*x))));
+		return -1. + xx*(60. + xx*(-560. + xx*(1792. + xx*(-2304. + 1024.*xx))));
     if(n > 10)
         return 2.*x*chebyshev_1dU(x,n-1)-chebyshev_1dU(x,n-2);
     return 0.;	
@@ -82,8 +83,8 @@ double cubic_b_splines (double x, double y, int n)
 }
 double cubic_b_splines_2 (double x, double y, int n)
 {
-    cubic_stepx = (X1-X0)/(double)(N-1);
-    cubic_stepy = (Y1-Y0)/(double)(N-1);
+    //cubic_stepx = (X1-X0)/(double)(N-1);
+    //cubic_stepy = (Y1-Y0)/(double)(N-1);
     return f_B_3((N-1)/(X1-X0)*(x-X0-cubic_stepx*(double)(n%(N))))*
            f_B_3((N-1)/(Y1-Y0)*(y-Y0-cubic_stepy*(double)(n/(N))));
 }
@@ -119,20 +120,22 @@ void init_basis(int id)
     phi = &cubic_b_splines;
     if(id == 2)
     {
-	    phi = &polynomial;
-	}
+        phi = &polynomial;
+    }
     if(id == 3)
     {
         phi = &chebyshev_2d;
-	}
-	if(id == 4)
-	{
-		phi = &chebyshev_2dU;
-	}
-    if(id == 5)
+    }
+    if(id == 4)
     {
-	    phi 		= &cubic_b_splines_2;
-	}
+        phi = &chebyshev_2dU;
+    }
+    if(id == 5) //the only normal B-s. basis
+    {
+        cubic_stepx = (X1-X0)/(double)(N-1);
+        cubic_stepy = (Y1-Y0)/(double)(N-1);
+        phi 		= &cubic_b_splines_2;
+    }
     if(id == 6)
     {
 	    phi 		= &cubic_b_splines_3;

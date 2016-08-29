@@ -18,11 +18,12 @@
 //#include "error_functions.c" 
 //ToDo: avoid usage of globally defined
 //		re-write code in error_functions.c
-
+//double temp_underint = 0.;
 
 double left_under_int(double x, double y, int m, int n)
 {
  // \phi_m \Delta \phi_n 
+	//if(m !=0 && n !=0 && temp_underint)
     return  stucture(x,y,m)*(
 			stucture(x+diff_step,y,n)+stucture(x-diff_step,y,n)+
 			stucture(x,y+diff_step,n)+stucture(x,y-diff_step,n)
@@ -88,19 +89,30 @@ int main(int argc, char **argv)
  * ToDo: add normal argument processing
  */
 {
-    N 			= atoi(argv[1]);
-    intStep 	= (double) atoi(argv[2]);
-	initGaussInt();
-    init_eq(atoi(argv[3]));
-    init_basis(atoi(argv[4]));
+    initGaussInt();
+
+    if(argc>=5)
+    {
+        N 			= atoi(argv[1]);
+        intStep 	= (double) atoi(argv[2]);
+        init_eq(atoi(argv[3]));
+        init_basis(atoi(argv[4]));
+    }
+    else if(argc == 1)
+    {
+        N 			= 8;
+        intStep 	= 4.;
+        init_eq(10);
+        init_basis(5);
+	}
+    
     diff_step 	= pow(2.,-9);
     glob_delta 	= 1./diff_step;
 
     gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
     gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
 				*solution	= gsl_vector_alloc(N*N);
-    //solution_glob 			= gsl_vector_alloc(N*N);
-    form_matrix		(sys, rightpart, X0,X1, Y0,Y1);
+    form_matrix	(sys, rightpart, X0,X1, Y0,Y1);
     //form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
     
 	//FILE* matr_op;
@@ -113,7 +125,9 @@ int main(int argc, char **argv)
     //errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
     //multiplot		(solution_glob, X0,X1, Y0,Y1);
     
-    plot_region		(solution, X0,X1, Y0,Y1);
+    //plot_region		(solution, X0,X1, Y0,Y1);
+    plot_region_colorplot(solution, X0,X1, Y0,Y1);
+    //plot_laplacian	(solution, X0,X1, Y0,Y1);
     //plot_region_error	(solution_glob, X0,X1, Y0,Y1);
     //plot_exact_solution	(X0,X1, Y0,Y1);
     //plot_omega		(X0,X1, Y0,Y1);
