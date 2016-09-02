@@ -22,7 +22,7 @@ typedef struct basis_args {
 #include "tasks.h"
 #include "basis_functions.c"
 #include "plotters.c"
-#include "gauss_integrals.c" //todo: reduce file to single function
+#include "gauss_integrals.c"
 
 
 //#include "error_functions.c" 
@@ -47,7 +47,6 @@ double right_under_int_new(basis_args arguments)
 	double 	x = arguments.x;
 	double 	y = arguments.y;
 	int 	m = arguments.m;
-	//int 	n = arguments.n;
 	
 	return right_part_f(x,y)*structure(x,y,m);
 }
@@ -104,6 +103,9 @@ double left_under_int(double x, double y, int m, int n)
  * 
  * Place for Including of parallel former, if required
  * 
+ * //ToDo: 
+ * 	-re-write, using new new definition of left and right under integral functions
+ * 
  */
 
 void form_matrix (gsl_matrix * system,
@@ -158,7 +160,10 @@ int main(int argc, char **argv)
  * [path_to_PGRM/c_src]/build
  * or just double click on build script the same way as usual program.
  * 
- * ToDo: add normal argument processing, modify this instruction	
+ * ToDo: 
+ * 	-add normal argument processing, modify this instruction	
+ * 	-rewrite code, using types, defined earlier
+ * 	-reduce quantity of arguments used in the most part of used functions
  */
 {
     initGaussInt();
@@ -184,7 +189,7 @@ int main(int argc, char **argv)
     gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
     gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
 				*solution	= gsl_vector_alloc(N*N);
-    form_matrix	(sys, rightpart, X0,X1, Y0,Y1);
+    form_matrix_new	(sys, rightpart, X0,X1, Y0,Y1);
     //form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
     
 	//FILE* matr_op;
