@@ -24,10 +24,10 @@ double left_under_int(double x, double y, int m, int n)
 {
  // \phi_m \Delta \phi_n 
 	//if(m !=0 && n !=0 && temp_underint)
-    return  stucture(x,y,m)*(
-			stucture(x+diff_step,y,n)+stucture(x-diff_step,y,n)+
-			stucture(x,y+diff_step,n)+stucture(x,y-diff_step,n)
-			-4.*stucture(x,y,n))*glob_delta*glob_delta;
+    return  structure(x,y,m)*(
+			structure(x+diff_step,y,n)+structure(x-diff_step,y,n)+
+			structure(x,y+diff_step,n)+structure(x,y-diff_step,n)
+			-4.*structure(x,y,n))*glob_delta*glob_delta;
 }
 
 /*
@@ -49,7 +49,7 @@ void form_matrix (gsl_matrix * system,
     int i, j;
     for(i = 0; i < N*N; i++)
     {
-        gsl_vector_set(RightPart, i, integralRight(right_part_f,stucture,x1,x2,y1,y2,i));
+        gsl_vector_set(RightPart, i, integralRight(right_part_f,structure,x1,x2,y1,y2,i));
         for(j = 0; j < N*N; j++)
         {
             gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
@@ -125,8 +125,8 @@ int main(int argc, char **argv)
     //errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
     //multiplot		(solution_glob, X0,X1, Y0,Y1);
     
-    //plot_region		(solution, X0,X1, Y0,Y1);
-    plot_region_colorplot(solution, X0,X1, Y0,Y1);
+    plot_region		(solution, X0,X1, Y0,Y1);
+    //plot_region_colorplot(solution, X0,X1, Y0,Y1);
     //plot_laplacian	(solution, X0,X1, Y0,Y1);
     //plot_region_error	(solution_glob, X0,X1, Y0,Y1);
     //plot_exact_solution	(X0,X1, Y0,Y1);

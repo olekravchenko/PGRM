@@ -15,7 +15,7 @@ double reconstruct_at(gsl_vector *solution,
         return reconstruct_at(solution, x-5.*diff_step,y-5.*diff_step);
     for(i=0; i<N*N; i++)
     {
-        result += gsl_vector_get(solution, i)*stucture(x,y,i);
+        result += gsl_vector_get(solution, i)*structure(x,y,i);
     }
 
     result+=f_boundary(x,y);

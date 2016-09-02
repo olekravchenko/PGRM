@@ -21,7 +21,7 @@ double (*omega)			(double, double);
 double (*omega2)		(double, double);
 //omega function for Neumann values (in mixed boundary problem only)
 
-double (*stucture)		(double, double, int);
+double (*structure)		(double, double, int);
 //structure of solution. Usually is used one of function, defined in tasks.c
 
 double (*phi)			(double, double, int);
