@@ -45,7 +45,7 @@ double gauss_integral(	double (*f)(basis_args),
 
         return 0.5*res*stepy;
     }
-    else if (dimension == 1)
+    if (dimension == 1)
     {
         for (i = 1; i <= intStep; i++)
         {
