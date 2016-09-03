@@ -1,0 +1,480 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>cavity_rfm</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-10-12"><meta name="DC.source" content="cavity_rfm.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Computation loop</a></li></ul></div><pre class="codeinput"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">%                 Solving 2-D cavity problem with</span>
+<span class="comment">%           Petrov-Galerkin-Rvachev method (PGRM)</span>
+<span class="comment">%</span>
+<span class="comment">%               U\theta_X + V\theta_Y = (1/Pr) \grad^2\theta + S(x,y),</span>
+<span class="comment">%               U\zeta_X  + V\zeta_Y  =        \grad^2\zeta  + Gr \theta_X,</span>
+<span class="comment">%               \grad^2\psi = -\zeta,</span>
+<span class="comment">%               U = \psi_Y, V = -\psi_X,          for (x,y) \in \Omega</span>
+<span class="comment">%               where \Omega domain is defined by R(Rvachev)-functions</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%              coded by Oleg Kravchenko, BMSTU, 2015.09.29</span>
+<span class="comment">%              UPD1: 2015.10.11</span>
+<span class="comment">%</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Refs:</span>
+<span class="comment">% [1] M.A. Basarab. "Solution of stationary two dimensional problems</span>
+<span class="comment">%     of natural convection in closed domains by R-function method."</span>
+<span class="comment">%     Engineering Journal: Science and Innovation (2013): 1-17.</span>
+<span class="comment">%     link: http://engjournal.ru/articles/1071/1071.pdf</span>
+<span class="comment">% [2] M.A. Basarab. "Numerical-analytical method of solving two-dimensional</span>
+<span class="comment">%     problems of natural convection in a closed cavity."</span>
+<span class="comment">%     Mathematical Modeling and Computational Methods (2015): 18-35.</span>
+<span class="comment">%     link: http://mmcm.bmstu.ru/media/pdf/a40c6baf-f3ea-401c-854d-438f3f2c4517.pdf</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Notes: Petrov Galerkin Scheme Implementation with the usage of R(Rvachev)-functions method.</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+
+clear <span class="string">all</span>
+close <span class="string">all</span>
+clc
+
+addpath <span class="string">'core'</span>
+addpath <span class="string">'core_rfm'</span>
+addpath <span class="string">'core_basis'</span>
+
+<span class="comment">% Initial parameters</span>
+L       = 1;
+H       = 1;
+Pr      = 1;
+Gr      = 10^3;
+Ra      = Pr*Gr;
+eps01   = 1e-6;
+nx      = 2^7;
+ny      = nx;
+dx      = L / (nx-1);
+dy      = H / (ny-1);
+tx      = -0.5*L:dx:0.5*L;
+ty      = -0.5*H:dy:0.5*H;
+[x, y]  = meshgrid(tx, ty);
+theta   = 0*x;          <span class="comment">% temperature</span>
+psi     = 0*x;          <span class="comment">% vortex</span>
+dzeta   = 0*x;          <span class="comment">% flow</span>
+u       = 0*x;          <span class="comment">% x component of velocity field</span>
+v       = 0*x;          <span class="comment">% y component of velocity field</span>
+<span class="comment">% Set of basis functions</span>
+nf      = 2;
+hf      = 1 / (nf + 1);
+<span class="comment">% ind_mat = zeros(3,(nf+2)^2);</span>
+K       = (nf+2)^2;
+Th      = zeros(nx,ny);
+Ps      = zeros(nx,ny);
+Dz      = zeros(nx,ny);
+Th_new  = Th;
+Ps_new  = Ps;
+Dz_new  = Dz;
+ThA     = zeros(K,K);
+PsA     = zeros(K,K);
+DzA     = zeros(K,K);
+ThB     = zeros(1,K);
+PsB     = zeros(1,K);
+DzB     = zeros(1,K);
+BfTh    = zeros(K,nx,ny);
+BfPs    = zeros(K,nx,ny);
+BfDz    = zeros(K,nx,ny);
+ind     = 1:K;
+
+<span class="comment">% Omega function</span>
+f03 = x + 0.5;
+f04 = y + 0.5*H/L;
+f05 = 0.5 - x;
+f06 = 0.5*H/L - y;
+omH = r_con(f03, f04);
+omC = r_con(f05, f06);
+<span class="comment">% Normalized Omega</span>
+omH_norm = omH;
+omC_norm = omC;
+omH_norm(omH&lt;0) = 0;
+omC_norm(omC&lt;0) = 0;
+fL = omC_norm ./ (omH_norm + omC_norm);
+<span class="comment">% Modified omega</span>
+omega = r_con(0.25 - x.^2, 0.25*H/L - y.^2);
+omega(omega&lt;0) = 0;
+omega = tanh(30*omega);
+
+<span class="comment">% Plot Omega</span>
+figure(1),
+surf(x, y, fL); view(30, 30);
+daspect([1,1,1])
+shading <span class="string">interp</span>
+light
+lighting <span class="string">phong</span>
+<span class="comment">% material shiny</span>
+<span class="comment">% view(0,90)</span>
+xlabel(<span class="string">'$x$'</span>,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>)
+ylabel(<span class="string">'$y$'</span>,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>)
+title(<span class="string">'BC function $f$'</span>,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>)
+
+
+<span class="comment">% Matrix of indices</span>
+ind_mat = mat_index(nf);
+
+<span class="comment">% compute matrix of basis functions</span>
+<span class="keyword">for</span> k = ind
+    i = ind_mat(2,k);
+    j = ind_mat(3,k);
+    BfTh(k,:,:)   = omega.*bdspln_function(i-1, x, hf, nf).*bdspln_function(j-1, y, hf, nf);
+    tmp           = omega.^2.*bdspln_function(i-1, x, hf, nf).*bdspln_function(j-1, y, hf, nf);
+    BfPs(k,:,:)   = tmp;
+    BfDz(k,:,:)   = del2(tmp, dx, dy);
+<span class="keyword">end</span>
+
+<span class="comment">% Matrix of basis functions</span>
+<span class="comment">% tmp      = bf_mat(ind_mat, K, nx, ny, x, y, hf, nf);</span>
+<span class="comment">% BfTh(:,:,:) = tmp(:,:,:) .* omega;</span>
+
+res = 1;
+</pre><img vspace="5" hspace="5" src="cavity_rfm_01.png" alt=""> <h2>Computation loop<a name="2"></a></h2><pre class="codeinput">tic
+
+<span class="keyword">while</span> res &gt; eps01
+    <span class="comment">% step 1: Th function</span>
+    [fL_x, fL_y]    = gradient(fL,dx,dy);
+    [Th_x, Th_y]    = gradient(Th,dx,dy);
+    F               = del2(fL,dx,dy)/Pr - (u.*fL_x + v.*fL_y);
+    tmp             = u.*Th_x + v.*Th_y - F;
+    <span class="comment">% Assembling</span>
+    [ThA, ThB]      = pde_assembling(tmp, BfTh, omega, K, tx, ty, dx, dy);
+    <span class="comment">% Solution</span>
+    ThC             = solve_mat(ThA, ThB);
+    <span class="comment">% Reconstruct solution</span>
+    Th_new          = rec_sol(fL, BfTh, omega, ThC, K);
+
+    <span class="comment">% step 2: Dz function</span>
+    [Th_x, Th_y]    = gradient(Th_new,dx,dy);
+    F               = del2(fL)/Pr - (u.*fL_x + v.*fL_y);
+    tmp             = u.*Th_x + v.*Th_y - F;
+    <span class="comment">% Assembling</span>
+    [DzA, DzB]      = pde_assembling(tmp, BfDz, omega, K, tx, ty, dx, dy);
+    <span class="comment">% Solution</span>
+    PsC             = solve_mat(DzA, DzB);
+    <span class="comment">% Reconstruct solution</span>
+    Dz_new          = rec_sol(fL, BfDz, omega, PsC, K);
+
+    <span class="comment">% step 3: Psi function</span>
+    <span class="comment">% Assembling</span>
+    [PsA, PsB]      = pde_assembling(-Dz_new, BfPs, omega, K, tx, ty, dx, dy);
+    <span class="comment">% Solution</span>
+    PsC             = solve_mat(PsA, PsB);
+    <span class="comment">% Reconstruct solution</span>
+    Ps_new          = rec_sol(fL, BfPs, omega, PsC, K);
+
+
+    <span class="comment">% Update</span>
+    Th      = Th_new;
+    Dz      = Dz_new;
+    Ps      = Ps_new;
+    [u, v]  = gradient(Ps,dx,dy);
+    v       = -v;
+    res     = max(max(abs(Th_new - Th)./abs(Th)));
+
+    <span class="comment">% Output residual</span>
+    disp([<span class="string">'res:='</span> num2str(res)])
+<span class="keyword">end</span> <span class="comment">%while</span>
+
+toc;
+
+<span class="comment">% plot numerical solution</span>
+figure(2),
+surf(x, y, Th)
+shading <span class="string">interp</span>
+lighting <span class="string">phong</span>
+title(<span class="string">'Numerical solution $\theta(x,y)$'</span>,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>)
+axis <span class="string">square</span>
+
+figure(3),
+surf(x, y, Dz)
+shading <span class="string">interp</span>
+lighting <span class="string">phong</span>
+title(<span class="string">'Numerical solution $\zeta(x,y)$'</span>,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>)
+axis <span class="string">square</span>
+
+figure(4),
+surf(x, y, Ps)
+shading <span class="string">interp</span>
+lighting <span class="string">phong</span>
+title(<span class="string">'Numerical solution $\psi(x,y)$'</span>,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>)
+axis <span class="string">square</span>
+</pre><pre class="codeoutput">cgs stopped at iteration 16 without converging to the desired tolerance 1e-06
+because the maximum number of iterations was reached.
+The iterate returned (number 16) has relative residual NaN.
+cgs stopped at iteration 16 without converging to the desired tolerance 1e-06
+because the maximum number of iterations was reached.
+The iterate returned (number 16) has relative residual NaN.
+cgs stopped at iteration 16 without converging to the desired tolerance 1e-06
+because the maximum number of iterations was reached.
+The iterate returned (number 16) has relative residual NaN.
+res:=NaN
+Elapsed time is 1.589137 seconds.
+</pre><img vspace="5" hspace="5" src="cavity_rfm_02.png" alt=""> <img vspace="5" hspace="5" src="cavity_rfm_03.png" alt=""> <img vspace="5" hspace="5" src="cavity_rfm_04.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                 Solving 2-D cavity problem with
+%           Petrov-Galerkin-Rvachev method (PGRM)
+%
+%               U\theta_X + V\theta_Y = (1/Pr) \grad^2\theta + S(x,y),
+%               U\zeta_X  + V\zeta_Y  =        \grad^2\zeta  + Gr \theta_X,
+%               \grad^2\psi = -\zeta,
+%               U = \psi_Y, V = -\psi_X,          for (x,y) \in \Omega
+%               where \Omega domain is defined by R(Rvachev)-functions
+%           
+%
+%              coded by Oleg Kravchenko, BMSTU, 2015.09.29
+%              UPD1: 2015.10.11
+%                               
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Refs: 
+% [1] M.A. Basarab. "Solution of stationary two dimensional problems
+%     of natural convection in closed domains by R-function method." 
+%     Engineering Journal: Science and Innovation (2013): 1-17.  
+%     link: http://engjournal.ru/articles/1071/1071.pdf
+% [2] M.A. Basarab. "Numerical-analytical method of solving two-dimensional
+%     problems of natural convection in a closed cavity."
+%     Mathematical Modeling and Computational Methods (2015): 18-35.  
+%     link: http://mmcm.bmstu.ru/media/pdf/a40c6baf-f3ea-401c-854d-438f3f2c4517.pdf
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Notes: Petrov Galerkin Scheme Implementation with the usage of R(Rvachev)-functions method.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+clear all
+close all
+clc
+
+addpath 'core'
+addpath 'core_rfm'
+addpath 'core_basis'
+
+% Initial parameters
+L       = 1;
+H       = 1;
+Pr      = 1;
+Gr      = 10^3;
+Ra      = Pr*Gr;
+eps01   = 1e-6;
+nx      = 2^7;
+ny      = nx;
+dx      = L / (nx-1);
+dy      = H / (ny-1);
+tx      = -0.5*L:dx:0.5*L;
+ty      = -0.5*H:dy:0.5*H;
+[x, y]  = meshgrid(tx, ty);
+theta   = 0*x;          % temperature
+psi     = 0*x;          % vortex
+dzeta   = 0*x;          % flow
+u       = 0*x;          % x component of velocity field
+v       = 0*x;          % y component of velocity field
+% Set of basis functions
+nf      = 2;
+hf      = 1 / (nf + 1);
+% ind_mat = zeros(3,(nf+2)^2);
+K       = (nf+2)^2;
+Th      = zeros(nx,ny);
+Ps      = zeros(nx,ny);
+Dz      = zeros(nx,ny);
+Th_new  = Th;
+Ps_new  = Ps;
+Dz_new  = Dz;
+ThA     = zeros(K,K);
+PsA     = zeros(K,K);
+DzA     = zeros(K,K);
+ThB     = zeros(1,K);
+PsB     = zeros(1,K);
+DzB     = zeros(1,K);
+BfTh    = zeros(K,nx,ny);
+BfPs    = zeros(K,nx,ny);
+BfDz    = zeros(K,nx,ny);
+ind     = 1:K;
+
+% Omega function
+f03 = x + 0.5;
+f04 = y + 0.5*H/L;
+f05 = 0.5 - x;
+f06 = 0.5*H/L - y;
+omH = r_con(f03, f04);
+omC = r_con(f05, f06);
+% Normalized Omega
+omH_norm = omH;
+omC_norm = omC;
+omH_norm(omH<0) = 0;
+omC_norm(omC<0) = 0;
+fL = omC_norm ./ (omH_norm + omC_norm);
+% Modified omega
+omega = r_con(0.25 - x.^2, 0.25*H/L - y.^2);
+omega(omega<0) = 0;
+omega = tanh(30*omega);
+
+% Plot Omega
+figure(1),
+surf(x, y, fL); view(30, 30);
+daspect([1,1,1])
+shading interp
+light
+lighting phong
+% material shiny   
+% view(0,90)
+xlabel('$x$','Interpreter','latex')
+ylabel('$y$','Interpreter','latex')
+title('BC function $f$','Interpreter','latex')
+
+
+% Matrix of indices
+ind_mat = mat_index(nf);
+
+% compute matrix of basis functions
+for k = ind
+    i = ind_mat(2,k);
+    j = ind_mat(3,k);
+    BfTh(k,:,:)   = omega.*bdspln_function(i-1, x, hf, nf).*bdspln_function(j-1, y, hf, nf);
+    tmp           = omega.^2.*bdspln_function(i-1, x, hf, nf).*bdspln_function(j-1, y, hf, nf);
+    BfPs(k,:,:)   = tmp;
+    BfDz(k,:,:)   = del2(tmp, dx, dy);
+end
+
+% Matrix of basis functions
+% tmp      = bf_mat(ind_mat, K, nx, ny, x, y, hf, nf);
+% BfTh(:,:,:) = tmp(:,:,:) .* omega;
+
+res = 1;
+%% Computation loop
+tic
+
+while res > eps01
+    % step 1: Th function
+    [fL_x, fL_y]    = gradient(fL,dx,dy);
+    [Th_x, Th_y]    = gradient(Th,dx,dy);
+    F               = del2(fL,dx,dy)/Pr - (u.*fL_x + v.*fL_y);    
+    tmp             = u.*Th_x + v.*Th_y - F;
+    % Assembling
+    [ThA, ThB]      = pde_assembling(tmp, BfTh, omega, K, tx, ty, dx, dy);
+    % Solution
+    ThC             = solve_mat(ThA, ThB);
+    % Reconstruct solution
+    Th_new          = rec_sol(fL, BfTh, omega, ThC, K);
+    
+    % step 2: Dz function  
+    [Th_x, Th_y]    = gradient(Th_new,dx,dy);
+    F               = del2(fL)/Pr - (u.*fL_x + v.*fL_y);    
+    tmp             = u.*Th_x + v.*Th_y - F;
+    % Assembling
+    [DzA, DzB]      = pde_assembling(tmp, BfDz, omega, K, tx, ty, dx, dy);
+    % Solution
+    PsC             = solve_mat(DzA, DzB);
+    % Reconstruct solution
+    Dz_new          = rec_sol(fL, BfDz, omega, PsC, K);
+    
+    % step 3: Psi function
+    % Assembling
+    [PsA, PsB]      = pde_assembling(-Dz_new, BfPs, omega, K, tx, ty, dx, dy);
+    % Solution
+    PsC             = solve_mat(PsA, PsB);
+    % Reconstruct solution
+    Ps_new          = rec_sol(fL, BfPs, omega, PsC, K);
+    
+    
+    % Update
+    Th      = Th_new;
+    Dz      = Dz_new;
+    Ps      = Ps_new;    
+    [u, v]  = gradient(Ps,dx,dy);
+    v       = -v;    
+    res     = max(max(abs(Th_new - Th)./abs(Th)));
+    
+    % Output residual
+    disp(['res:=' num2str(res)])
+end %while
+
+toc;
+
+% plot numerical solution
+figure(2),
+surf(x, y, Th)
+shading interp
+lighting phong
+title('Numerical solution $\theta(x,y)$','Interpreter','latex')
+axis square
+
+figure(3),
+surf(x, y, Dz)
+shading interp
+lighting phong
+title('Numerical solution $\zeta(x,y)$','Interpreter','latex')
+axis square
+
+figure(4),
+surf(x, y, Ps)
+shading interp
+lighting phong
+title('Numerical solution $\psi(x,y)$','Interpreter','latex')
+axis square
+##### SOURCE END #####
+--></body></html>
