@@ -1,3 +1,6 @@
+//ToDo: reduce all this functions to one or two
+
+
 double reconstruct_at(gsl_vector *solution,
                       double x, double y)
 // Reconstucts value of solution at point (x,y)

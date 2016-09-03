@@ -160,9 +160,7 @@ int main(int argc, char **argv)
  * or just double click on build script the same way as usual program.
  * 
  * ToDo: 
- * 	-add normal argument processing, modify this instruction	
- * 	-rewrite code, using types, defined earlier
- * 	-reduce quantity of arguments used in the most part of used functions
+ * 	-add normal argument processing
  */
 {
     initGaussInt();
