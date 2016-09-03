@@ -1,3 +1,8 @@
+//Depends on gauss_integrals initialization, if L_n error required
+
+
+
+
 gsl_vector *solution_glob;
 
 
@@ -87,9 +92,9 @@ double error_L2(double (*right_f)(double, double),
     return step/3.*res;
 }
 
-double error_f(double x, double y)
+double error_f(double x, double y, gsl_vector *solution)
 {
-    return fabs(reconstruct_at(solution_glob,x,y)-u_exact(x,y));
+    return fabs(reconstruct_at(solution,x,y)-u_exact(x,y));
 }
 
 void errors_to_stdio(gsl_vector *solution,
@@ -107,4 +112,40 @@ void errors_to_stdio(gsl_vector *solution,
            maxerr,
            error_L1(error_f,x1,x2,y1,y2),
            error_L2(error_f,x1,x2,y1,y2));
+}
+
+double SubIntegralLeft(double (*f)(double,double, int, int),
+                       double x0,double x1,
+                       double yc,
+                       int k1,int k2)
+{
+	int i,j;
+	double res = 0., step = (x1-x0)/intStep;
+	for (i = 1; i <= intStep; i++)
+	{
+		for (j = 0; j < 4; j++)
+		{
+			res += weights[j]*(*f)((double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step, yc, k1,k2);
+		}
+	}
+	
+	return 0.5*res*step;
+}
+
+double integralLeft(double (*f)(double,double, int, int),
+                    double x0,double x1,
+                    double y0,double y1,
+                    int k1,int k2)
+{
+	int i,j;
+	double res = 0., step = (y1-y0)/intStep;
+	for (i = 1; i <= intStep; i++)
+	{
+		for (j = 0; j < 4; j++)
+		{
+			res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
+		}
+	}
+	
+	return 0.5*res*step;
 }

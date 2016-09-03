@@ -21,7 +21,7 @@ typedef struct basis_args {
 //ToDo: reduce usage of global variables
 #include "tasks.h"
 #include "basis_functions.c"
-#include "plotters.c"
+#include "plotters_new.c"
 #include "gauss_integrals.c"
 
 
@@ -53,8 +53,7 @@ double right_under_int_new(basis_args arguments)
 
 void form_matrix_new (gsl_matrix * system,
                       gsl_vector * RightPart,
-                      double x0, double x1,
-                      double y0, double y1)
+                      rect_area int_area)
 // Forms SLE system
 // system 	- left part matrix form of system
 // RightPart- right part vector of coefficients
@@ -62,12 +61,6 @@ void form_matrix_new (gsl_matrix * system,
 // y1, y2	- sizes of rectangle by y
 {
     int i, j;
-
-    rect_area int_area;
-    int_area.x0 = x0;
-    int_area.x1 = x1;
-    int_area.y0 = y0;
-    int_area.y1 = y1;
 
     basis_args args;
     args.x = 0.;
@@ -153,11 +146,17 @@ int main(int argc, char **argv)
  * 3. id of example equation in right_parts.c.
  * 4. id of basis functions.
  * 
- * Typical launch command (one of the best for testing):
- * 	./bin/main 8 64 3 3
+ * Typical launch command with arguments:
+ * 	./main 8 4 3 3
+ * 
+ * --//-- w/o arguments:
+ *  ./main
+ * 
+ * Launch w/o arguments equal to:
+ *  ./main 8 4 10 5
  * 
  * To build a program completly:
- * [path_to_PGRM/c_src]/build
+ * [path_to_PGRM/c_src]/src/build.sh
  * or just double click on build script the same way as usual program.
  * 
  * ToDo: 
@@ -185,11 +184,20 @@ int main(int argc, char **argv)
     
     diff_step 	= pow(2.,-9);
     glob_delta 	= 1./diff_step;
-
+    
+	rect_area sol_area;
+	sol_area.x0 = X0;
+	sol_area.x1 = X1;
+	sol_area.y0 = Y0;
+	sol_area.y1 = Y1;
+	
+	
     gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
     gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
 				*solution	= gsl_vector_alloc(N*N);
-    form_matrix_new	(sys, rightpart, X0,X1, Y0,Y1);
+	
+	
+    form_matrix_new	(sys, rightpart, sol_area);
     //form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
     
 	//FILE* matr_op;
@@ -202,7 +210,7 @@ int main(int argc, char **argv)
     //errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
     //multiplot		(solution_glob, X0,X1, Y0,Y1);
     
-    plot_region		(solution, X0,X1, Y0,Y1);
+    plot_region		(solution, sol_area);
     //plot_region_colorplot(solution, X0,X1, Y0,Y1);
     //plot_laplacian	(solution, X0,X1, Y0,Y1);
     //plot_region_error	(solution_glob, X0,X1, Y0,Y1);
