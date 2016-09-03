@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <openacc.h>
 #include "B-splines.c"
 #include <gsl/gsl_linalg.h>
 #include "af_poly.c"
@@ -68,7 +69,6 @@ void form_matrix_new (gsl_matrix * system,
     args.m = 0;
     args.n = 0;
 
-
     for(i = 0; i < N*N; i++)
     {
         args.m = i;
@@ -112,6 +112,7 @@ void form_matrix (gsl_matrix * system,
 // y1, y2	- sizes of rectangle by y
 {
     int i, j;
+    
     for(i = 0; i < N*N; i++)
     {
         gsl_vector_set(RightPart, i, integralRight(right_part_f,structure,x1,x2,y1,y2,i));
@@ -195,8 +196,8 @@ int main(int argc, char **argv)
 				*solution	= gsl_vector_alloc(N*N);
 	
 	
-    form_matrix_new	(sys, rightpart, sol_area);
-    //form_matrix_parallel(sys, rightpart, X0,X1, Y0,Y1);
+    //form_matrix_new	(sys, rightpart, sol_area);
+    form_matrix			(sys, rightpart, X0,X1, Y0,Y1);
     
 	//FILE* matr_op;
 	//matr_op = fopen("matrix.txt","w");
@@ -208,7 +209,7 @@ int main(int argc, char **argv)
     //errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
     //multiplot		(solution_glob, X0,X1, Y0,Y1);
     
-    plot_region		(solution, sol_area);
+    plot_region_colorplot(solution, sol_area);
     //plot_region_colorplot(solution, X0,X1, Y0,Y1);
     //plot_laplacian	(solution, X0,X1, Y0,Y1);
     //plot_region_error	(solution_glob, X0,X1, Y0,Y1);
