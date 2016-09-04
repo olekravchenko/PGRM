@@ -119,7 +119,9 @@ int main(int argc, char **argv)
  * or just double click on build script the same way as usual program.
  * 
  * ToDo: 
- * 	-add normal argument processing
+ * 	-start rewriting code for solving systems of PDE
+ * 	-start rewriting code with methods of description of OOP
+ * 	-moving to C++ and Qt
  */
 {
     initGaussInt();
@@ -142,6 +144,7 @@ int main(int argc, char **argv)
         intStep 	= 4.;
         init_eq(10);
         init_basis(5);
+        output_format	= 1000;
 	}
     
     diff_step 	= pow(2.,-9);
@@ -160,7 +163,6 @@ int main(int argc, char **argv)
 	
 	
     form_matrix_new	(sys, rightpart, sol_area);
-    //form_matrix			(sys, rightpart, X0,X1, Y0,Y1);
     
 	//FILE* matr_op;
 	//matr_op = fopen("matrix.txt","w");
@@ -169,9 +171,7 @@ int main(int argc, char **argv)
 
 
     solve_matrix_eq	(solution, sys, rightpart);
-    //errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
-    //multiplot		(solution_glob, X0,X1, Y0,Y1);
-    
+
     
     if (output_format == 0)
 	{
