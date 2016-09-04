@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <openacc.h>
+#include <omp.h>
+//#include <openacc.h>
 #include "B-splines.c"
 #include <gsl/gsl_linalg.h>
 #include "af_poly.c"
@@ -23,7 +24,7 @@ typedef struct basis_args {
 #include "tasks.h"
 #include "basis_functions.c"
 #include "plotters_new.c"
-#include "gauss_integrals.c"
+#include "gauss_integrals_compact.c"
 
 
 //#include "error_functions.c" 
@@ -68,7 +69,7 @@ void form_matrix_new (gsl_matrix * system,
     args.y = 0.;
     args.m = 0;
     args.n = 0;
-
+#pragma omp parallel for shared(int_area, system, RightPart,N) private(args, i,j)
     for(i = 0; i < N*N; i++)
     {
         args.m = i;
@@ -77,48 +78,6 @@ void form_matrix_new (gsl_matrix * system,
         {
             args.n = j;
             gsl_matrix_set(system, i,j, gauss_integral(left_under_int_new, int_area, args,2));
-        }
-    }
-}
-
-
-
-double left_under_int(double x, double y, int m, int n)
-{
- // \phi_m \Delta \phi_n 
-    return  structure(x,y,m)*(
-			structure(x+diff_step,y,n)+structure(x-diff_step,y,n)+
-			structure(x,y+diff_step,n)+structure(x,y-diff_step,n)
-			-4.*structure(x,y,n))*glob_delta*glob_delta;
-}
-
-/*
- * 
- * Place for Including of parallel former, if required
- * 
- * //ToDo: 
- * 	-re-write, using new new definition of left and right under integral functions
- * 
- */
-
-void form_matrix (gsl_matrix * system,
-                  gsl_vector * RightPart,
-                  double x1, double x2,
-                  double y1, double y2)
-// Forms SLE system
-// system 	- left part matrix form of system
-// RightPart- right part vector of coefficients
-// x1, x2	- sizes of rectangle by x
-// y1, y2	- sizes of rectangle by y
-{
-    int i, j;
-    
-    for(i = 0; i < N*N; i++)
-    {
-        gsl_vector_set(RightPart, i, integralRight(right_part_f,structure,x1,x2,y1,y2,i));
-        for(j = 0; j < N*N; j++)
-        {
-            gsl_matrix_set(system, i,j, integralLeft(left_under_int,x1,x2,y1,y2,i,j));
         }
     }
 }
@@ -166,6 +125,10 @@ int main(int argc, char **argv)
 {
     initGaussInt();
 
+    omp_set_dynamic(1);      
+    omp_set_num_threads(16);
+
+
     if(argc>=5)
     {
         N 			= atoi(argv[1]);
@@ -196,8 +159,8 @@ int main(int argc, char **argv)
 				*solution	= gsl_vector_alloc(N*N);
 	
 	
-    //form_matrix_new	(sys, rightpart, sol_area);
-    form_matrix			(sys, rightpart, X0,X1, Y0,Y1);
+    form_matrix_new	(sys, rightpart, sol_area);
+    //form_matrix			(sys, rightpart, X0,X1, Y0,Y1);
     
 	//FILE* matr_op;
 	//matr_op = fopen("matrix.txt","w");
