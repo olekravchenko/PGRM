@@ -6,7 +6,6 @@
 #include <gsl/gsl_linalg.h>
 #include "af_poly.c"
 #include <string.h>
-#include <pthread.h>
 #include "smplDynArray.c"
 
 typedef struct rect_area {
@@ -63,13 +62,13 @@ void form_matrix_new (gsl_matrix * system,
 // y1, y2	- sizes of rectangle by y
 {
     int i, j;
-
     basis_args args;
     args.x = 0.;
     args.y = 0.;
     args.m = 0;
     args.n = 0;
-#pragma omp parallel for shared(int_area, system, RightPart,N) private(args, i,j)
+    
+#pragma omp parallel for shared(system, RightPart,N) private(i,j) firstprivate(args)
     for(i = 0; i < N*N; i++)
     {
         args.m = i;
