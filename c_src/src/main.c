@@ -126,14 +126,15 @@ int main(int argc, char **argv)
 
     omp_set_dynamic(1);      
     omp_set_num_threads(16);
+	int output_format = 0;
 
-
-    if(argc>=5)
+    if(argc>=6)
     {
-        N 			= atoi(argv[1]);
-        intStep 	= (double) atoi(argv[2]);
+        N 				= atoi(argv[1]);
+        intStep 		= (double) atoi(argv[2]);
         init_eq(atoi(argv[3]));
         init_basis(atoi(argv[4]));
+        output_format	= atoi(argv[5]);
     }
     else if(argc == 1)
     {
@@ -171,12 +172,38 @@ int main(int argc, char **argv)
     //errors_to_stdio	(solution_glob, X0,X1, Y0,Y1);
     //multiplot		(solution_glob, X0,X1, Y0,Y1);
     
-    plot_region_colorplot(solution, sol_area);
-    //plot_region_colorplot(solution, X0,X1, Y0,Y1);
-    //plot_laplacian	(solution, X0,X1, Y0,Y1);
-    //plot_region_error	(solution_glob, X0,X1, Y0,Y1);
-    //plot_exact_solution	(X0,X1, Y0,Y1);
-    //plot_omega		(X0,X1, Y0,Y1);
+    
+    if (output_format == 0)
+	{
+		return 0;
+	}
+	if (output_format == 1111)
+	{
+		multiplot	(solution, sol_area);
+		return 0;
+	}
+	
+	
+	if (output_format/1000%10 == 1)
+	{
+		plot_region	(solution, sol_area);
+	}
+	if (output_format/1000%10 == 2)
+	{
+		plot_region_colorplot	(solution, sol_area);
+	}
+	if (output_format/100%10 == 1)
+	{
+		plot_exact_solution		(sol_area);
+	}
+	if (output_format/10%10 == 1)
+	{
+		plot_region_error		(solution, sol_area);
+	}
+	if (output_format%10 == 1)
+	{
+		plot_omega	(sol_area);
+	}
 
     return 0;
 }
