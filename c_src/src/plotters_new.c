@@ -182,3 +182,39 @@ void plot_region_error(gsl_vector *solution, rect_area plot_area)
     fclose(op);
     i = system("../bin/plotter.py ../plot_data/plot_region_error Error &");
 }
+
+
+void plot_by_argument(gsl_vector *solution, int output_format, rect_area area)
+{
+	    if (output_format == 0)
+	{
+		return;
+	}
+	if (output_format == 1111)
+	{
+		multiplot	(solution, area);
+		return;
+	}
+	
+	
+	if (output_format/1000%10 == 1)
+	{
+		plot_region	(solution, area);
+	}
+	if (output_format/1000%10 == 2)
+	{
+		plot_region_colorplot	(solution, area);
+	}
+	if (output_format/100%10 == 1)
+	{
+		plot_exact_solution		(area);
+	}
+	if (output_format/10%10 == 1)
+	{
+		plot_region_error		(solution, area);
+	}
+	if (output_format%10 == 1)
+	{
+		plot_omega	(area);
+	}
+}

@@ -28,8 +28,7 @@ double gauss_integral(	double (*f)(basis_args),
     double res = 0., stepx = (x1-x0)/intStep, stepy = (y1-y0)/intStep;
     
     basis_args temp_args = args;
-    //argument processing
-	
+
     //integral calculations
     if (dimension == 2)
     {

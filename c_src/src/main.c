@@ -150,6 +150,26 @@ int main(int argc, char **argv)
     diff_step 	= pow(2.,-9);
     glob_delta 	= 1./diff_step;
     
+/*
+ * To class-like struct:
+ * 
+ * int N;
+ * rect_area sol_area;
+ * gsl_matrix 	*sys;
+ * gsl_vector  *rightpart, *solution;
+ * 
+ * double (*right_part_f)	(double, double);
+ * double (*f_boundary)		(double, double);
+ * double (*omega)			(double, double);
+ * double (*omega2)			(double, double);
+ * double (*structure)		(double, double, int);
+ * double (*phi)			(double, double, int);
+ * 
+ * double left_under_int_new(basis_args arguments);
+ * double right_under_int_new(basis_args arguments);
+ * 
+ */
+    
 	rect_area sol_area;
 	sol_area.x0 = X0;
 	sol_area.x1 = X1;
@@ -163,47 +183,18 @@ int main(int argc, char **argv)
 	
 	
     form_matrix_new	(sys, rightpart, sol_area);
+    solve_matrix_eq	(solution, sys, rightpart);
     
+
+
+	plot_by_argument(solution, output_format, sol_area);
+
+
+    return 0;
+}
+/*    
 	//FILE* matr_op;
 	//matr_op = fopen("matrix.txt","w");
 	//gsl_matrix_fprintf(matr_op,sys,"%3.3f");
 	//fclose(matr_op);
-
-
-    solve_matrix_eq	(solution, sys, rightpart);
-
-    
-    if (output_format == 0)
-	{
-		return 0;
-	}
-	if (output_format == 1111)
-	{
-		multiplot	(solution, sol_area);
-		return 0;
-	}
-	
-	
-	if (output_format/1000%10 == 1)
-	{
-		plot_region	(solution, sol_area);
-	}
-	if (output_format/1000%10 == 2)
-	{
-		plot_region_colorplot	(solution, sol_area);
-	}
-	if (output_format/100%10 == 1)
-	{
-		plot_exact_solution		(sol_area);
-	}
-	if (output_format/10%10 == 1)
-	{
-		plot_region_error		(solution, sol_area);
-	}
-	if (output_format%10 == 1)
-	{
-		plot_omega	(sol_area);
-	}
-
-    return 0;
-}
+*/
