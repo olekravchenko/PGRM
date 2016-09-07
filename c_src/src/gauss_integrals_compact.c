@@ -59,4 +59,50 @@ double gauss_integral(	double (*f)(basis_args),
     }
     return 0.;
 }
+double gauss_integral2(	double (*f)(basis_args,task),
+                        rect_area int_area,
+                        basis_args args,
+                        int dimension,
+                        task *Task)
+{
+	double x0 = int_area.x0;
+	double x1 = int_area.x1;
+	double y0 = int_area.y0;
+	double y1 = int_area.y1;
+	
+    int i,j;
+    double res = 0., stepx = (x1-x0)/intStep, stepy = (y1-y0)/intStep;
+    
+    basis_args temp_args = args;
+
+    //integral calculations
+    if (dimension == 2)
+    {
+        for (i = 1; i <= intStep; i++)
+        {
+            for (j = 0; j < 4; j++)
+            {
+				temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
+                //res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
+                res += weights[j]*gauss_integral2((*f), int_area, temp_args, 1, Task);
+            }
+        }
+
+        return 0.5*res*stepy;
+    }
+    if (dimension == 1)
+    {
+        for (i = 1; i <= intStep; i++)
+        {
+            for (j = 0; j < 4; j++)
+            {
+				temp_args.x = (double)(i-1)*stepx + x0 + 0.5*(nodes[j]+1.)*stepx;
+                res += weights[j]*(*f)(temp_args, *Task);
+            }
+        }
+
+        return 0.5*res*stepx;
+    }
+    return 0.;
+}
 

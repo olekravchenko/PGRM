@@ -186,7 +186,7 @@ void plot_region_error(gsl_vector *solution, rect_area plot_area)
 
 void plot_by_argument(gsl_vector *solution, int output_format, rect_area area)
 {
-	    if (output_format == 0)
+	if (output_format == 0)
 	{
 		return;
 	}

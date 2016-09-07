@@ -1,29 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-//#include <openacc.h>
 #include "B-splines.c"
 #include <gsl/gsl_linalg.h>
 #include "af_poly.c"
 #include <string.h>
 #include "smplDynArray.c"
+#include "tasks.h"
 
-typedef struct rect_area {
-    double x0, x1;
-    double y0, y1;
-} rect_area;
-
-typedef struct basis_args {
-	double	x, y;
-	int		m, n;
-} basis_args;
+#include "types_and_structs.c"
 
 //Definitions moved to tasks.h
 //ToDo: reduce usage of global variables
-#include "tasks.h"
 #include "basis_functions.c"
 #include "plotters_new.c"
 #include "gauss_integrals_compact.c"
+
+
+
 
 
 //#include "error_functions.c" 
@@ -82,6 +76,56 @@ void form_matrix_new (gsl_matrix * system,
 }
 
 
+double left_under_int_t(basis_args arguments, task Task)
+{
+	double 	x = arguments.x;
+	double 	y = arguments.y;
+	int 	m = arguments.m;
+	int 	n = arguments.n;
+	
+    return  Task.structure(x,y,m)*(
+			Task.structure(x+diff_step,y,n)+Task.structure(x-diff_step,y,n)+
+			Task.structure(x,y+diff_step,n)+Task.structure(x,y-diff_step,n)
+			-4.*Task.structure(x,y,n))*glob_delta*glob_delta;
+}
+
+double right_under_int_t(basis_args arguments, task Task)
+{
+	double 	x = arguments.x;
+	double 	y = arguments.y;
+	int 	m = arguments.m;
+	
+	return Task.right_part_f(x,y)*Task.structure(x,y,m);
+}
+
+void form_matrix_t (task *Task)
+// Forms SLE system
+// system 	- left part matrix form of system
+// RightPart- right part vector of coefficients
+// x1, x2	- sizes of rectangle by x
+// y1, y2	- sizes of rectangle by y
+{	
+    int i, j;
+    basis_args args;
+    args.x = 0.;
+    args.y = 0.;
+    args.m = 0;
+    args.n = 0;
+    
+//#pragma omp parallel for shared(system, RightPart,N) private(i,j) firstprivate(args)
+    for(i = 0; i < N*N; i++)
+    {
+        args.m = i;
+        gsl_vector_set(Task->rightpart, i, gauss_integral2(right_under_int_t,Task->area,args,2, Task));
+        for(j = 0; j < N*N; j++)
+        {
+            args.n = j;
+            gsl_matrix_set(Task->sys, i,j, gauss_integral2(left_under_int_t, Task->area, args,2, Task));
+        }
+    }
+}
+
+
 
 void solve_matrix_eq(gsl_vector * solution,
                      gsl_matrix * system,
@@ -93,8 +137,18 @@ void solve_matrix_eq(gsl_vector * solution,
     gsl_linalg_LU_decomp (system, p, &i);
     gsl_linalg_LU_solve (system, p, RightPart, solution);
 }
+void solve_matrix_eq_t(task *Task)
+//Solve SLE Ax=b, where A = system, b = RightPart, x = solution
+{
+    int i;
+    gsl_permutation * p = gsl_permutation_alloc (N*N);
+    gsl_linalg_LU_decomp (Task->sys, p, &i);
+    gsl_linalg_LU_solve (Task->sys, p, Task->rightpart, Task->solution);
+}
 
-
+double F3(double x, double y) {return -2.*sin(x)*sin(y);}
+double rectangle(double x, double y){return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);}
+double bf3(double x, double y){return 0.;}
 
 int main(int argc, char **argv)
 /*
@@ -143,7 +197,7 @@ int main(int argc, char **argv)
         N 			= 8;
         intStep 	= 4.;
         init_eq(10);
-        init_basis(5);
+        init_basis(3);
         output_format	= 1000;
 	}
     
@@ -177,18 +231,42 @@ int main(int argc, char **argv)
 	sol_area.y1 = Y1;
 	
 	
-    gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
-    gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
-				*solution	= gsl_vector_alloc(N*N);
-	
-	
-    form_matrix_new	(sys, rightpart, sol_area);
-    solve_matrix_eq	(solution, sys, rightpart);
+    //gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
+    //gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
+				//*solution	= gsl_vector_alloc(N*N);
+	task current;
+	tasks_constructor(&current,sol_area);
+	task second;// = current;
+	//tasks_constructor(&second,sol_area);
+
+    //form_matrix_new	(current.sys, current.rightpart, current.area);
+    form_matrix_t		(&current);
+    solve_matrix_eq_t	(&current);
+	plot_by_argument(current.solution, output_format, current.area);
     
-
-
-	plot_by_argument(solution, output_format, sol_area);
-
+    //omega = 0;
+    //omega2 = 0;
+    //structure = 0;
+    //f_boundary = 0;
+    //right_part_f = 0;
+    
+    //init_eq(1);
+    
+	//sol_area.x0 = X0;
+	//sol_area.x1 = X1;
+	//sol_area.y0 = Y0;
+	//sol_area.y1 = Y1;
+    
+	//task second;
+	//tasks_constructor(&second,sol_area);
+	//second.omega = &rectangle;
+	//second.omega2 = &rectangle;
+	//second.structure = &Structure1;
+	//second.f_boundary = &bf3;
+	//second.right_part_f = &F3;
+	//gsl_vector_fprintf(stdout,second.rightpart,"%f");
+    //solve_matrix_eq_t(&second);
+	//plot_by_argument(second.solution, output_format, current.area);
 
     return 0;
 }
