@@ -19,24 +19,24 @@ typedef struct task {
     gsl_vector  *rightpart, *solution;
 } task;
 
-double Structure1(double x, double y, int n)
+double Structure1(double x, double y, int n, task Task)
 {
-    return phi(x,y,n)*omega(x,y);
+    return phi(x,y,n)*Task.omega(x,y);
 }
 //Neumann problem structure
-double Structure2(double x, double y, int n)
+double Structure2(double x, double y, int n, task Task)
 {
-	return 	phi(x,y,n)-omega(x,y)*
-			((omega(x+diff_step,y)-omega(x-diff_step,y))*(phi(x+diff_step,y,n)-phi(x-diff_step,y,n))
-			+(omega(x,y+diff_step)-omega(x,y-diff_step))*(phi(x,y+diff_step,n)-phi(x,y-diff_step,n)))*
+	return 	phi(x,y,n)-Task.omega(x,y)*
+			((Task.omega(x+diff_step,y)-Task.omega(x-diff_step,y))*(phi(x+diff_step,y,n)-phi(x-diff_step,y,n))
+			+(Task.omega(x,y+diff_step)-Task.omega(x,y-diff_step))*(phi(x,y+diff_step,n)-phi(x,y-diff_step,n)))*
 			glob_delta*glob_delta*0.25;
 }
 //Mixed boundary problem
-double StructureM(double x, double y, int n)
+double StructureM(double x, double y, int n,task Task)
 {
-	return 	Structure1(x,y,n)-omega(x,y)*omega2(x,y)/(omega(x,y)+omega2(x,y))*
-			((omega2(x+diff_step,y)-omega2(x-diff_step,y))*(Structure1(x+diff_step,y,n)-Structure1(x-diff_step,y,n))
-			+(omega2(x,y+diff_step)-omega2(x,y-diff_step))*(Structure1(x,y+diff_step,n)-Structure1(x,y-diff_step,n)))*
+	return 	Structure1(x,y,n,Task)-Task.omega(x,y)*Task.omega2(x,y)/(Task.omega(x,y)+Task.omega2(x,y))*
+			((Task.omega2(x+diff_step,y)-Task.omega2(x-diff_step,y))*(Structure1(x+diff_step,y,n,Task)-Structure1(x-diff_step,y,n,Task))
+			+(Task.omega2(x,y+diff_step)-Task.omega2(x,y-diff_step))*(Structure1(x,y+diff_step,n,Task)-Structure1(x,y-diff_step,n,Task)))*
 			glob_delta*glob_delta*0.25;
 }
 
@@ -56,21 +56,3 @@ void tasks_constructor(task *Task, rect_area Area)
     
     
 }
-
-void tasks_constructor2(task *Task, rect_area Area)
-{
-    Task->sys = gsl_matrix_alloc (N*N,N*N);
-    Task->rightpart	= gsl_vector_alloc(N*N);
-    Task->solution	= gsl_vector_alloc(N*N);
-    
-    Task->area = Area;
-    
-    //Task->right_part_f = right_part_f;
-    //Task->f_boundary = f_boundary;
-    //Task->omega = omega;
-    //Task->omega2 = omega2;
-    //Task->structure = structure;
-    
-    
-}
-

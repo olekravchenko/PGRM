@@ -431,6 +431,13 @@ double laplace_f(double x, double y){return 0.;}
 double omega_rectangle(double x, double y){return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);}
 void init_eq(int id)
 {
+    omega = 0;
+    omega2 = 0;
+    structure = 0;
+    f_boundary = 0;
+    right_part_f = 0;
+	
+	
 	structure = &structure1;
     if(id == 1)
     {

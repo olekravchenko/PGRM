@@ -173,9 +173,8 @@ int main(int argc, char **argv)
  * or just double click on build script the same way as usual program.
  * 
  * ToDo: 
- * 	-start rewriting code for solving systems of PDE
- * 	-start rewriting code with methods of description of OOP
- * 	-moving to C++ and Qt
+ * 	-finish rewriting code for solving systems of PDE
+ * 	-finish rewriting code with methods of description of OOP
  */
 {
     initGaussInt();
@@ -196,61 +195,31 @@ int main(int argc, char **argv)
     {
         N 			= 8;
         intStep 	= 4.;
-        init_eq(10);
+        init_eq(1);
         init_basis(3);
-        output_format	= 1000;
+        output_format	= 2000;
 	}
     
     diff_step 	= pow(2.,-9);
     glob_delta 	= 1./diff_step;
-    
-/*
- * To class-like struct:
- * 
- * int N;
- * rect_area sol_area;
- * gsl_matrix 	*sys;
- * gsl_vector  *rightpart, *solution;
- * 
- * double (*right_part_f)	(double, double);
- * double (*f_boundary)		(double, double);
- * double (*omega)			(double, double);
- * double (*omega2)			(double, double);
- * double (*structure)		(double, double, int);
- * double (*phi)			(double, double, int);
- * 
- * double left_under_int_new(basis_args arguments);
- * double right_under_int_new(basis_args arguments);
- * 
- */
-    
+        
 	rect_area sol_area;
 	sol_area.x0 = X0;
 	sol_area.x1 = X1;
 	sol_area.y0 = Y0;
 	sol_area.y1 = Y1;
-	
-	
-    //gsl_matrix 	*sys 		= gsl_matrix_alloc (N*N,N*N);;
-    //gsl_vector  *rightpart	= gsl_vector_alloc(N*N),
-				//*solution	= gsl_vector_alloc(N*N);
+
 	task current;
 	tasks_constructor(&current,sol_area);
 
-    //form_matrix_new	(current.sys, current.rightpart, current.area);
     form_matrix_t		(&current);
     solve_matrix_eq_t	(&current);
 	plot_by_argument(current.solution, output_format, current.area);
 	
-	system("sleep 1");
-    omega = 0;
-    omega2 = 0;
-    structure = 0;
-    f_boundary = 0;
-    right_part_f = 0;
-    
-    init_eq(1);
-	
+	//system("sleep 1");
+
+    init_eq(13);
+
 	task second;
 	tasks_constructor(&second,sol_area);
 	
@@ -258,30 +227,6 @@ int main(int argc, char **argv)
     form_matrix_t		(&second);
     solve_matrix_eq_t	(&second);
 	plot_by_argument(second.solution, output_format, current.area);
-
-    //omega = 0;
-    //omega2 = 0;
-    //structure = 0;
-    //f_boundary = 0;
-    //right_part_f = 0;
-    
-    //init_eq(1);
-    
-	//sol_area.x0 = X0;
-	//sol_area.x1 = X1;
-	//sol_area.y0 = Y0;
-	//sol_area.y1 = Y1;
-    
-	//task second;
-	//tasks_constructor(&second,sol_area);
-	//second.omega = &rectangle;
-	//second.omega2 = &rectangle;
-	//second.structure = &Structure1;
-	//second.f_boundary = &bf3;
-	//second.right_part_f = &F3;
-	//gsl_vector_fprintf(stdout,second.rightpart,"%f");
-    //solve_matrix_eq_t(&second);
-	//plot_by_argument(second.solution, output_format, current.area);
 
     return 0;
 }
