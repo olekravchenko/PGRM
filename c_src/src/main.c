@@ -236,14 +236,29 @@ int main(int argc, char **argv)
 				//*solution	= gsl_vector_alloc(N*N);
 	task current;
 	tasks_constructor(&current,sol_area);
-	task second;// = current;
-	//tasks_constructor(&second,sol_area);
 
     //form_matrix_new	(current.sys, current.rightpart, current.area);
     form_matrix_t		(&current);
     solve_matrix_eq_t	(&current);
 	plot_by_argument(current.solution, output_format, current.area);
+	
+	system("sleep 1");
+    omega = 0;
+    omega2 = 0;
+    structure = 0;
+    f_boundary = 0;
+    right_part_f = 0;
     
+    init_eq(1);
+	
+	task second;
+	tasks_constructor(&second,sol_area);
+	
+	
+    form_matrix_t		(&second);
+    solve_matrix_eq_t	(&second);
+	plot_by_argument(second.solution, output_format, current.area);
+
     //omega = 0;
     //omega2 = 0;
     //structure = 0;
