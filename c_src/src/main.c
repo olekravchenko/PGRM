@@ -201,8 +201,8 @@ int main(int argc, char **argv)
         N 			= 8;
         intStep 	= 4.;
         init_eq(6);
-        init_basis(5);
-        output_format	= 2000;
+        init_basis(3);
+        output_format	= 1000;
     }
 
     diff_step 	= pow(2.,-9);
@@ -218,8 +218,7 @@ int main(int argc, char **argv)
     tasks_constructor	(&stream_function,sol_area);
 
     form_system_t		(&stream_function);
-    gsl_matrix_memcpy(general_system, stream_function.sys);
-
+    gsl_matrix_memcpy	(general_system, stream_function.sys);
     solve_matrix_eq_t	(&stream_function);
     plot_by_argument	(stream_function.solution, output_format, stream_function.area);
     /*
@@ -233,7 +232,7 @@ int main(int argc, char **argv)
     	//sol_area.y0 = Y0;
     	//sol_area.y1 = Y1;
     */
-    argc = system("sleep 1"); //using argc to not define new variable
+    //argc = system("sleep 1"); //using argc to not define new variable
 
     double psi(double x, double y)
     {
@@ -249,30 +248,18 @@ int main(int argc, char **argv)
     }
 	double rotors_right_f(double x, double y)//ToDo: optimize this function
 	{
-		//printf("10\n");
 		double	l_psi_px = laplacian(psi,x+diff_step,y);
-		//printf("11\n");
 		double	l_psi_py = laplacian(psi,x-diff_step,y);
-		//printf("12\n");
 		double	l_psi_mx = laplacian(psi,x,y+diff_step);
-		//printf("13\n");
 		double	l_psi_my = laplacian(psi,x,y-diff_step);
 		double 	psi_px = psi(x+diff_step,y);
-		//printf("11\n");
 		double	psi_py = psi(x,y+diff_step);
-		//printf("12\n");
 		double	psi_mx = psi(x+diff_step,y);
-		//printf("12\n");
 		double	psi_my = psi(x,y+diff_step);
 				
-
-			//printf("2\n");	
 		return Reynolds_number*0.25*(
-				((psi_py-psi_my)*
-				 (l_psi_px-l_psi_mx)	-
-				 (psi_px-psi_mx)*
-				 (l_psi_py-l_psi_my)) +
-
+				((psi_py-psi_my)*(l_psi_px-l_psi_mx) -
+				 (psi_px-psi_mx)*(l_psi_py-l_psi_my)) +
 				(l_psi_px+l_psi_mx+l_psi_py+l_psi_my-4.*laplacian(psi,x,y)))*glob_delta*glob_delta;
 	}
 	double rotor_boundary_f(double x, double y) //ToDo: reduce one of this functions
@@ -296,7 +283,18 @@ int main(int argc, char **argv)
     form_right_part_t	(&rotor_function);
     printf("2\n");
     solve_matrix_eq_t	(&rotor_function);
-    plot_by_argument	(rotor_function.solution, output_format, rotor_function.area);
-	//plot_func(psi,sol_area);
+    //plot_by_argument	(rotor_function.solution, output_format, rotor_function.area);
+
+	double rotor_value	(double x, double y)
+	{
+        return -reconstruct_at_t(rotor_function,x,y);
+	}
+	stream_function.right_part_f = 0;
+	stream_function.right_part_f = &rotor_value;
+	
+    form_right_part_t	(&stream_function);
+    gsl_matrix_memcpy	(general_system, stream_function.sys);
+    solve_matrix_eq_t	(&stream_function);
+    plot_by_argument	(stream_function.solution, output_format, stream_function.area);
     return 0;
 }
