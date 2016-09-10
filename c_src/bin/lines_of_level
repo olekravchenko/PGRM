@@ -9,7 +9,7 @@ set pm3d at s
 set palette rgbformulae 33,13,10
 set dgrid3d 65,65
 set contour
-set cntrparam levels incremental -1,0.05,1
+set cntrparam levels incremental -1,0.01,1
 set zlabel  offset character 1, 0, 0 font "" textcolor lt -1 norotate
 set table '.temp'
 splot "../plot_data/plot_region" with line ls 7 palette notitle

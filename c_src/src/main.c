@@ -198,8 +198,8 @@ int main(int argc, char **argv)
     }
     else if(argc == 1)
     {
-        N 			= 8;
-        intStep 	= 4.;
+        N 			= 6;
+        intStep 	= 10.;
         init_eq(6);
         init_basis(3);
         output_format	= 1000;
@@ -209,7 +209,7 @@ int main(int argc, char **argv)
     glob_delta 	= 1./diff_step;
 	
 	
-	double Reynolds_number = 10.;
+	double Reynolds_number = 1.;
 	
     rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
     gsl_matrix *general_system = gsl_matrix_alloc (N*N,N*N); //temporary storage for the matrix of the system
@@ -266,9 +266,11 @@ int main(int argc, char **argv)
 	{
 		return -laplacian(psi,x,y);
 	}
-
+	double rotor_value	(double x, double y)
+	{
+        return reconstruct_at_t(rotor_function,x,y);
+	}
     tasks_constructor	(&rotor_function,sol_area);
-    gsl_matrix_memcpy	(rotor_function.sys, general_system);
 
 	rotor_function.f_boundary = 0;
     rotor_function.right_part_f = 0;
@@ -279,22 +281,36 @@ int main(int argc, char **argv)
 	//f_boundary = &rotor_boundary_f;
 
     
-	printf("1\n");
+//	printf("1\n");
+    gsl_matrix_memcpy	(rotor_function.sys, general_system);
     form_right_part_t	(&rotor_function);
-    printf("2\n");
     solve_matrix_eq_t	(&rotor_function);
     //plot_by_argument	(rotor_function.solution, output_format, rotor_function.area);
 
-	double rotor_value	(double x, double y)
-	{
-        return -reconstruct_at_t(rotor_function,x,y);
-	}
+
 	stream_function.right_part_f = 0;
 	stream_function.right_part_f = &rotor_value;
 	
     form_right_part_t	(&stream_function);
     gsl_matrix_memcpy	(general_system, stream_function.sys);
     solve_matrix_eq_t	(&stream_function);
+    
+    int i;
+    for (i = 0; i < 3; i++)
+	{
+	    gsl_matrix_memcpy	(rotor_function.sys, general_system);
+		form_right_part_t	(&rotor_function);
+		solve_matrix_eq_t	(&rotor_function);
+
+		
+		form_right_part_t	(&stream_function);
+		gsl_matrix_memcpy	(general_system, stream_function.sys);
+		solve_matrix_eq_t	(&stream_function);
+	}
+	
+    
+    
+    
     plot_by_argument	(stream_function.solution, output_format, stream_function.area);
     return 0;
 }

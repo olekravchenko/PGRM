@@ -3,7 +3,7 @@
 //Dirichlet problem structure
 double structure1(double x, double y, int n)
 {
-    return phi(x,y,n)*omega(x,y);
+    return phi(x,y,n)*omega(x,y)*omega(x,y);
 }
 //Neumann problem structure
 double structure2(double x, double y, int n)
