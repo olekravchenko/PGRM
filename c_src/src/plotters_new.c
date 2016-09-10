@@ -20,9 +20,34 @@ double reconstruct_at(gsl_vector *solution,
     {
         result += gsl_vector_get(solution, i)*structure(x,y,i);
     }
-	//printf("%f %f\n",x ,y);
 
     result+=f_boundary(x,y);
+	//printf("%f %f\n",x ,y);
+    return result;
+
+}
+double reconstruct_at_t(task Task,
+                      double x, double y)
+// Reconstucts value of solution at point (x,y)
+{
+    int i;
+    double result = 0.;
+
+    if(x==X0 && y==Y0)
+        return reconstruct_at(Task.solution, x+5.*diff_step,y+5.*diff_step);
+    else if(x==X0 && y==Y1)
+        return reconstruct_at(Task.solution, x+5.*diff_step,y-5.*diff_step);
+    else if(x==X1 && y==Y0)
+        return reconstruct_at(Task.solution, x-5.*diff_step,y+5.*diff_step);
+    else if(x==X1 && y==Y1)
+        return reconstruct_at(Task.solution, x-5.*diff_step,y-5.*diff_step);
+    for(i=0; i<N*N; i++)
+    {
+        result += gsl_vector_get(Task.solution, i)*structure(x,y,i);
+    }
+
+    result+=f_boundary(x,y);
+	//printf("%f %f\n",x ,y);
     return result;
 
 }
@@ -85,6 +110,25 @@ void plot_region(gsl_vector *solution, rect_area plot_area)
         for(j=plot_area.y0; j<=plot_area.y1; j+=hy)
         {
 				fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
+		}
+    fclose(op);
+    i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");
+}
+void plot_func(double (*f)(double, double), rect_area plot_area)
+// Plot solution in rectangle region
+// from x1 till x2 by x, and from y1 till y2 by y
+
+{
+    double hx = (plot_area.x1-plot_area.x0)/64.,
+           hy = (plot_area.y1-plot_area.y0)/64.,
+           i,j;
+
+    FILE * op;
+    op = fopen("../plot_data/plot_region", "w");
+    for(i=plot_area.x0; i<=plot_area.x1; i+=hx)
+        for(j=plot_area.y0; j<=plot_area.y1; j+=hy)
+        {
+				fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, (*f)(i,j));
 		}
     fclose(op);
     i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");

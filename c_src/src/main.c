@@ -238,7 +238,7 @@ int main(int argc, char **argv)
     double psi(double x, double y)
     {
 		//printf("%f %f\n",x ,y);
-        return reconstruct_at(stream_function.solution,x,y);
+        return reconstruct_at_t(stream_function,x,y);
     }
     double laplacian(double (*f)(double, double),double x, double y)
     {
@@ -249,20 +249,24 @@ int main(int argc, char **argv)
     }
 	double rotors_right_f(double x, double y)//ToDo: optimize this function
 	{
-		printf("10\n");
+		//printf("10\n");
+		double	l_psi_px = laplacian(psi,x+diff_step,y);
+		//printf("11\n");
+		double	l_psi_py = laplacian(psi,x-diff_step,y);
+		//printf("12\n");
+		double	l_psi_mx = laplacian(psi,x,y+diff_step);
+		//printf("13\n");
+		double	l_psi_my = laplacian(psi,x,y-diff_step);
 		double 	psi_px = psi(x+diff_step,y);
-		printf("11\n");
+		//printf("11\n");
 		double	psi_py = psi(x,y+diff_step);
-		printf("12\n");
+		//printf("12\n");
 		double	psi_mx = psi(x+diff_step,y);
-		printf("12\n");
+		//printf("12\n");
 		double	psi_my = psi(x,y+diff_step);
 				
-		double	l_psi_px = laplacian(psi,x+diff_step,y);
-		double	l_psi_py = laplacian(psi,x-diff_step,y);
-		double	l_psi_mx = laplacian(psi,x,y+diff_step);
-		double	l_psi_my = laplacian(psi,x,y-diff_step);
-			printf("2\n");	
+
+			//printf("2\n");	
 		return Reynolds_number*0.25*(
 				((psi_py-psi_my)*
 				 (l_psi_px-l_psi_mx)	-
@@ -281,11 +285,11 @@ int main(int argc, char **argv)
 
 	rotor_function.f_boundary = 0;
     rotor_function.right_part_f = 0;
-	f_boundary = 0;
+	//f_boundary = 0;
     
-	//rotor_function.f_boundary = &rotor_boundary_f;
+	rotor_function.f_boundary = &rotor_boundary_f;
     rotor_function.right_part_f = &rotors_right_f;
-	f_boundary = &rotor_boundary_f;
+	//f_boundary = &rotor_boundary_f;
 
     
 	printf("1\n");
@@ -293,6 +297,6 @@ int main(int argc, char **argv)
     printf("2\n");
     solve_matrix_eq_t	(&rotor_function);
     plot_by_argument	(rotor_function.solution, output_format, rotor_function.area);
-
+	//plot_func(psi,sol_area);
     return 0;
 }

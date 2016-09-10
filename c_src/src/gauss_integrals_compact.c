@@ -69,7 +69,7 @@ double gauss_integral2(	double (*f)(basis_args,task),
 	double x1 = int_area.x1;
 	double y0 = int_area.y0;
 	double y1 = int_area.y1;
-	
+	//printf("%f %f %f %f\n", x0, x1, y0, y1);
     int i,j;
     double res = 0., stepx = (x1-x0)/intStep, stepy = (y1-y0)/intStep;
     
