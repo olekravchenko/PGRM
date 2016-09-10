@@ -116,7 +116,10 @@ double fup_basis (double x, double y, int n)
 
 void init_basis(int id)
 {
-    //	if(id == 1)
+    phi = 0;
+    
+    
+    //default value
     phi = &cubic_b_splines;
     if(id == 2)
     {

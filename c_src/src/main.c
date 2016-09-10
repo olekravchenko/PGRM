@@ -219,14 +219,19 @@ int main(int argc, char **argv)
 	//system("sleep 1");
 
     init_eq(13);
+    init_basis(5);
+	
+	sol_area.x0 = X0;
+	sol_area.x1 = X1;
+	sol_area.y0 = Y0;
+	sol_area.y1 = Y1;
 
 	task second;
 	tasks_constructor(&second,sol_area);
-	
-	
+		
     form_matrix_t		(&second);
     solve_matrix_eq_t	(&second);
-	plot_by_argument(second.solution, output_format, current.area);
+	plot_by_argument(second.solution, output_format, second.area);
 
     return 0;
 }
