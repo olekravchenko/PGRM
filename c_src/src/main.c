@@ -49,11 +49,6 @@ double right_under_int_new(basis_args arguments)
 void form_matrix_new (gsl_matrix * system,
                       gsl_vector * RightPart,
                       rect_area int_area)
-// Forms SLE system
-// system 	- left part matrix form of system
-// RightPart- right part vector of coefficients
-// x1, x2	- sizes of rectangle by x
-// y1, y2	- sizes of rectangle by y
 {
     int i, j;
     basis_args args;
@@ -98,12 +93,7 @@ double right_under_int_t(basis_args arguments, task Task)
 	return Task.right_part_f(x,y)*Task.structure(x,y,m);
 }
 
-void form_matrix_t (task *Task)
-// Forms SLE system
-// system 	- left part matrix form of system
-// RightPart- right part vector of coefficients
-// x1, x2	- sizes of rectangle by x
-// y1, y2	- sizes of rectangle by y
+void form_system_t (task *Task)
 {	
     int i, j;
     basis_args args;
@@ -125,7 +115,22 @@ void form_matrix_t (task *Task)
     }
 }
 
-
+void form_right_part_t (task *Task)
+{	
+    int i;//, j;
+    basis_args args;
+    args.x = 0.;
+    args.y = 0.;
+    args.m = 0;
+    args.n = 0;
+    
+//#pragma omp parallel for shared(system, RightPart,N) private(i,j) firstprivate(args)
+    for(i = 0; i < N*N; i++)
+    {
+        args.m = i;
+        gsl_vector_set(Task->rightpart, i, gauss_integral2(right_under_int_t,Task->area,args,2, Task));
+    }
+}
 
 void solve_matrix_eq(gsl_vector * solution,
                      gsl_matrix * system,
@@ -149,39 +154,39 @@ void solve_matrix_eq_t(task *Task)
 double F3(double x, double y) {return -2.*sin(x)*sin(y);}
 double rectangle(double x, double y){return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);}
 double bf3(double x, double y){return 0.;}
-
+    task stream_function, rotor_function;
 int main(int argc, char **argv)
 /*
  * requires 4 arguments to launch:
- * 
- * 1. N - quantity of basis functions per side. 
+ *
+ * 1. N - quantity of basis functions per side.
  * 2. intStep - quantity of integration nodes.
  * 3. id of example equation in right_parts.c.
  * 4. id of basis functions.
- * 
+ *
  * Typical launch command with arguments:
  * 	./main 8 4 3 3
- * 
+ *
  * --//-- w/o arguments:
  *  ./main
- * 
+ *
  * Launch w/o arguments equal to:
  *  ./main 8 4 10 5
- * 
+ *
  * To build a program completly:
  * [path_to_PGRM/c_src]/src/build.sh
  * or just double click on build script the same way as usual program.
- * 
- * ToDo: 
+ *
+ * ToDo:
  * 	-finish rewriting code for solving systems of PDE
  * 	-finish rewriting code with methods of description of OOP
  */
 {
     initGaussInt();
 
-    omp_set_dynamic(1);      
+    omp_set_dynamic(1);
     omp_set_num_threads(16);
-	int output_format = 0;
+    int output_format = 0;
 
     if(argc>=6)
     {
@@ -195,49 +200,99 @@ int main(int argc, char **argv)
     {
         N 			= 8;
         intStep 	= 4.;
-        init_eq(1);
-        init_basis(3);
+        init_eq(6);
+        init_basis(5);
         output_format	= 2000;
-	}
-    
+    }
+
     diff_step 	= pow(2.,-9);
     glob_delta 	= 1./diff_step;
-        
-	rect_area sol_area;
-	sol_area.x0 = X0;
-	sol_area.x1 = X1;
-	sol_area.y0 = Y0;
-	sol_area.y1 = Y1;
-
-	task current;
-	tasks_constructor(&current,sol_area);
-
-    form_matrix_t		(&current);
-    solve_matrix_eq_t	(&current);
-	plot_by_argument(current.solution, output_format, current.area);
 	
-	//system("sleep 1");
-
-    init_eq(13);
-    init_basis(5);
 	
-	sol_area.x0 = X0;
-	sol_area.x1 = X1;
-	sol_area.y0 = Y0;
-	sol_area.y1 = Y1;
+	double Reynolds_number = 10.;
+	
+    rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
+    gsl_matrix *general_system = gsl_matrix_alloc (N*N,N*N); //temporary storage for the matrix of the system
 
-	task second;
-	tasks_constructor(&second,sol_area);
-		
-    form_matrix_t		(&second);
-    solve_matrix_eq_t	(&second);
-	plot_by_argument(second.solution, output_format, second.area);
+    //initial psi calculation
+    tasks_constructor	(&stream_function,sol_area);
+
+    form_system_t		(&stream_function);
+    gsl_matrix_memcpy(general_system, stream_function.sys);
+
+    solve_matrix_eq_t	(&stream_function);
+    plot_by_argument	(stream_function.solution, output_format, stream_function.area);
+    /*
+
+
+        //init_eq(6);
+        //init_basis(5);
+
+    	//sol_area.x0 = X0;
+    	//sol_area.x1 = X1;
+    	//sol_area.y0 = Y0;
+    	//sol_area.y1 = Y1;
+    */
+    argc = system("sleep 1"); //using argc to not define new variable
+
+    double psi(double x, double y)
+    {
+		//printf("%f %f\n",x ,y);
+        return reconstruct_at(stream_function.solution,x,y);
+    }
+    double laplacian(double (*f)(double, double),double x, double y)
+    {
+		//printf("%f %f\n",x ,y);
+        return ((*f)(x+diff_step,y)+(*f)(x-diff_step,y)+
+                (*f)(x,y+diff_step)+(*f)(x,y-diff_step)
+                -4.*(*f)(x,y))*glob_delta*glob_delta;
+    }
+	double rotors_right_f(double x, double y)//ToDo: optimize this function
+	{
+		printf("10\n");
+		double 	psi_px = psi(x+diff_step,y);
+		printf("11\n");
+		double	psi_py = psi(x,y+diff_step);
+		printf("12\n");
+		double	psi_mx = psi(x+diff_step,y);
+		printf("12\n");
+		double	psi_my = psi(x,y+diff_step);
+				
+		double	l_psi_px = laplacian(psi,x+diff_step,y);
+		double	l_psi_py = laplacian(psi,x-diff_step,y);
+		double	l_psi_mx = laplacian(psi,x,y+diff_step);
+		double	l_psi_my = laplacian(psi,x,y-diff_step);
+			printf("2\n");	
+		return Reynolds_number*0.25*(
+				((psi_py-psi_my)*
+				 (l_psi_px-l_psi_mx)	-
+				 (psi_px-psi_mx)*
+				 (l_psi_py-l_psi_my)) +
+
+				(l_psi_px+l_psi_mx+l_psi_py+l_psi_my-4.*laplacian(psi,x,y)))*glob_delta*glob_delta;
+	}
+	double rotor_boundary_f(double x, double y) //ToDo: reduce one of this functions
+	{
+		return -laplacian(psi,x,y);
+	}
+
+    tasks_constructor	(&rotor_function,sol_area);
+    gsl_matrix_memcpy	(rotor_function.sys, general_system);
+
+	rotor_function.f_boundary = 0;
+    rotor_function.right_part_f = 0;
+	f_boundary = 0;
+    
+	//rotor_function.f_boundary = &rotor_boundary_f;
+    rotor_function.right_part_f = &rotors_right_f;
+	f_boundary = &rotor_boundary_f;
+
+    
+	printf("1\n");
+    form_right_part_t	(&rotor_function);
+    printf("2\n");
+    solve_matrix_eq_t	(&rotor_function);
+    plot_by_argument	(rotor_function.solution, output_format, rotor_function.area);
 
     return 0;
 }
-/*    
-	//FILE* matr_op;
-	//matr_op = fopen("matrix.txt","w");
-	//gsl_matrix_fprintf(matr_op,sys,"%3.3f");
-	//fclose(matr_op);
-*/

@@ -501,7 +501,7 @@ void init_eq(int id)
     }
     if(id == 6)
     {
-        right_part_f = &f6;
+        right_part_f = &f_num;
         u_exact 	 = &u5;
         f_boundary	 = &bf6;
         omega		 = &o6;

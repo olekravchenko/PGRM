@@ -34,3 +34,6 @@ int N;
 double intStep, glob_delta, diff_step;
 
 void init_eq(int);
+double structure1(double x, double y, int n);
+double structure2(double x, double y, int n);
+double structureM(double x, double y, int n);

@@ -20,6 +20,7 @@ double reconstruct_at(gsl_vector *solution,
     {
         result += gsl_vector_get(solution, i)*structure(x,y,i);
     }
+	//printf("%f %f\n",x ,y);
 
     result+=f_boundary(x,y);
     return result;
