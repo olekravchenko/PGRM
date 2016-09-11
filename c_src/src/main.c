@@ -195,7 +195,7 @@ int main(int argc, char **argv)
     }
     else if(argc == 1)
     {
-        N 			= 5;
+        N 			= 6;
         intStep 	= 10.;
         init_eq(6);
         init_basis(5);
@@ -206,7 +206,7 @@ int main(int argc, char **argv)
     glob_delta 	= 1./diff_step;
 
 
-    double Reynolds_number = 1.;
+    double Reynolds_number = 10.;
 
     rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
     gsl_matrix *general_system = gsl_matrix_alloc (N*N,N*N); //single-use temporary storage for the matrix of the system
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
     form_system_t		(&stream_function);
     gsl_matrix_memcpy	(general_system, stream_function.sys);
     solve_matrix_eq_t	(&stream_function);
-
+    //plot_lines_of_stream(stream_function.solution, stream_function.area);
     double psi(double x, double y)
     {
         return reconstruct_at_t(stream_function,x,y);
@@ -270,7 +270,7 @@ int main(int argc, char **argv)
     solve_matrix_eq_t	(&stream_function);
 
     int i;
-    for (i = 0; i < 17; i++)
+    for (i = 0; i < 130; i++)
     {
         form_right_part_t	(&rotor_function);
         solve_matrix_eq_t	(&rotor_function);
@@ -278,8 +278,10 @@ int main(int argc, char **argv)
         form_right_part_t	(&stream_function);
         gsl_matrix_memcpy	(rotor_function.sys, stream_function.sys);
         solve_matrix_eq_t	(&stream_function);
+        if(i%10 == 0)plot_lines_of_stream(stream_function.solution, stream_function.area);
+
     }
 
-    plot_lines_of_stream(stream_function.solution, stream_function.area);
+    //plot_lines_of_stream(stream_function.solution, stream_function.area);
     return 0;
 }
