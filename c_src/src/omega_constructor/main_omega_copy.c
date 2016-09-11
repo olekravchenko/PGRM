@@ -5,6 +5,7 @@
 typedef struct omega_primitive{
 	double x0, y0;
 	double a, b;
+	
 }omega_primitive;
 
 /*
