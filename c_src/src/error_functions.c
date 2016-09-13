@@ -5,7 +5,61 @@
 
 gsl_vector *solution_glob;
 
+double error_L1_inner(task Task,
+                        double x, double y)
+{
+	double x0 = Task.area.x0;
+	double y0 = Task.area.y0;
+	
+	double 	step = (x1-x0)/intStep;
 
+    const int   q_of_layers = (int)((x1-x0)/step) + 1;// - (int)((x1-x0)/step)%2;
+    int         k;
+}       
+
+double error_L1(	rect_area int_area,                        
+                        int dimension,
+                        task *Task)
+{
+    double x0 = int_area.x0;
+    double x1 = int_area.x1;
+    double y0 = int_area.y0;
+    double y1 = int_area.y1;
+    //printf("%f %f %f %f\n", x0, x1, y0, y1);
+    int i,j;
+    double res = 0., stepx = (x1-x0)/intStep, stepy = (y1-y0)/intStep;
+
+    
+    //integral calculations
+    if (dimension == 2)
+    {
+        for (i = 1; i <= intStep; i++)
+        {
+            for (j = 0; j < 4; j++)
+            {
+                temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
+                //res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
+                res += weights[j]*gauss_integral2((*f), int_area, temp_args, 1, Task);
+            }
+        }
+
+        return 0.5*res*stepy;
+    }
+    if (dimension == 1)
+    {
+        for (i = 1; i <= intStep; i++)
+        {
+            for (j = 0; j < 4; j++)
+            {
+                temp_args.x = (double)(i-1)*stepx + x0 + 0.5*(nodes[j]+1.)*stepx;
+                res += weights[j]*(*f)(temp_args, *Task);
+            }
+        }
+
+        return 0.5*res*stepx;
+    }
+    return 0.;
+}                 
 
 double error_L1_inner(double (*err_f)(double, double),
                       double x0, double x1,

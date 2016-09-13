@@ -36,6 +36,35 @@ double band_x(omega_primitive properties, double x, double y) {
     return 0.5/height*(height-Y)*(height+Y);
 }
 
+double dx_band_x(omega_primitive properties, double x, double y) {
+
+    return 0;
+}
+
+double dy_band_x(omega_primitive properties, double x, double y) {
+    double Y = y - properties.y0;
+    double height = properties.b;
+
+    return -1/height*Y;
+}
+
+double d2x_band_x(omega_primitive properties, double x, double y) {
+    
+    return 0;
+}
+
+double dxdy_band_x(omega_primitive properties, double x, double y) {
+    
+    return 0;
+}
+
+double d2y_band_x(omega_primitive properties, double x, double y) {
+    double Y = y - properties.y0;
+    double height = properties.b;
+
+    return -1/height;
+}
+
 double rectangle(omega_primitive properties, double x, double y) {
     double X = x - properties.x0;
     double Y = y - properties.y0;
@@ -49,12 +78,57 @@ double rectangle(omega_primitive properties, double x, double y) {
     return val01 + val02 - sqrt(val01*val01 + val02*val02);
 }
 
+/*
+double dx_rectangle(omega_primitive properties, double x, double y) {
+    double X = x - properties.x0;
+    double Y = y - properties.y0;
+    
+    double val01 = X;
+    double val02 = sqrt(X*X+Y*Y);
+
+
+    return 1 - val01/val02;
+}
+*/
+
 double circle(omega_primitive properties, double x, double y) {
     double X = x - properties.x0;
     double Y = y - properties.y0;
     double radius = properties.a;
 
     return 0.5/radius*(radius*radius-X*X-Y*Y);
+}
+
+double dx_circle(omega_primitive properties, double x, double y) {
+    double X = x - properties.x0;
+    double radius = properties.a;
+
+    return -X/radius;
+}
+
+double dy_circle(omega_primitive properties, double x, double y) {
+    double Y = y - properties.y0;
+    double radius = properties.a;
+
+    return -Y/radius;
+}
+
+double d2x_circle(omega_primitive properties, double x, double y) {
+    double radius = properties.a;
+
+    return -1/radius;
+}
+
+double dxy_circle(omega_primitive properties, double x, double y) {
+    double radius = properties.a;
+
+    return 0;
+}
+
+double d2y_circle(omega_primitive properties, double x, double y) {
+    double radius = properties.a;
+
+    return -1/radius;
 }
 
 double ellipse(omega_primitive properties, double x, double y) {
@@ -85,6 +159,41 @@ double half_plane(omega_primitive properties, double x, double y) {
     double b2 = b*b;
 
     return (a*X+b*Y)/sqrt(a2+b2);
+}
+
+double dx_half_plane(omega_primitive properties, double x, double y) {
+    double a = properties.a;
+    double b = properties.b;
+
+    double a2 = a*a;
+    double b2 = b*b;
+
+    return a/sqrt(a2+b2);
+}
+
+double dy_half_plane(omega_primitive properties, double x, double y) {
+    double a = properties.a;
+    double b = properties.b;
+
+    double a2 = a*a;
+    double b2 = b*b;
+
+    return b/sqrt(a2+b2);
+}
+
+double d2x_half_plane(omega_primitive properties, double x, double y) {
+   
+    return 0;
+}
+
+double dxy_half_plane(omega_primitive properties, double x, double y) {   
+
+    return 0;
+}
+
+double d2y_half_plane(omega_primitive properties, double x, double y) {
+   
+    return 0;
 }
 
 double parabola(omega_primitive properties, double x, double y) {
