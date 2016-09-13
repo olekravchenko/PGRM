@@ -15,7 +15,7 @@
 #include "basis_functions.c"
 #include "plotters_new.c"
 #include "gauss_integrals_compact.c"
-
+//#include "omega_constructor/R-operations.c"
 
 
 
@@ -174,7 +174,6 @@ int main(int argc, char **argv)
  * or just double click on build script the same way as usual program.
  *
  * ToDo:
- * 	-finish rewriting code for solving systems of PDE
  * 	-finish rewriting code with methods of description of OOP
  */
 {
@@ -194,25 +193,28 @@ int main(int argc, char **argv)
     }
     else if(argc == 1)
     {
-        N 			= 10;
-        intStep 	= 2.;
+        N 			= 8;
+        intStep 	= 3.;
         init_eq(6);
         init_basis(5);
         output_format	= 1000;
     }
 
-    diff_step 	= pow(2.,-9);
+    diff_step 	= pow(2.,-10);
     glob_delta 	= 1./diff_step;
 
 
     double Reynolds_number = 100.;
 	task stream_function, rotor_function;
     rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
+    
+    
     gsl_matrix *general_system = gsl_matrix_alloc (N*N,N*N); //single-use temporary storage for the matrix of the system
 
     //initial psi calculation
     tasks_constructor	(&stream_function,sol_area);
     form_system_t		(&stream_function);
+    
     gsl_matrix_memcpy	(general_system, stream_function.sys);
     solve_matrix_eq_t	(&stream_function);
     //plot_lines_of_stream(stream_function.solution, stream_function.area);

@@ -1,5 +1,6 @@
 #include <math.h>
 #include "tasks.h"
+#include "omega_constructor/R-operations.c"
 //Dirichlet problem structure
 double structure1(double x, double y, int n)
 {
@@ -44,6 +45,27 @@ double structure2_diff(double x, double y, int n)
 
 #define Power pow
 #define Sqrt sqrt
+
+//omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
+//omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/9., .b=Y1/9.};
+
+
+double o14(double x, double y)
+{
+	omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
+	omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/25., .b=Y1/25.};
+
+    return R_and(rectangle(external, x,y),-rectangle(inner, x,y));
+}
+double bf14(double x, double y)
+{
+    return -10.*((y*(-3 + x*x + y*y + 
+         Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y))*
+       (-2 + 625*x*x + 625*y*y + 
+         Sqrt(2 - 1250*x*x + 390625*x*x*x*x - 1250*y*y + 390625*y*y*y*y)
+         ))/(1248 - 625*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
+       Sqrt(2 - 1250*x*x + 390625*x*x*x*x - 1250*y*y + 390625*y*y*y*y)));
+}
 
 double o13(double x, double y)
 {
@@ -402,7 +424,7 @@ double f6(double x, double y)
 }
 double bf6(double x, double y)
 {
-    return (y*(-8 + 225*x*x + 225*y*y +
+    return 2.*(y*(-8 + 225*x*x + 225*y*y +
                Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y)))/
            (442 - 225*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) +
             Sqrt(32 - 1800*x*x + 50625*x*x*x*x - 1800*y*y + 50625*y*y*y*y));
@@ -632,4 +654,20 @@ void init_eq(int id)
         Y0 =  -1.;
         Y1 =   1.;
     }
+    if(id == 14)
+    {
+        structure = &structure4;
+        right_part_f = &f_num;
+        u_exact 	 = &u5;
+        f_boundary	 = &bf14;
+        omega		 = &o14;
+        omega2		 = &o14;
+        X0 =  -1.;
+        X1 =   1.;
+        Y0 =  -1.;
+        Y1 =   1.;
+    }
+
+    
+    
 }
