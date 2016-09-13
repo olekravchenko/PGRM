@@ -36,13 +36,21 @@ void plot_func(double (*f)(double, double))
 
 int main()
 {
-	omega_primitive A = {.x0 = 0., .y0 = 0., .a = 2., .b = 2./5};
+	omega_primitive A = {.x0 = 0., .y0 = 0., .a = 1./5., .b = 2./5};
 	double figure1(double x, double y)
 	{
-		return fmax(parabola(A, x,y),0);
+		return band_x(A, x,y);
+	}
+	double figure2(double x, double y)
+	{
+		return band_y(A, x,y);
 	}
 	
-	plot_func(figure1);
+	double omega_new(double x, double y)
+	{
+		return fmax(0.,R_and(-band_x(A, x,y), band_y(A, x,y)));
+	}
+	plot_func(omega_new);
 	
 	return 0;
 }

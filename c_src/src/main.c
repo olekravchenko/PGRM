@@ -151,7 +151,6 @@ void solve_matrix_eq_t(task *Task)
     gsl_linalg_LU_solve (Task->sys, p, Task->rightpart, Task->solution);
 }
 
-task stream_function, rotor_function;
 int main(int argc, char **argv)
 /*
  * requires 4 arguments to launch:
@@ -195,8 +194,8 @@ int main(int argc, char **argv)
     }
     else if(argc == 1)
     {
-        N 			= 6;
-        intStep 	= 10.;
+        N 			= 10;
+        intStep 	= 2.;
         init_eq(6);
         init_basis(5);
         output_format	= 1000;
@@ -206,8 +205,8 @@ int main(int argc, char **argv)
     glob_delta 	= 1./diff_step;
 
 
-    double Reynolds_number = 10.;
-
+    double Reynolds_number = 100.;
+	task stream_function, rotor_function;
     rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
     gsl_matrix *general_system = gsl_matrix_alloc (N*N,N*N); //single-use temporary storage for the matrix of the system
 
@@ -255,8 +254,10 @@ int main(int argc, char **argv)
 
     rotor_function.f_boundary = 0;
     rotor_function.right_part_f = 0;
+    rotor_function.structure = 0;
     rotor_function.f_boundary = &rotor_boundary_f;
     rotor_function.right_part_f = &rotors_right_f;
+    rotor_function.structure = &structure1;
 
     gsl_matrix_memcpy	(rotor_function.sys, general_system);
     form_right_part_t	(&rotor_function);
@@ -270,7 +271,7 @@ int main(int argc, char **argv)
     solve_matrix_eq_t	(&stream_function);
 
     int i;
-    for (i = 0; i < 130; i++)
+    for (i = 0; i < 60; i++)
     {
         form_right_part_t	(&rotor_function);
         solve_matrix_eq_t	(&rotor_function);
@@ -282,6 +283,6 @@ int main(int argc, char **argv)
 
     }
 
-    //plot_lines_of_stream(stream_function.solution, stream_function.area);
+    //plot_region(stream_function.solution, stream_function.area);
     return 0;
 }
