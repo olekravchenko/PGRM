@@ -6,6 +6,7 @@ double structure1(double x, double y, int n)
     //double omega_at = omega(x,y);
     return phi(x,y,n)*omega(x,y);//*omega_at;
 }
+//Rigid clamping :-)
 double structure4(double x, double y, int n)
 {
     double omega_at = omega(x,y);
@@ -25,6 +26,16 @@ double structureM(double x, double y, int n)
     return 	structure1(x,y,n)-omega(x,y)*omega2(x,y)/(omega(x,y)+omega2(x,y))*
             ((omega2(x+diff_step,y)-omega2(x-diff_step,y))*(structure1(x+diff_step,y,n)-structure1(x-diff_step,y,n))
              +(omega2(x,y+diff_step)-omega2(x,y-diff_step))*(structure1(x,y+diff_step,n)-structure1(x,y-diff_step,n)))*
+            glob_delta*glob_delta*0.25;
+}
+
+//Newton/Robin/3rd order
+double structure3(double x, double y, int n)
+{
+	double h;
+    return 	phi(x,y,n)-omega(x,y)*
+            (-h+omega(x+diff_step,y)-omega(x-diff_step,y))*(phi(x+diff_step,y,n)-phi(x-diff_step,y,n))
+             +(omega(x,y+diff_step)-omega(x,y-diff_step))*(phi(x,y+diff_step,n)-phi(x,y-diff_step,n)))*
             glob_delta*glob_delta*0.25;
 }
 
