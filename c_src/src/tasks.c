@@ -33,8 +33,8 @@ double structureM(double x, double y, int n)
 //Newton/Robin/3rd order
 double structure3(double x, double y, int n)
 {
-	double h;
-    return 	phi(x,y,n)-omega(x,y)*
+	double h=0.;
+    return 	phi(x,y,n)-omega(x,y)*(
             (-h+omega(x+diff_step,y)-omega(x-diff_step,y))*(phi(x+diff_step,y,n)-phi(x-diff_step,y,n))
              +(omega(x,y+diff_step)-omega(x,y-diff_step))*(phi(x,y+diff_step,n)-phi(x,y-diff_step,n)))*
             glob_delta*glob_delta*0.25;
@@ -59,7 +59,22 @@ double structure2_diff(double x, double y, int n)
 
 //omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
 //omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/9., .b=Y1/9.};
-
+double bf15(double x, double y)
+{
+	
+	return ((-0.75 - 5.333333333333333*Power(-0.75 + y,3) + y)/(1.5 + x + Sqrt((1+x)*(1+x) + (y-0.5)*(y-0.5)) - 1.*y) + 
+     (0.75 + y - 5.333333333333333*Power(0.75 + y,3))/(1.5 - 1.*x + y + Sqrt(1.25 - 2*x + x*x + 1.*y + y*y)) - 
+     0.16666666666666666/(-1.5 + x + 2.*y + Sqrt(2 - 2*x + x*x - 2*y + y*y) - 
+        1.*Sqrt((y+0.5)*(y+0.5) + Power(-2 + x + y + Sqrt(2 - 2*x + x*x - 2*y + y*y),2))) - 
+     1/(6.*(1.5 + x + 2*y - Sqrt((1+x)*(1+x) + (1+y)*(1+y)) + 
+          Sqrt((y-0.5)*(y-0.5) + Power(2 + x + y - Sqrt((1+x)*(1+x) + (1+y)*(1+y)),2)))))/
+   (1/(1.5 + x + Sqrt((1+x)*(1+x) + (y-0.5)*(y-0.5)) - 1.*y) + 
+     1/(1.5 - 1.*x + y + Sqrt(1.25 - 2*x + x*x + 1.*y + y*y)) - 
+     1./(-1.5 + x + 2.*y + Sqrt(2 - 2*x + x*x - 2*y + y*y) - 
+        1.*Sqrt((y+0.5)*(y+0.5) + Power(-2 + x + y + Sqrt(2 - 2*x + x*x - 2*y + y*y),2))) + 
+     1/(1.5 + x + 2*y - Sqrt((1+x)*(1+x) + (1+y)*(1+y)) + 
+        Sqrt((y-0.5)*(y-0.5) + Power(2 + x + y - Sqrt((1+x)*(1+x) + (1+y)*(1+y)),2))));
+}
 
 double o14(double x, double y)
 {
@@ -673,6 +688,19 @@ void init_eq(int id)
         f_boundary	 = &bf14;
         omega		 = &o14;
         omega2		 = &o14;
+        X0 =  -1.;
+        X1 =   1.;
+        Y0 =  -1.;
+        Y1 =   1.;
+    }
+    if(id == 15)
+    {
+        structure = &structure1;
+        right_part_f = &f_num;
+        u_exact 	 = &u5;
+        f_boundary	 = &bf15;
+        omega		 = &omega_rectangle;
+        omega2		 = &omega_rectangle;
         X0 =  -1.;
         X1 =   1.;
         Y0 =  -1.;
