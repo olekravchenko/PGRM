@@ -214,6 +214,20 @@ int main(int argc, char **argv)
  *
  * ToDo:
  * 	-rewrite task forming completely
+ * 	-simplify tasks' inner code
+ * 	-add examples of code to be generated with the help of automatic omega former
+ * 	-add line, circle segment primitive (normed to 1 at normal derivative)
+ * 	-add derivatives to all primitives and modify their arguments
+ * 	-add derivatives to all basis functions, including fup_3_poly
+ * 	-start work on img2Rf smooth converter
+ * 	-add possibility to gauss integrals to work on different nodes quantity mode
+ * 	-refactor the code, if you see that its unreadable, or mark it for further refactoring here
+ * 	
+ * 	-add support for distributed calculations with OpenMP
+ * 	-start rewriting code to CUDA/OpenCL
+ * 	-start work on GUI part of omega and boundary_f former
+ * 
+ * 	-restructure nearly all src's, find unused and move to legacy_* files
  */
 {
     initGaussInt();
