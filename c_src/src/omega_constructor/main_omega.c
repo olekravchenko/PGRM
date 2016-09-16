@@ -1,11 +1,21 @@
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 typedef struct omega_primitive {
     double x0, y0;
     double a, b;
 } omega_primitive;
+
+
+double R_and(double x, double y)
+{
+	return x+y-sqrt(x*x+y*y);
+}
+double R_or(double x, double y)
+{
+	return x+y+sqrt(x*x+y*y);
+}
 
 /*
  * полоса || Ox		band_y			+
@@ -49,7 +59,6 @@ double band_x(omega_primitive properties, double x, double y) {
 //}
 
 //double d2x_band_x(omega_primitive properties, double x, double y) {
-    
     //return 0;
 //}
 
@@ -207,3 +216,17 @@ double parabola(omega_primitive properties, double x, double y) {
 
     return (b-a*X2-Y)/sqrt(1+a2*X2);
 }
+
+double line_segment(omega_primitive properties, double x, double y)
+{
+	double	A = 1./(properties.a-properties.x0),
+			B = 1./(properties.b-properties.y0),
+			norm = 1./sqrt(A*A+B*B);
+	
+	return norm*R_or(fabs(A*(x-properties.x0)-B*(y-properties.y0)),
+			R_or(-A*(x-properties.x0)-B*(y-properties.y0),
+					A*(x-properties.a)+B*(y-properties.b)));
+	
+}
+
+
