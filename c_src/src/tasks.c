@@ -1,6 +1,6 @@
 #include <math.h>
 #include "tasks.h"
-#include "omega_constructor/main-omega.c"
+#include "omega_constructor/main_omega.c"
 //Dirichlet problem structure
 double structure1(double x, double y, int n)
 {
@@ -30,7 +30,7 @@ double structureM(double x, double y, int n)
             glob_delta*glob_delta*0.25;
 }
 
-//Newton/Robin/3rd order
+//Newton/Robin/3rd order		ToDo: fix it and test it
 double structure3(double x, double y, int n)
 {
 	double h=0.;
@@ -59,6 +59,24 @@ double structure2_diff(double x, double y, int n)
 
 //omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
 //omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/9., .b=Y1/9.};
+
+double bf16(double x, double y)
+{
+	omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
+	omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/9., .b=Y1/9.};
+
+	double	inner_v = rectangle(inner, x,y), 
+			extern_v = rectangle(external, x,y);
+	return inner_v*y/(inner_v + extern_v);
+}
+double o16(double x, double y)
+{
+	omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
+	omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/9., .b=Y1/9.};
+	return R_and(rectangle(external, x,y),-rectangle(inner, x,y));
+}
+
+
 double bf15(double x, double y)
 {
 	
@@ -701,6 +719,19 @@ void init_eq(int id)
         f_boundary	 = &bf15;
         omega		 = &omega_rectangle;
         omega2		 = &omega_rectangle;
+        X0 =  -1.;
+        X1 =   1.;
+        Y0 =  -1.;
+        Y1 =   1.;
+    }
+    if(id == 16)
+    {
+        structure = &structure1;
+        right_part_f = &f_num;
+        u_exact 	 = &u5;
+        f_boundary	 = &bf16;
+        omega		 = &o16;
+        omega2		 = &o16;
         X0 =  -1.;
         X1 =   1.;
         Y0 =  -1.;

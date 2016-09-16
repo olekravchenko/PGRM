@@ -14,7 +14,6 @@
 #include "basis_functions.c"
 #include "plotters_new.c"
 #include "gauss_integrals_compact.c"
-//#include "omega_constructor/R-operations.c"
 
 
 
@@ -245,10 +244,10 @@ int main(int argc, char **argv)
     }
     else if(argc == 1)
     {
-        N 			= 10;
-        intStep 	= 20.;
-        init_eq(15);
-        init_basis(3);
+        N 			= 6;
+        intStep 	= 4.;
+        init_eq(16);
+        init_basis(5);
         output_format	= 1000;
     }
 
