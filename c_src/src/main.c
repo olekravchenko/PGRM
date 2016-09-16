@@ -14,7 +14,6 @@
 #include "basis_functions.c"
 #include "plotters_new.c"
 #include "gauss_integrals_compact.c"
-//#include "omega_constructor/R-operations.c"
 
 
 
@@ -216,11 +215,9 @@ int main(int argc, char **argv)
  * 	-rewrite task forming completely
  * 	-simplify tasks' inner code
  * 	-add examples of code to be generated with the help of automatic omega former
- * 	-add line, circle segment primitive (normed to 1 at normal derivative)
  * 	-add derivatives to all primitives and modify their arguments
  * 	-add derivatives to all basis functions, including fup_3_poly
  * 	-start work on img2Rf smooth converter
- * 	-add possibility to gauss integrals to work on different nodes quantity mode
  * 	-refactor the code, if you see that its unreadable, or mark it for further refactoring here
  * 	
  * 	-add support for distributed calculations with OpenMP
@@ -228,6 +225,7 @@ int main(int argc, char **argv)
  * 	-start work on GUI part of omega and boundary_f former
  * 
  * 	-restructure nearly all src's, find unused and move to legacy_* files
+ * 	-add possibility to gauss integrals to work on different nodes quantity mode
  */
 {
     initGaussInt();
@@ -246,10 +244,12 @@ int main(int argc, char **argv)
     }
     else if(argc == 1)
     {
+
         N 			= 10;
         intStep 	= 1.;
         init_eq(11);
         init_basis(3);
+
         output_format	= 1000;
     }
 
