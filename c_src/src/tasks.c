@@ -1,6 +1,6 @@
 #include <math.h>
 #include "tasks.h"
-#include "omega_constructor/R-operations.c"
+#include "omega_constructor/main-omega.c"
 //Dirichlet problem structure
 double structure1(double x, double y, int n)
 {
