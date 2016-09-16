@@ -213,7 +213,7 @@ __global__ void form_matrix_new (float *sys,
 }
 
 
-
+//used as example from previous project
 __global__ void iter		(float *U, float *Unew, int size)
 {
     int k = (blockIdx.x + 1)*size + (threadIdx.x +1);

@@ -247,8 +247,8 @@ int main(int argc, char **argv)
     else if(argc == 1)
     {
         N 			= 10;
-        intStep 	= 20.;
-        init_eq(15);
+        intStep 	= 1.;
+        init_eq(11);
         init_basis(3);
         output_format	= 1000;
     }
