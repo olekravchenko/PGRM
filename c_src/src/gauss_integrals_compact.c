@@ -143,7 +143,7 @@ double gauss_integral2(	double (*f)(basis_args,task),
     {
         for (i = 1; i <= intStep; i++)
         {
-            for (j = 0; j < 4; j++)
+            for (j = 0; j < 16; j++)
             {
                 temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
                 //res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
@@ -157,7 +157,7 @@ double gauss_integral2(	double (*f)(basis_args,task),
     {
         for (i = 1; i <= intStep; i++)
         {
-            for (j = 0; j < 4; j++)
+            for (j = 0; j < 16; j++)
             {
                 temp_args.x = (double)(i-1)*stepx + x0 + 0.5*(nodes[j]+1.)*stepx;
                 res += weights[j]*(*f)(temp_args, *Task);
