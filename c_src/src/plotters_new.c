@@ -33,14 +33,14 @@ double reconstruct_at_t(task Task,
     int i;
     double result = 0.;
 
-    //if(x==X0 && y==Y0)
-    //return reconstruct_at(Task.solution, x+5.*diff_step,y+5.*diff_step);
-    //else if(x==X0 && y==Y1)
-    //return reconstruct_at(Task.solution, x+5.*diff_step,y-5.*diff_step);
-    //else if(x==X1 && y==Y0)
-    //return reconstruct_at(Task.solution, x-5.*diff_step,y+5.*diff_step);
-    //else if(x==X1 && y==Y1)
-    //return reconstruct_at(Task.solution, x-5.*diff_step,y-5.*diff_step);
+    if(x==X0 && y==Y0)
+    return reconstruct_at(Task.solution, x+5.*diff_step,y+5.*diff_step);
+    else if(x==X0 && y==Y1)
+    return reconstruct_at(Task.solution, x+5.*diff_step,y-5.*diff_step);
+    else if(x==X1 && y==Y0)
+    return reconstruct_at(Task.solution, x-5.*diff_step,y+5.*diff_step);
+    else if(x==X1 && y==Y1)
+    return reconstruct_at(Task.solution, x-5.*diff_step,y-5.*diff_step);
     for(i=0; i<N*N; i++)
     {
         result += gsl_vector_get(Task.solution, i)*structure(x,y,i);

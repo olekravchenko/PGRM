@@ -106,7 +106,7 @@ void solve_matrix_eq_t(task *Task)
 
 void CFD_problem()
 {
-    double Reynolds_number = 0.;
+    double Reynolds_number = 10.;
 	task stream_function, rotor_function;
     rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
     
@@ -175,7 +175,7 @@ void CFD_problem()
     solve_matrix_eq_t	(&stream_function);
 
     int i;
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < 120; i++)
     {
         form_right_part_t	(&rotor_function);
         solve_matrix_eq_t	(&rotor_function);
@@ -183,7 +183,7 @@ void CFD_problem()
         form_right_part_t	(&stream_function);
         gsl_matrix_memcpy	(rotor_function.sys, stream_function.sys);
         solve_matrix_eq_t	(&stream_function);
-        //plot_region_colorplot(stream_function.solution, stream_function.area);
+		if(i%10 == 0)plot_lines_of_stream(stream_function.solution, stream_function.area);
     }
 
     plot_lines_of_stream(stream_function.solution, stream_function.area);
@@ -212,20 +212,10 @@ int main(int argc, char **argv)
  * or just double click on build script the same way as usual program.
  *
  * ToDo:
- * 	-rewrite task forming completely
  * 	-simplify tasks' inner code
- * 	-add examples of code to be generated with the help of automatic omega former
- * 	-add derivatives to all primitives and modify their arguments
- * 	-add derivatives to all basis functions, including fup_3_poly
  * 	-start work on img2Rf smooth converter
- * 	-refactor the code, if you see that its unreadable, or mark it for further refactoring here
  * 	
- * 	-add support for distributed calculations with OpenMP
- * 	-start rewriting code to CUDA/OpenCL
  * 	-start work on GUI part of omega and boundary_f former
- * 
- * 	-restructure nearly all src's, find unused and move to legacy_* files
- * 	-add possibility to gauss integrals to work on different nodes quantity mode
  */
 {
     initGaussInt();
@@ -245,10 +235,10 @@ int main(int argc, char **argv)
     else if(argc == 1)
     {
 
-        N 			= 10;
+        N 			= 6;
         intStep 	= 1.;
-        init_eq(11);
-        init_basis(3);
+        init_eq(6);
+        init_basis(5);
 
         output_format	= 1000;
     }
@@ -259,15 +249,13 @@ int main(int argc, char **argv)
 	task function;
     rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
     
-    //initial psi calculation
-    tasks_constructor	(&function,sol_area);
-    form_system_t		(&function);
-    
-    //gsl_matrix_memcpy	(general_system, stream_function.sys);
-    solve_matrix_eq_t	(&function);
-    plot_region_colorplot(function.solution, function.area);
+    //~ tasks_constructor	(&function,sol_area);
+    //~ form_system_t		(&function);
+    //~ 
+    //~ solve_matrix_eq_t	(&function);
+    //~ plot_region_colorplot(function.solution, function.area);
 
-	//CFD_problem(); //to be used for testing solutions for Navier-Stokes equation in Stream function-Rotor form
+	CFD_problem(); //to be used for testing solutions for Navier-Stokes equation in Stream function-Rotor form
 	//task-id - 6
 	
     return 0;

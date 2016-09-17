@@ -41,33 +41,18 @@ double structure3(double x, double y, int n)
 }
 
 
-//difference type structure
-double structure2_diff(double x, double y, int n)
-{
-    double omega_at_point = omega(x,y);
-    return 	phi(x,y,n)-omega(x,y)*
-            ((omega(x+omega_at_point*0.5,y)-omega(x-omega_at_point*0.5,y))*
-             (phi(x+omega_at_point*0.5,y,n)-phi(x-omega_at_point*0.5,y,n))
-             +(omega(x,y+omega_at_point*0.5)-omega(x,y-omega_at_point*0.5))*
-             (phi(x,y+omega_at_point*0.5,n)-phi(x,y-omega_at_point*0.5,n))
-            )*glob_delta*glob_delta*0.25;
-}
-
-
 #define Power pow
 #define Sqrt sqrt
 
-//omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
-//omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/9., .b=Y1/9.};
 
 double bf16(double x, double y)
 {
 	omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
-	omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/9., .b=Y1/9.};
+	omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/5., .b=Y1/5.};
 
 	double	inner_v = rectangle(inner, x,y), 
 			extern_v = rectangle(external, x,y);
-	return inner_v*y/(inner_v + extern_v);
+	return (inner_v*y*(1.-y*y/3.)-extern_v*0.)/(inner_v - extern_v);
 }
 double o16(double x, double y)
 {
@@ -726,7 +711,7 @@ void init_eq(int id)
     }
     if(id == 16)
     {
-        structure = &structure1;
+        structure = &structure4;
         right_part_f = &f_num;
         u_exact 	 = &u5;
         f_boundary	 = &bf16;
