@@ -52,7 +52,7 @@ double bf16(double x, double y)
 
 	double	inner_v = rectangle(inner, x,y), 
 			extern_v = rectangle(external, x,y);
-	return (inner_v*y*(1.-y*y/3.)-extern_v*0.)/(inner_v - extern_v);
+	return (inner_v*y/*(1.-y*y/3.)*/-extern_v*0.)/(inner_v - extern_v);
 }
 double o16(double x, double y)
 {

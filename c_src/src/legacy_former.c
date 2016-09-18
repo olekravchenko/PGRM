@@ -1,3 +1,13 @@
+void solve_matrix_eq(gsl_vector * solution,
+                     gsl_matrix * system,
+                     gsl_vector * RightPart)
+//Solve SLE Ax=b, where A = system, b = RightPart, x = solution
+{
+    int i;
+    gsl_permutation * p = gsl_permutation_alloc (N*N);
+    gsl_linalg_LU_decomp (system, p, &i);
+    gsl_linalg_LU_solve (system, p, RightPart, solution);
+}
 
 double left_under_int_new(basis_args arguments)
 {

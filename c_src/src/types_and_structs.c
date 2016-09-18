@@ -23,6 +23,11 @@ double Structure1(double x, double y, int n, task Task)
 {
     return phi(x,y,n)*Task.omega(x,y);
 }
+double Structure4(double x, double y, int n, task Task)
+{
+	double temp_omega = Task.omega(x,y);
+    return phi(x,y,n)*temp_omega*temp_omega;
+}
 //Neumann problem structure
 double Structure2(double x, double y, int n, task Task)
 {
@@ -52,7 +57,14 @@ void tasks_constructor(task *Task, rect_area Area)
     Task->f_boundary = f_boundary;
     Task->omega = omega;
     Task->omega2 = omega2;
-    Task->structure = structure;
-
+    //~ if(structure == structure1)
+        //~ Task->structure = structure1;
+    //~ if(structure == structure2)
+        //~ Task->structure = structure2;
+    //~ if(structure == structureM)
+        //~ Task->structure = structureM;
+    //~ if(structure == structure4)
+        //~ Task->structure = structure4;
+	Task->structure = structure;
 
 }

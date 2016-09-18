@@ -32,9 +32,9 @@ double left_under_int_t(basis_args arguments, task Task)
     int 	n = arguments.n;
 
     return  Task.structure(x,y,m)*(
-                Task.structure(x+diff_step,y,n)+Task.structure(x-diff_step,y,n)+
-                Task.structure(x,y+diff_step,n)+Task.structure(x,y-diff_step,n)
-                -4.*Task.structure(x,y,n))*glob_delta*glob_delta;
+            Task.structure(x+diff_step,y,n)+Task.structure(x-diff_step,y,n)+
+            Task.structure(x,y+diff_step,n)+Task.structure(x,y-diff_step,n)
+            -4.*Task.structure(x,y,n))*glob_delta*glob_delta;
 }
 
 double right_under_int_t(basis_args arguments, task Task)
@@ -85,18 +85,7 @@ void form_right_part_t (task *Task)
     }
 }
 
-void solve_matrix_eq(gsl_vector * solution,
-                     gsl_matrix * system,
-                     gsl_vector * RightPart)
-//Solve SLE Ax=b, where A = system, b = RightPart, x = solution
-{
-    int i;
-    gsl_permutation * p = gsl_permutation_alloc (N*N);
-    gsl_linalg_LU_decomp (system, p, &i);
-    gsl_linalg_LU_solve (system, p, RightPart, solution);
-}
-void solve_matrix_eq_t(task *Task)
-//Solve SLE Ax=b, where A = system, b = RightPart, x = solution
+void solve_task(task *Task)
 {
     int i;
     gsl_permutation * p = gsl_permutation_alloc (N*N);
@@ -118,7 +107,7 @@ void CFD_problem()
     form_system_t		(&stream_function);
     
     gsl_matrix_memcpy	(general_system, stream_function.sys);
-    solve_matrix_eq_t	(&stream_function);
+    solve_task	(&stream_function);
     //plot_region_colorplot(stream_function.solution, stream_function.area);
     double psi(double x, double y)
     {
@@ -165,24 +154,24 @@ void CFD_problem()
 
     gsl_matrix_memcpy	(rotor_function.sys, general_system);
     form_right_part_t	(&rotor_function);
-    solve_matrix_eq_t	(&rotor_function);
+    solve_task	(&rotor_function);
 
     stream_function.right_part_f = 0;
     stream_function.right_part_f = &rotor_value;
 
     form_right_part_t	(&stream_function);
     gsl_matrix_memcpy	(rotor_function.sys, stream_function.sys);
-    solve_matrix_eq_t	(&stream_function);
+    solve_task	(&stream_function);
 
     int i;
     for (i = 0; i < 120; i++)
     {
         form_right_part_t	(&rotor_function);
-        solve_matrix_eq_t	(&rotor_function);
+        solve_task	(&rotor_function);
 
         form_right_part_t	(&stream_function);
         gsl_matrix_memcpy	(rotor_function.sys, stream_function.sys);
-        solve_matrix_eq_t	(&stream_function);
+        solve_task	(&stream_function);
 		if(i%10 == 0)plot_lines_of_stream(stream_function.solution, stream_function.area);
     }
 
@@ -210,15 +199,9 @@ int main(int argc, char **argv)
  * To build a program completly:
  * [path_to_PGRM/c_src]/src/build.sh
  * or just double click on build script the same way as usual program.
- *
- * ToDo:
- * 	-simplify tasks' inner code
- * 	-start work on img2Rf smooth converter
- * 	
- * 	-start work on GUI part of omega and boundary_f former
  */
 {
-    initGaussInt();
+    initGaussInt(16);
 
     omp_set_dynamic(1);
     omp_set_num_threads(8);
@@ -228,17 +211,17 @@ int main(int argc, char **argv)
     {
         N 				= atoi(argv[1]);
         intStep 		= (double) atoi(argv[2]);
-        init_eq(atoi(argv[3]));
-        init_basis(atoi(argv[4]));
+        init_eq		(atoi(argv[3]));
+        init_basis	(atoi(argv[4]));
         output_format	= atoi(argv[5]);
     }
     else if(argc == 1)
     {
 
-        N 			= 6;
-        intStep 	= 1.;
-        init_eq(6);
-        init_basis(5);
+        N 			= 8;
+        intStep 	= 4.;
+        init_eq		(16);
+        init_basis	(5);
 
         output_format	= 1000;
     }
@@ -249,14 +232,14 @@ int main(int argc, char **argv)
 	task function;
     rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
     
-    //~ tasks_constructor	(&function,sol_area);
-    //~ form_system_t		(&function);
-    //~ 
-    //~ solve_matrix_eq_t	(&function);
-    //~ plot_region_colorplot(function.solution, function.area);
+    tasks_constructor	(&function,sol_area);
+    form_system_t		(&function);
+    
+    solve_task	(&function);
+    plot_region_colorplot(function.solution, function.area);
 
-	CFD_problem(); //to be used for testing solutions for Navier-Stokes equation in Stream function-Rotor form
-	//task-id - 6
+	//~ CFD_problem(); //to be used for testing solutions for Navier-Stokes equation in Stream function-Rotor form
+	//task-id - 6 & 16
 	
     return 0;
 }
