@@ -1,42 +1,3 @@
-//double nodes[4], weights[4];
-
-//void initGaussInt()
-//{
-    ////initializing node & weights
-    //nodes[3] = sqrt(3./7. +2./7.*sqrt(1.2));
-    //nodes[0] = -nodes[3];
-    //nodes[2] = sqrt(3./7. -2./7.*sqrt(1.2));
-    //nodes[1] = -nodes[2];
-
-    //weights[2] = 0.5+sqrt(30)/36;
-    //weights[3] = 0.5-sqrt(30)/36;
-    //weights[0] = weights[3];
-    //weights[1] = weights[2];
-//}
-//double nodes[8], weights[8];
-
-//void initGaussInt()
-//{
-    ////initializing node & weights
-    //nodes[0] = -0.1834346424956498;
-    //nodes[1] =  0.1834346424956498;
-    //nodes[2] = -0.5255324099163290;
-    //nodes[3] =  0.5255324099163290;
-    //nodes[4] = -0.7966664774136267;
-    //nodes[5] =  0.7966664774136267;
-    //nodes[6] = -0.9602898564975363;
-    //nodes[7] =  0.9602898564975363;
-
-    //weights[0] = 0.3626837833783620;
-    //weights[1] = 0.3626837833783620;
-    //weights[2] = 0.3137066458778873;
-    //weights[3] = 0.3137066458778873;
-    //weights[4] = 0.2223810344533745;
-    //weights[5] = 0.2223810344533745;
-    //weights[6] = 0.1012285362903763;
-    //weights[7] = 0.1012285362903763;
-//}
-//~ double nodes[16], weights[16];
 double *nodes, *weights;
 int NodesQ;
 void initGaussInt(int nodes_quantity)
@@ -85,7 +46,7 @@ void initGaussInt(int nodes_quantity)
         weights[14] =  0.0271524594117541;
         weights[15] =  0.0271524594117541;
     }
-    if(nodes_quantity == 8) {
+    if(nodes_quantity == 8 ) {
         nodes[0] = -0.1834346424956498;
         nodes[1] =  0.1834346424956498;
         nodes[2] = -0.5255324099163290;
@@ -104,7 +65,7 @@ void initGaussInt(int nodes_quantity)
         weights[6] = 0.1012285362903763;
         weights[7] = 0.1012285362903763;
     }
-    if(nodes_quantity == 4) {
+    if(nodes_quantity == 4 ) {
         nodes[3] = sqrt(3./7. +2./7.*sqrt(1.2));
         nodes[0] = -nodes[3];
         nodes[2] = sqrt(3./7. -2./7.*sqrt(1.2));
@@ -117,51 +78,6 @@ void initGaussInt(int nodes_quantity)
     }
 }
 
-double gauss_integral(	double (*f)(basis_args),
-                        rect_area int_area,
-                        basis_args args,
-                        int dimension)
-{
-    double x0 = int_area.x0;
-    double x1 = int_area.x1;
-    double y0 = int_area.y0;
-    double y1 = int_area.y1;
-
-    int i,j, nodes_q = sizeof(nodes)/sizeof(double);
-    double res = 0., stepx = (x1-x0)/intStep, stepy = (y1-y0)/intStep;
-
-    basis_args temp_args = args;
-
-    //integral calculations
-    if (dimension == 2)
-    {
-        for (i = 1; i <= intStep; i++)
-        {
-            for (j = 0; j < nodes_q; j++)
-            {
-                temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
-                //res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
-                res += weights[j]*gauss_integral((*f), int_area, temp_args, 1);
-            }
-        }
-
-        return 0.5*res*stepy;
-    }
-    if (dimension == 1)
-    {
-        for (i = 1; i <= intStep; i++)
-        {
-            for (j = 0; j < nodes_q; j++)
-            {
-                temp_args.x = (double)(i-1)*stepx + x0 + 0.5*(nodes[j]+1.)*stepx;
-                res += weights[j]*(*f)(temp_args);
-            }
-        }
-
-        return 0.5*res*stepx;
-    }
-    return 0.;
-}
 double gauss_integral2(	double (*f)(basis_args,task),
                         rect_area int_area,
                         basis_args args,
@@ -172,39 +88,38 @@ double gauss_integral2(	double (*f)(basis_args,task),
     double x1 = int_area.x1;
     double y0 = int_area.y0;
     double y1 = int_area.y1;
-    //printf("%f %f %f %f\n", x0, x1, y0, y1);
-    int i,j;//, nodes_q = sizeof(nodes)/sizeof(double);
-    double res = 0., stepx = (x1-x0)/intStep, stepy = (y1-y0)/intStep;
+    int i,j;
+    double res = 0., step;
 
     basis_args temp_args = args;
 
-    //integral calculations
-    if (dimension == 2)
+    if (dimension == 2) //case of two dimensional integration in rectangle area
     {
+		step = (y1-y0)/intStep;
         for (i = 1; i <= intStep; i++)
         {
             for (j = 0; j < NodesQ; j++)
             {
-                temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
-                //res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
+                temp_args.y = (double)(i-1)*step + y0 + 0.5*(nodes[j]+1.)*step;
                 res += weights[j]*gauss_integral2((*f), int_area, temp_args, 1, Task);
             }
         }
 
-        return 0.5*res*stepy;
+        return 0.5*res*step;
     }
-    if (dimension == 1)
+    if (dimension == 1) //case of one dimensional integration
     {
+		step = (x1-x0)/intStep;
         for (i = 1; i <= intStep; i++)
         {
             for (j = 0; j < NodesQ; j++)
             {
-                temp_args.x = (double)(i-1)*stepx + x0 + 0.5*(nodes[j]+1.)*stepx;
+                temp_args.x = (double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step;
                 res += weights[j]*(*f)(temp_args, *Task);
             }
         }
 
-        return 0.5*res*stepx;
+        return 0.5*res*step;
     }
     return 0.;
 }

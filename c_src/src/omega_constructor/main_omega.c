@@ -32,115 +32,83 @@ double R_or(double x, double y)
  *
  */
 
-double band_y(omega_primitive properties, double x, double y) {
+
+double half_plane(omega_primitive properties, double x, double y, int dxN, int dyN) 
+{
+    double X = x - properties.x0;
+    double Y = y - properties.y0;
+    double a = properties.a;
+    double b = properties.b;
+	
+	if(dxN == 0 && dyN == 0)
+		return (a*X+b*Y)/sqrt(a*a+b*b);
+	if(dxN == 1 && dyN == 0)
+		return a/sqrt(a*a+b*b);
+	if(dxN == 0 && dyN == 1)
+		return b/sqrt(a*a+b*b);
+		
+	return 0.;
+}
+
+double band_y(omega_primitive properties, double x, double y, int dxN, int dyN) {
     double X = x - properties.x0;
     double width = properties.a;
 
-    return 0.5/width*(width-X)*(width+X);
+	if(dxN == 0 && dyN == 0)
+		return 0.5/width*(width-X)*(width+X);
+	if(dyN > 0 || dxN > 2)
+		return 0.;
+	if(dxN == 1)
+		return -X/width;
+	if(dxN == 2)
+		return -1./width;
+	return 0.;
 }
 
-double band_x(omega_primitive properties, double x, double y) {
+double band_x(omega_primitive properties, double x, double y, int dxN, int dyN) {
     double Y = y - properties.y0;
     double height = properties.b;
-
-    return 0.5/height*(height-Y)*(height+Y);
+	
+	if(dxN == 0 && dyN == 0)
+		return 0.5/height*(height-Y)*(height+Y);
+	if(dyN > 2 || dxN > 0)
+		return 0.;
+	if(dyN == 1)
+		return -Y/height;
+	if(dyN == 2)
+		return -1./height;
+	return 0.;
 }
 
-//double dx_band_x(omega_primitive properties, double x, double y) {
-
-    //return 0;
-//}
-
-//double dy_band_x(omega_primitive properties, double x, double y) {
-    //double Y = y - properties.y0;
-    //double height = properties.b;
-
-    //return -1/height*Y;
-//}
-
-//double d2x_band_x(omega_primitive properties, double x, double y) {
-    //return 0;
-//}
-
-//double dxdy_band_x(omega_primitive properties, double x, double y) {
-    
-    //return 0;
-//}
-
-//double d2y_band_x(omega_primitive properties, double x, double y) {
-    //double Y = y - properties.y0;
-    //double height = properties.b;
-
-    //return -1/height;
-//}
-
-double rectangle(omega_primitive properties, double x, double y) {
-    double X = x - properties.x0;
-    double Y = y - properties.y0;
-    double width = properties.a;
-    double height = properties.b;
-
-    double val01 = 0.5/width*(width-X)*(width+X);
-    double val02 = 0.5/height*(height-Y)*(height+Y);
 
 
-    return val01 + val02 - sqrt(val01*val01 + val02*val02);
-}
-
-/*
-double dx_rectangle(omega_primitive properties, double x, double y) {
-    double X = x - properties.x0;
-    double Y = y - properties.y0;
-    
-    double val01 = X;
-    double val02 = sqrt(X*X+Y*Y);
-
-
-    return 1 - val01/val02;
-}
-*/
-
-double circle(omega_primitive properties, double x, double y) {
+double circle(omega_primitive properties, double x, double y, int dxN, int dyN) {
     double X = x - properties.x0;
     double Y = y - properties.y0;
     double radius = properties.a;
 
-    return 0.5/radius*(radius*radius-X*X-Y*Y);
+
+	if(dxN == 0 && dyN == 0)
+		return 0.5/radius*(radius*radius-X*X-Y*Y);
+	if(dxN == 0)
+	{
+		if(dyN == 1)
+			return -Y/radius;
+		if(dyN == 2)
+			return -1./radius;
+	}
+	if(dyN == 0)
+	{
+		if(dxN == 1)
+			return -X/radius;
+		if(dxN == 2)
+			return -1./radius;
+	}
+	return 0.;
 }
 
-//double dx_circle(omega_primitive properties, double x, double y) {
-    //double X = x - properties.x0;
-    //double radius = properties.a;
 
-    //return -X/radius;
-//}
-
-//double dy_circle(omega_primitive properties, double x, double y) {
-    //double Y = y - properties.y0;
-    //double radius = properties.a;
-
-    //return -Y/radius;
-//}
-
-//double d2x_circle(omega_primitive properties, double x, double y) {
-    //double radius = properties.a;
-
-    //return -1/radius;
-//}
-
-//double dxy_circle(omega_primitive properties, double x, double y) {
-    //double radius = properties.a;
-
-    //return 0;
-//}
-
-//double d2y_circle(omega_primitive properties, double x, double y) {
-    //double radius = properties.a;
-
-    //return -1/radius;
-//}
-
-double ellipse(omega_primitive properties, double x, double y) {
+double ellipse(omega_primitive properties, double x, double y, int dxN, int dyN) {
     double X = x - properties.x0;
     double Y = y - properties.y0;
     double a = properties.a;
@@ -158,54 +126,37 @@ double ellipse(omega_primitive properties, double x, double y) {
 }
 
 
-double half_plane(omega_primitive properties, double x, double y) {
+
+
+
+
+
+double rectangle(omega_primitive properties, double x, double y, int dxN, int dyN) {
     double X = x - properties.x0;
     double Y = y - properties.y0;
-    double a = properties.a;
-    double b = properties.b;
+    double width = properties.a;
+    double height = properties.b;
 
-    double a2 = a*a;
-    double b2 = b*b;
+    double val01 = 0.5/width*(width-X)*(width+X);
+    double val02 = 0.5/height*(height-Y)*(height+Y);
 
-    return (a*X+b*Y)/sqrt(a2+b2);
+
+    return val01 + val02 - sqrt(val01*val01 + val02*val02);
 }
 
-//double dx_half_plane(omega_primitive properties, double x, double y) {
-    //double a = properties.a;
-    //double b = properties.b;
+double line_segment(omega_primitive properties, double x, double y, int dxN, int dyN)
+{
+	double	A = 1./(properties.a-properties.x0),
+			B = 1./(properties.b-properties.y0),
+			norm = 1./sqrt(A*A+B*B);
+	
+	return norm*R_or(fabs(A*(x-properties.x0)-B*(y-properties.y0)),
+			R_or(-A*(x-properties.x0)-B*(y-properties.y0),
+					A*(x-properties.a)+B*(y-properties.b)));
+	
+}
 
-    //double a2 = a*a;
-    //double b2 = b*b;
-
-    //return a/sqrt(a2+b2);
-//}
-
-//double dy_half_plane(omega_primitive properties, double x, double y) {
-    //double a = properties.a;
-    //double b = properties.b;
-
-    //double a2 = a*a;
-    //double b2 = b*b;
-
-    //return b/sqrt(a2+b2);
-//}
-
-//double d2x_half_plane(omega_primitive properties, double x, double y) {
-   
-    //return 0;
-//}
-
-//double dxy_half_plane(omega_primitive properties, double x, double y) {   
-
-    //return 0;
-//}
-
-//double d2y_half_plane(omega_primitive properties, double x, double y) {
-   
-    //return 0;
-//}
-
-double parabola(omega_primitive properties, double x, double y) {
+double parabola(omega_primitive properties, double x, double y, int dxN, int dyN) {
     double X = x - properties.x0;
     double Y = y - properties.y0;
     double a = properties.a;
@@ -217,16 +168,5 @@ double parabola(omega_primitive properties, double x, double y) {
     return (b-a*X2-Y)/sqrt(1+a2*X2);
 }
 
-double line_segment(omega_primitive properties, double x, double y)
-{
-	double	A = 1./(properties.a-properties.x0),
-			B = 1./(properties.b-properties.y0),
-			norm = 1./sqrt(A*A+B*B);
-	
-	return norm*R_or(fabs(A*(x-properties.x0)-B*(y-properties.y0)),
-			R_or(-A*(x-properties.x0)-B*(y-properties.y0),
-					A*(x-properties.a)+B*(y-properties.b)));
-	
-}
 
 

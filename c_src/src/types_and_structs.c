@@ -1,23 +1,4 @@
-typedef struct rect_area {
-    double x0, x1;
-    double y0, y1;
-} rect_area;
 
-typedef struct basis_args {
-    double	x, y;
-    int		m, n;
-} basis_args;
-
-typedef struct task {
-    double (*right_part_f)	(double, double);
-    double (*f_boundary)	(double, double);
-    double (*omega)			(double, double);
-    double (*omega2)		(double, double);
-    double (*structure)		(double, double, int);
-    rect_area area;
-    gsl_matrix 	*sys;
-    gsl_vector  *rightpart, *solution;
-} task;
 
 double Structure1(double x, double y, int n, task Task)
 {
@@ -57,14 +38,14 @@ void tasks_constructor(task *Task, rect_area Area)
     Task->f_boundary = f_boundary;
     Task->omega = omega;
     Task->omega2 = omega2;
-    //~ if(structure == structure1)
-        //~ Task->structure = structure1;
-    //~ if(structure == structure2)
-        //~ Task->structure = structure2;
-    //~ if(structure == structureM)
-        //~ Task->structure = structureM;
-    //~ if(structure == structure4)
-        //~ Task->structure = structure4;
-	Task->structure = structure;
+    if(structure == structure1)
+        Task->Structure = Structure1;
+    if(structure == structure2)
+        Task->Structure = Structure2;
+    if(structure == structureM)
+        Task->Structure = StructureM;
+    if(structure == structure4)
+        Task->Structure = Structure4;
+	//~ Task->structure = structure;
 
 }

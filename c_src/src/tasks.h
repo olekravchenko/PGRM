@@ -1,10 +1,33 @@
 #include <stdbool.h>
+#include <gsl/gsl_linalg.h>
 
 /*
  * ToDo: 
  * - write normal comments, start writing documents for code
  * 
  */
+typedef struct rect_area {
+    double x0, x1;
+    double y0, y1;
+} rect_area;
+
+typedef struct basis_args {
+    double	x, y;
+    int		m, n;
+} basis_args;
+
+typedef struct task {
+    double (*right_part_f)	(double, double);
+    double (*f_boundary)	(double, double);
+    double (*omega)			(double, double);
+    double (*omega2)		(double, double);
+    //~ double (*structure)		(double, double, int);
+    double (*Structure)		(double, double, int, struct task);
+    rect_area area;
+    gsl_matrix 	*sys;
+    gsl_vector  *rightpart, *solution;
+} task;
+ 
 
 double (*right_part_f)	(double, double);
 //in case of Poisson's equation $\Delta u = f$, right_part_f is f itself

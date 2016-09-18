@@ -50,15 +50,15 @@ double bf16(double x, double y)
 	omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
 	omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/5., .b=Y1/5.};
 
-	double	inner_v = rectangle(inner, x,y), 
-			extern_v = rectangle(external, x,y);
+	double	inner_v = rectangle(inner, x,y,0,0), 
+			extern_v = rectangle(external, x,y,0,0);
 	return (inner_v*y/*(1.-y*y/3.)*/-extern_v*0.)/(inner_v - extern_v);
 }
 double o16(double x, double y)
 {
 	omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
 	omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/9., .b=Y1/9.};
-	return R_and(rectangle(external, x,y),-rectangle(inner, x,y));
+	return R_and(rectangle(external, x,y,0,0),-rectangle(inner, x,y,0,0));
 }
 
 
@@ -84,7 +84,7 @@ double o14(double x, double y)
 	omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
 	omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/25., .b=Y1/25.};
 
-    return R_and(rectangle(external, x,y),-rectangle(inner, x,y));
+    return R_and(rectangle(external, x,y,0,0),-rectangle(inner, x,y,0,0));
 }
 double bf14(double x, double y)
 {
