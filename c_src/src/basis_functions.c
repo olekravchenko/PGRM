@@ -33,33 +33,6 @@ double chebyshev_1d(double x, int n)
     return 0.;
 }
 
-double d_chebyshevT(double x, int n)
-{
-	if(n == 0)
-		return 0.;
-	if(n == 1)
-		return 1.;
-	if(n == 2)
-		return 4.*x;
-	if(n == 3)
-		return 12.*x-3.;
-	if(n == 4)
-		return x*(-16.+32.*x*x);
-	if(n == 5)
-		return 5. + x*x*(-60. + 80.*x*x);
-	if(n == 6)
-		return x*(36.+x*x*192.*(-1.+x*x);
-	if(n == 7)
-		return -7 + x*x*(168. + x*x*(-560. + 448.*x*x));
-	if(n == 8)
-		return x.*(-64. + x*x*(640. + x*x*(-1536. + 1024.*x*x)));
-	if(n == 9)
-		return 9. + x*x*(-360. + x*x*(2160.+x*x*(-4032. + 2304.*x*x)));
-	if(n == 10)
-		return x.*(100.+x*x*(-1600.+x*x*(6720.+x*x*(-10240.+5120.*x*x))));
-	if(n > 11)
-		return n*chebyshev_1dU(x, n-1);
-}
 
 double chebyshev_2d(double x, double y, int n)
 {
@@ -97,8 +70,39 @@ double chebyshev_1dU(double x, int n)
 }
 double d_chebyshevU(double x, int n)
 {
-	return (-(1.+n)*chebyshev_1dU(x,n-1)+dN*x*chebyshev_1dU(x,n))/(x*x-1.);
+	return (-(1.+n)*chebyshev_1dU(x,n-1)+n*x*chebyshev_1dU(x,n))/(x*x-1.);
 }
+
+double d_chebyshevT(double x, int n)
+{
+	if(n == 0)
+		return 0.;
+	if(n == 1)
+		return 1.;
+	if(n == 2)
+		return 4.*x;
+	if(n == 3)
+		return 12.*x-3.;
+	if(n == 4)
+		return x*(-16.+32.*x*x);
+	if(n == 5)
+		return 5. + x*x*(-60. + 80.*x*x);
+	if(n == 6)
+		return x*(36.+x*x*192.*(-1.+x*x));
+	if(n == 7)
+		return -7 + x*x*(168. + x*x*(-560. + 448.*x*x));
+	if(n == 8)
+		return x*(-64. + x*x*(640. + x*x*(-1536. + 1024.*x*x)));
+	if(n == 9)
+		return 9. + x*x*(-360. + x*x*(2160.+x*x*(-4032. + 2304.*x*x)));
+	if(n == 10)
+		return x*(100.+x*x*(-1600.+x*x*(6720.+x*x*(-10240.+5120.*x*x))));
+	if(n > 11)
+		return n*chebyshev_1dU(x, n-1);
+	return 0.;
+}
+
+
 double chebyshev_2dU(double x, double y, int n)
 {
     return chebyshev_1dU(x/(X1-X0),n%N)*chebyshev_1dU(y/(Y1-Y0),n/N);

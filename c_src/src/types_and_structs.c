@@ -46,6 +46,5 @@ void tasks_constructor(task *Task, rect_area Area)
         Task->Structure = StructureM;
     if(structure == structure4)
         Task->Structure = Structure4;
-	//~ Task->structure = structure;
 
 }
