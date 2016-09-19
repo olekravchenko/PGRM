@@ -149,7 +149,7 @@ void CFD_problem()
     rotor_function.Structure = 0;
     rotor_function.f_boundary = &rotor_boundary_f;
     rotor_function.right_part_f = &rotors_right_f;
-    rotor_function.Structure = &Structure1;
+    rotor_function.Structure = &Structure4;
 
     gsl_matrix_memcpy	(rotor_function.sys, general_system);
     form_right_part_t	(&rotor_function);
@@ -218,8 +218,8 @@ int main(int argc, char **argv)
     {
 
         N 			= 8;
-        intStep 	= 2.;
-        init_eq		(6);
+        intStep 	= 1.;
+        init_eq		(16);
         init_basis	(5);
 
         output_format	= 1000;
@@ -228,16 +228,16 @@ int main(int argc, char **argv)
     diff_step 	= pow(2.,-10);
     glob_delta 	= 1./diff_step;
 
-	task function;
-    rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
+	//~ task function;
+    //~ rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
     
-    tasks_constructor	(&function,sol_area);
-    form_system_t		(&function);
+    //~ tasks_constructor	(&function,sol_area);
+    //~ form_system_t		(&function);
     
-    solve_task	(&function);
-    plot_region_colorplot(function.solution, function.area);
+    //~ solve_task	(&function);
+    //~ plot_region_colorplot(function.solution, function.area);
 
-	//~ CFD_problem(); //to be used for testing solutions for Navier-Stokes equation in Stream function-Rotor form
+	CFD_problem(); //to be used for testing solutions for Navier-Stokes equation in Stream function-Rotor form
 	//task-id - 6 & 16
 	
     return 0;
