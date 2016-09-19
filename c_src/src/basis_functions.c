@@ -33,7 +33,7 @@ double chebyshev_1d(double x, int n)
     return 0.;
 }
 
-double d_chebyshevT(double x, int dN)
+double d_chebyshevT(double x, int n)
 {
 	if(n == 0)
 		return 0.;
@@ -94,6 +94,10 @@ double chebyshev_1dU(double x, int n)
     if(n > 10)
         return 2.*x*chebyshev_1dU(x,n-1)-chebyshev_1dU(x,n-2);
     return 0.;
+}
+double d_chebyshevU(double x, int n)
+{
+	return (-(1.+n)*chebyshev_1dU(x,n-1)+dN*x*chebyshev_1dU(x,n))/(x*x-1.);
 }
 double chebyshev_2dU(double x, double y, int n)
 {
