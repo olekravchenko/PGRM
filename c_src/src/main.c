@@ -218,8 +218,8 @@ int main(int argc, char **argv)
     {
 
         N 			= 8;
-        intStep 	= 1.;
-        init_eq		(1);
+        intStep 	= 3.;
+        init_eq		(2);
         init_basis	(3);
 
         output_format	= 1000;
