@@ -101,7 +101,7 @@ double gauss_integral2(	double (*f)(basis_args,task),
             for (j = 0; j < NodesQ; j++)
             {
                 temp_args.y = (double)(i-1)*step + y0 + 0.5*(nodes[j]+1.)*step;
-                res += weights[j]*gauss_integral2((*f), int_area, temp_args, 1, Task);
+                res += /*sqrt(1.-temp_args.y*temp_args.y)*/weights[j]*gauss_integral2((*f), int_area, temp_args, 1, Task);
             }
         }
 
@@ -115,7 +115,7 @@ double gauss_integral2(	double (*f)(basis_args,task),
             for (j = 0; j < NodesQ; j++)
             {
                 temp_args.x = (double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step;
-                res += weights[j]*(*f)(temp_args, *Task);
+                res += /*sqrt(1.-temp_args.x*temp_args.x)*/weights[j]*(*f)(temp_args, *Task);
             }
         }
 

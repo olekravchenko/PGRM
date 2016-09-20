@@ -582,7 +582,7 @@ void init_eq(int id)
     }
     if(id == 6)
     {
-        structure = &structure4;
+        structure = &structure1;
         right_part_f = &f_num;
         u_exact 	 = &u5;
         f_boundary	 = &bf6;
