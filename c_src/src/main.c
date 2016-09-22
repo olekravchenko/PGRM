@@ -219,7 +219,7 @@ int main(int argc, char **argv)
 
         N 			= 8;
         intStep 	= 3.;
-        init_eq		(2);
+        init_eq		(1);
         init_basis	(3);
 
         output_format	= 1000;
@@ -228,10 +228,11 @@ int main(int argc, char **argv)
     diff_step 	= pow(2.,-10);
     glob_delta 	= 1./diff_step;
 
-	task *function = &GetTask(1);
-    //~ rect_area sol_area = function.area;
+	task function;// = &GetTask(1);
+	//~ GetTask(1, &function);
+    rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
     
-    //~ tasks_constructor	(&function,sol_area);
+    tasks_constructor	(&function,sol_area);
     form_system_t		(&function);
     
     solve_task	(&function);

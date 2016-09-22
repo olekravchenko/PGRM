@@ -66,5 +66,5 @@ double Structure2(double x, double y, int n, task Task);
 double StructureM(double x, double y, int n, task Task);
 double Structure4(double x, double y, int n, task Task);
 
-task GetTask(int id);
+void GetTask(int id, task *Task);
 

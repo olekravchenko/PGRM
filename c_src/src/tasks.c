@@ -4,7 +4,6 @@
 //Dirichlet problem structure
 double structure1(double x, double y, int n)
 {
-    //double omega_at = omega(x,y);
     return phi(x,y,n)*omega(x,y);//*omega_at;
 }
 //Rigid clamping :-)
@@ -501,6 +500,7 @@ double f1(double x, double y) {
     return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));
 }
 double u1(double x, double y) {
+	//~ printf("done!\n");
     return (x*x*x*x-1.)*(y*y*y*y-1.);
 }
 
@@ -724,41 +724,46 @@ void init_eq(int id)
     }   
 }
 
-task GetTask(int id)
+void GetTask(int id, task *Task)
 {
-	task returnTask;
-    returnTask.Structure = &Structure1;
+	//~ task returnTask;
+    (*Task).Structure = &Structure1;
     if(id == 1)
     {
-        returnTask.right_part_f  = &f1;
-        u_exact 	 	 = &u1;
-        returnTask.f_boundary	 = &laplace_f;
-        returnTask.omega		 = &omega_rectangle;
-        returnTask.omega2		 = &omega_rectangle;
+        (*Task).right_part_f = &f1;
+        u_exact 	 	 	 = &u1;
+        (*Task).f_boundary	 = &laplace_f;
+        (*Task).omega		 = &omega_rectangle;
+        (*Task).omega2		 = &omega_rectangle;
+        right_part_f = &f1;
+        //~ u_exact 	 = &u1;
+        f_boundary	 = &laplace_f;
+        omega		 = &omega_rectangle;
+        omega2		 = &omega_rectangle;
         X0 = -1.;
         X1 =  1.;
         Y0 = -1.;
         Y1 =  1.;        
-        returnTask.area.x0 = -1.;
-        returnTask.area.x1 =  1.;
-        returnTask.area.y0 = -1.;
-        returnTask.area.y1 =  1.;
+        (*Task).area.x0 = -1.;
+        (*Task).area.x1 =  1.;
+        (*Task).area.y0 = -1.;
+        (*Task).area.y1 =  1.;
     }
 
     if(id == 2)
     {
-        returnTask.right_part_f  = &f2;
+        (*Task).right_part_f  = &f2;
         u_exact 	 	 = &u2;
-        returnTask.f_boundary	 = &laplace_f;
-        returnTask.omega		 = &omega_rectangle;
+        (*Task).f_boundary	 = &laplace_f;
+        (*Task).omega		 = &omega_rectangle;
         X0 = -1.;
         X1 =  1.;
         Y0 = -1.;
         Y1 =  1.;
-        returnTask.area.x0 = -1.;
-        returnTask.area.x1 =  1.;
-        returnTask.area.y0 = -1.;
-        returnTask.area.y1 =  1.;
+        (*Task).area.x0 = -1.;
+        (*Task).area.x1 =  1.;
+        (*Task).area.y0 = -1.;
+        (*Task).area.y1 =  1.;
     }
-    return returnTask;
+    //~ return returnTask;
 }

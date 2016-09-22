@@ -2,6 +2,8 @@
 
 double Structure1(double x, double y, int n, task Task)
 {
+		//~ printf("done!\n");
+
     return phi(x,y,n)*Task.omega(x,y);
 }
 double Structure4(double x, double y, int n, task Task)
