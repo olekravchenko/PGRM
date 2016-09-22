@@ -721,8 +721,44 @@ void init_eq(int id)
         X1 =   1.;
         Y0 =  -1.;
         Y1 =   1.;
+    }   
+}
+
+task GetTask(int id)
+{
+	task returnTask;
+    returnTask.Structure = &Structure1;
+    if(id == 1)
+    {
+        returnTask.right_part_f  = &f1;
+        u_exact 	 	 = &u1;
+        returnTask.f_boundary	 = &laplace_f;
+        returnTask.omega		 = &omega_rectangle;
+        returnTask.omega2		 = &omega_rectangle;
+        X0 = -1.;
+        X1 =  1.;
+        Y0 = -1.;
+        Y1 =  1.;        
+        returnTask.area.x0 = -1.;
+        returnTask.area.x1 =  1.;
+        returnTask.area.y0 = -1.;
+        returnTask.area.y1 =  1.;
     }
 
-    
-    
+    if(id == 2)
+    {
+        returnTask.right_part_f  = &f2;
+        u_exact 	 	 = &u2;
+        returnTask.f_boundary	 = &laplace_f;
+        returnTask.omega		 = &omega_rectangle;
+        X0 = -1.;
+        X1 =  1.;
+        Y0 = -1.;
+        Y1 =  1.;
+        returnTask.area.x0 = -1.;
+        returnTask.area.x1 =  1.;
+        returnTask.area.y0 = -1.;
+        returnTask.area.y1 =  1.;
+    }
+    return returnTask;
 }

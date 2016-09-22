@@ -61,3 +61,10 @@ double structure1(double x, double y, int n);
 double structure2(double x, double y, int n);
 double structureM(double x, double y, int n);
 double structure4(double x, double y, int n);
+double Structure1(double x, double y, int n, task Task);
+double Structure2(double x, double y, int n, task Task);
+double StructureM(double x, double y, int n, task Task);
+double Structure4(double x, double y, int n, task Task);
+
+task GetTask(int id);
+

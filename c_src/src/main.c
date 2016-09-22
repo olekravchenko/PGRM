@@ -228,10 +228,10 @@ int main(int argc, char **argv)
     diff_step 	= pow(2.,-10);
     glob_delta 	= 1./diff_step;
 
-	task function;
-    rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
+	task *function = &GetTask(1);
+    //~ rect_area sol_area = function.area;
     
-    tasks_constructor	(&function,sol_area);
+    //~ tasks_constructor	(&function,sol_area);
     form_system_t		(&function);
     
     solve_task	(&function);
