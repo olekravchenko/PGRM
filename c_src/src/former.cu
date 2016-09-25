@@ -98,37 +98,21 @@ __global__ void initGaussInt()
     weights[15] =  0.0271524594117541;
 }
 
-__device__ double gauss_integral_right(rect_area int_area,
-                                       basis_args args,
-                                       int dimension)
+__device__ double gauss_integral_right1(rect_area int_area,
+                                       basis_args args
+                                       )
 {
     double x0 = int_area.x0;
     double x1 = int_area.x1;
-    double y0 = int_area.y0;
-    double y1 = int_area.y1;
+    //~ double y0 = int_area.y0;
+    //~ double y1 = int_area.y1;
 
     int i,j;
-    double res = 0., stepx = (x1-x0)/intStep, stepy = (y1-y0)/intStep;
+    double res = 0., stepx = (x1-x0)/intStep;//, stepy = (y1-y0)/intStep;
 
     basis_args temp_args = args;
 
     //integral calculations
-    if (dimension == 2)
-    {
-        for (i = 1; i <= intStep; i++)
-        {
-            for (j = 0; j < 16; j++)
-            {
-                temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
-                //res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
-                res += weights[j]*gauss_integral_right( int_area, temp_args, 1);
-            }
-        }
-
-        return 0.5*res*stepy;
-    }
-    if (dimension == 1)
-    {
         for (i = 1; i <= intStep; i++)
         {
             for (j = 0; j < 16; j++)
@@ -139,80 +123,119 @@ __device__ double gauss_integral_right(rect_area int_area,
         }
 
         return 0.5*res*stepx;
-    }
-    return 0.;
 }
-__device__ double gauss_integral_left(rect_area int_area,
-                                      basis_args args,
-                                      int dimension)
+
+__device__ double gauss_integral_right2(rect_area int_area,
+                                       basis_args args
+                                       )
 {
-    double x0 = int_area.x0;
-    double x1 = int_area.x1;
+    //~ double x0 = int_area.x0;
+    //~ double x1 = int_area.x1;
     double y0 = int_area.y0;
     double y1 = int_area.y1;
 
     int i,j;
-    double res = 0., stepx = (x1-x0)/intStep, stepy = (y1-y0)/intStep;
+    double res = 0.,/* stepx = (x1-x0)/intStep, */stepy = (y1-y0)/intStep;
 
     basis_args temp_args = args;
 
     //integral calculations
-    if (dimension == 2)
-    {
         for (i = 1; i <= intStep; i++)
         {
             for (j = 0; j < 16; j++)
             {
                 temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
                 //res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
-                res += weights[j]*gauss_integral_left( int_area, temp_args, 1);
+                res += weights[j]*gauss_integral_right1( int_area, temp_args);
             }
         }
 
         return 0.5*res*stepy;
-    }
-    if (dimension == 1)
-    {
-        for (i = 1; i <= intStep; i++)
-        {
-            for (j = 0; j < 16; j++)
-            {
-                temp_args.x = (double)(i-1)*stepx + x0 + 0.5*(nodes[j]+1.)*stepx;
-                res += weights[j]*left_under_int_new(temp_args);
-            }
-        }
+}
 
-        return 0.5*res*stepx;
+__device__ double gauss_integral_left1(rect_area int_area,
+                                       basis_args args
+                                       )
+{
+    double x0 = int_area.x0;
+    double x1 = int_area.x1;
+    //~ double y0 = int_area.y0;
+    //~ double y1 = int_area.y1;
+
+    int i,j;
+    double res = 0., stepx = (x1-x0)/intStep;//, stepy = (y1-y0)/intStep;
+
+    basis_args temp_args = args;
+
+    //integral calculations
+    for (i = 1; i <= intStep; i++)
+    {
+        for (j = 0; j < 16; j++)
+        {
+            temp_args.x = (double)(i-1)*stepx + x0 + 0.5*(nodes[j]+1.)*stepx;
+            res += weights[j]*left_under_int_new(temp_args);
+        }
     }
-    return 0.;
+
+    return 0.5*res*stepx;
+}
+__device__ double gauss_integral_left2(rect_area int_area,
+                                       basis_args args
+                                       )
+{
+    //~ double x0 = int_area.x0;
+    //~ double x1 = int_area.x1;
+    double y0 = int_area.y0;
+    double y1 = int_area.y1;
+
+    int i,j;
+    double res = 0.,/* stepx = (x1-x0)/intStep, */stepy = (y1-y0)/intStep;
+
+    basis_args temp_args = args;
+
+    //integral calculations
+    for (i = 1; i <= intStep; i++)
+    {
+        for (j = 0; j < 16; j++)
+        {
+            temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
+            //res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
+            res += weights[j]*gauss_integral_left1( int_area, temp_args);
+        }
+    }
+
+    return 0.5*res*stepy;
 }
 
 
 
-__global__ void form_matrix_new (float *sys,
-                                 float *RightPart,
-                                 rect_area int_area)
+
+
+__global__ void form_matrix_new (float *sys)/*,
+                                 //float *RightPart,
+                                 rect_area int_area)*/
 {
-    int i, j;
+    int i = blockIdx.x, j = threadIdx.x;
     basis_args args;
     args.x = 0.;
     args.y = 0.;
     args.m = 0;
     args.n = 0;
-
-    for(i = 0; i < N*N; i++) // replace this two loops with links to blockId and threadId
-    {
-        args.m = i;
-        RightPart[i] = gauss_integral_right(int_area,args,2);
-        for(j = 0; j < N*N; j++)
-        {
-            args.n = j;
-            sys[i*N*N+j] = gauss_integral_left(int_area, args,2);
-        }
-    }
+	rect_area int_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
+    //~ for(i = 0; i < N*N; i++) // replace this two loops with links to blockId and threadId
+    //~ {
+    args.m = i;
+    
+    //RightPart[i] = gauss_integral_right2(int_area,args);
+    
+    
+    //~ for(j = 0; j < N*N; j++)
+    //~ {
+    args.n = j;
+    sys[i*N*N+j] = gauss_integral_left2(int_area, args);
+    //~ }
+    //~ }
 }
-
-
 //used as example from previous project
 __global__ void iter		(float *U, float *Unew, int size)
 {
@@ -225,14 +248,27 @@ __global__ void iter		(float *U, float *Unew, int size)
 int main()
 {
     //pointers to host arrays
-    float *system;//, *right_part, *solution;
-
+    float *System;//, *right_part, *solution;
+	//rect_area *Area;
     //pointers to device copies of host arrays
-    float *dev_system;//, *dev_right_part, *dev_solution;
-
-    system = (float *)malloc(N*N * N*N*sizeof(float));
-    cudaMalloc( &dev_system, N*N * N*N*sizeof(float));
-
-
+    float *dev_System;//, *dev_right_part, *dev_solution;
+	
+    System = (float *)malloc(N*N * N*N*sizeof(float));
+    cudaMalloc( &dev_System, N*N * N*N*sizeof(float));
+	int i;//,j;
+	for(i = 0; i< N*N * N*N; i++)
+	{
+		System[i] = 0.;
+	}
+	cudaMemcpy( dev_System, System, N*N * N*N*sizeof(float), cudaMemcpyHostToDevice);
+	form_matrix_new<<<N*N, N*N>>>(dev_System);
+	cudaMemcpy( System, dev_System, N*N * N*N*sizeof(float), cudaMemcpyDeviceToHost);
+	for(i = 0; i < N*N * N*N; i++)
+	{
+		printf("%3.3f ",System[i]);
+		if(i%(N*N) == 0)
+			printf("\n");
+	}
+	printf("\n");
     return 0;
 }
