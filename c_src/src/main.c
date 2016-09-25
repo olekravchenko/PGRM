@@ -220,12 +220,12 @@ int main(int argc, char **argv)
         N 			= 8;
         intStep 	= 3.;
         init_eq		(1);
-        init_basis	(3);
+        init_basis	(2);
 
         output_format	= 1000;
     }
 
-    diff_step 	= pow(2.,-10);
+    diff_step 	= pow(2.,-14);
     glob_delta 	= 1./diff_step;
 
 	task function;// = &GetTask(1);
@@ -234,6 +234,8 @@ int main(int argc, char **argv)
     
     tasks_constructor	(&function,sol_area);
     form_system_t		(&function);
+    
+    gsl_vector_fprintf(stdout,function.rightpart,"%f");
     
     solve_task	(&function);
     multiplot(function.solution, function.area);
