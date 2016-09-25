@@ -1,12 +1,16 @@
 #include <stdio.h>
+#include <gsl/gsl_linalg.h>
+
 
 #define N 	10
 #define X0 -1.
 #define X1  1.
 #define Y0 -1.
 #define Y1  1.
-#define diff_step 0.00000001
-#define glob_delta 100000000.
+//~ #define diff_step 0.0009765625
+//~ #define glob_delta 1024.
+#define diff_step 0.00006103515625
+#define glob_delta 16384.
 #define intStep 1.
 
 typedef struct basis_args {
@@ -30,6 +34,48 @@ __device__ double structure(double x, double y, int n)
 {
     return phi(x,y,n)*omega(x,y);
 }
+
+__host__ double Hphi (double x, double y, int n)
+{
+    return pow(x,n%N)*pow(y,n/N);
+}
+__host__ double Homega(double x, double y) {
+    return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
+}
+__host__ double Hstructure(double x, double y, int n)
+{
+    return Hphi(x,y,n)*Homega(x,y);
+}
+__host__ double reconstruct_at(gsl_vector *solution,
+                               double x, double y)
+// Reconstucts value of solution at point (x,y)
+{
+    int i;
+    double result = 0.;
+    for(i=0; i<N*N; i++)
+        result += gsl_vector_get(solution, i)*Hstructure(x,y,i);
+
+    return result;
+}
+
+void plot_region(gsl_vector *solution/*, rect_area plot_area*/)
+{
+    double hx = (X1-X0)/64.,
+           hy = (Y1-Y0)/64.,
+           i,j;
+
+    FILE * op;
+    op = fopen("../plot_data/plot_region", "w");
+    for(i=X0; i<=X1; i+=hx)
+        for(j=Y0; j<=Y1; j+=hy)
+        {
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
+        }
+    fclose(op);
+    i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");
+}
+
+
 __device__ double right_part_f(double x, double y)
 {
     return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));
@@ -211,9 +257,9 @@ __device__ double gauss_integral_left2(rect_area int_area,
 
 
 
-__global__ void form_matrix_new (float *sys)/*,
-                                 //float *RightPart,
-                                 rect_area int_area)*/
+__global__ void form_matrix_new (float *sys,
+                                 float *RightPart)
+                                 //rect_area int_area)
 {
     int i = blockIdx.x, j = threadIdx.x;
     basis_args args;
@@ -225,49 +271,68 @@ __global__ void form_matrix_new (float *sys)/*,
 	
     args.m = i;
     
-    //RightPart[i] = gauss_integral_right2(int_area,args);
+    RightPart[i] = gauss_integral_right2(int_area,args);
     
     args.n = j;
     
     
     sys[i*N*N+j] = gauss_integral_left2(int_area, args);
 }
-//used as example from previous project
-__global__ void iter		(float *U, float *Unew, int size)
-{
-    int k = (blockIdx.x + 1)*size + (threadIdx.x +1);
-    float h=0.01;
-    Unew[k] = 0.25*(U[k+size]+U[k-size]+U[k-1]+U[k+1]-h*h*2*expf(h*(blockIdx.x+threadIdx.x+2)));
-}
 
 
 int main()
 {
-	initGaussInt<<<1,1>>>();
+    initGaussInt<<<1,1>>>();
 
-	
+
     //pointers to host arrays
-    float *System;//, *right_part, *solution;
-	//rect_area *Area;
+    float *System, *right_part;//, *solution;
+    //rect_area *Area;
     //pointers to device copies of host arrays
-    float *dev_System;//, *dev_right_part, *dev_solution;
-	
+    float *dev_System, *dev_right_part;//, *dev_solution;
+
     System = (float *)malloc(N*N * N*N*sizeof(float));
-    cudaMalloc( &dev_System, N*N * N*N*sizeof(float));
-	int i;//,j;
-	for(i = 0; i< N*N * N*N; i++)
-	{
-		System[i] = 0.;
-	}
-	cudaMemcpy( dev_System, System, N*N * N*N*sizeof(float), cudaMemcpyHostToDevice);
-	form_matrix_new<<<N*N, N*N>>>(dev_System);
-	cudaMemcpy( System, dev_System, N*N * N*N*sizeof(float), cudaMemcpyDeviceToHost);
-	for(i = 0; i < N*N * N*N; i++)
-	{
-		printf("%e ",System[i]);
-		if(i%(N*N) == 0)
-			printf("\n");
-	}
-	printf("\n");
+    cudaMalloc (&dev_System, N*N * N*N*sizeof(float));
+    right_part = (float *)malloc(N*N*sizeof(float));
+    cudaMalloc (&dev_right_part, N*N*sizeof(float));
+
+
+    int i, j;
+
+    for(i = 0; i< N*N * N*N; i++)
+        System[i] = 0.;
+    for(i = 0; i<N*N; i++)
+        right_part[i] = 0.;
+
+    cudaMemcpy( dev_System, System, N*N * N*N*sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy( dev_right_part,right_part,N*N*sizeof(float), cudaMemcpyHostToDevice);
+    form_matrix_new<<<N*N, N*N>>>(dev_System, dev_right_part);
+    cudaMemcpy( System, dev_System, N*N * N*N*sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy( right_part, dev_right_part, N*N*sizeof(float), cudaMemcpyDeviceToHost);
+
+    gsl_matrix 	*Gsys;
+    gsl_vector  *Grightpart, *Gsolution;
+
+    Gsys		= gsl_matrix_alloc (N*N,N*N);
+    Grightpart	= gsl_vector_alloc(N*N);
+    Gsolution	= gsl_vector_alloc(N*N);
+
+    for(i = 0; i < N*N; i++)
+    {
+        gsl_vector_set(Grightpart, i, right_part[i]);
+        for(j = 0; j < N*N; j++)
+        {
+            gsl_matrix_set(Gsys, i,j, System[i*N*N+j]);
+        }
+    }
+
+
+    gsl_permutation * p = gsl_permutation_alloc (N*N);
+    gsl_linalg_LU_decomp (Gsys, p, &i);
+    gsl_linalg_LU_solve (Gsys, p, Grightpart, Gsolution);
+
+	plot_region(Gsolution);
+
+
     return 0;
 }
