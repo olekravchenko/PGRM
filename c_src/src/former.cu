@@ -7,7 +7,7 @@
 #define Y1  1.
 #define diff_step 0.00000001
 #define glob_delta 100000000.
-#define intStep 2.
+#define intStep 1.
 
 typedef struct basis_args {
     double	x, y;
@@ -222,19 +222,15 @@ __global__ void form_matrix_new (float *sys)/*,
     args.m = 0;
     args.n = 0;
 	rect_area int_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
-    //~ for(i = 0; i < N*N; i++) // replace this two loops with links to blockId and threadId
-    //~ {
+	
     args.m = i;
     
     //RightPart[i] = gauss_integral_right2(int_area,args);
     
-    
-    //~ for(j = 0; j < N*N; j++)
-    //~ {
     args.n = j;
+    
+    
     sys[i*N*N+j] = gauss_integral_left2(int_area, args);
-    //~ }
-    //~ }
 }
 //used as example from previous project
 __global__ void iter		(float *U, float *Unew, int size)
@@ -247,6 +243,9 @@ __global__ void iter		(float *U, float *Unew, int size)
 
 int main()
 {
+	initGaussInt<<<1,1>>>();
+
+	
     //pointers to host arrays
     float *System;//, *right_part, *solution;
 	//rect_area *Area;
@@ -265,7 +264,7 @@ int main()
 	cudaMemcpy( System, dev_System, N*N * N*N*sizeof(float), cudaMemcpyDeviceToHost);
 	for(i = 0; i < N*N * N*N; i++)
 	{
-		printf("%3.3f ",System[i]);
+		printf("%e ",System[i]);
 		if(i%(N*N) == 0)
 			printf("\n");
 	}
