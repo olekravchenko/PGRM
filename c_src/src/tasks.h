@@ -21,6 +21,7 @@ typedef struct task {
     double (*f_boundary)	(double, double);
     double (*omega)			(double, double);
     double (*omega2)		(double, double);
+    double (*exact_solution)(double, double);
     //~ double (*structure)		(double, double, int);
     double (*Structure)		(double, double, int, struct task);
     rect_area area;

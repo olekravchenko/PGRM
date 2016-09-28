@@ -94,6 +94,42 @@ void multiplot(gsl_vector *solution, rect_area plot_area)
     i = system("../bin/plotter_experimental.py &");
 }
 
+void multiplot_t(task Task)
+{
+    double hx = (Task.area.x1-Task.area.x0)/64.,
+           hy = (Task.area.y1-Task.area.y0)/64.,
+           i,j;
+
+    FILE * op;
+    op = fopen("../plot_data/plot_region", "w");
+    for(i=Task.area.x0; i<=Task.area.x1; i+=hx)
+        for(j=Task.area.y0; j<=Task.area.y1; j+=hy)
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(Task.solution,i,j));
+    fclose(op);
+
+    op = fopen("../plot_data/plot_exact_solution", "w");
+    for(i=Task.area.x0; i<=Task.area.x1; i+=hx)
+        for(j=Task.area.y0; j<=Task.area.y1; j+=hy)
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, Task.exact_solution(i,j));
+    fclose(op);
+
+    op = fopen("../plot_data/plot_plot_omega", "w");
+
+    for(i=Task.area.x0; i<=Task.area.x1; i+=hx)
+        for(j=Task.area.y0; j<=Task.area.y1; j+=hy)
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, Task.omega(i,j));
+    fclose(op);
+
+    op = fopen("../plot_data/plot_region_error", "w");
+    for(i=Task.area.x0; i<=Task.area.x1; i+=hx)
+        for(j=Task.area.y0; j<=Task.area.y1; j+=hy)
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, fabs(reconstruct_at(Task.solution,i,j)-u_exact(i,j)));
+    fclose(op);
+
+    i = system("../bin/plotter_experimental.py &");
+}
+
+
 
 void plot_region(gsl_vector *solution, rect_area plot_area)
 // Plot solution in rectangle region
