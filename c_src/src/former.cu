@@ -259,7 +259,7 @@ __device__ double gauss_integral_left2(rect_area int_area,
 
 
 
-__global__ void form_sle (float *sys, float *RightPart)
+__global__ void form_PGRM_sle (float *sys, float *RightPart)
 {
     int i = blockIdx.x, j = threadIdx.x;
     basis_args args;
@@ -279,14 +279,14 @@ __global__ void form_sle (float *sys, float *RightPart)
     sys[i*N*N+j] = gauss_integral_left2(int_area, args);
 }
 
-__host__ void solve_using_PGRM_with_plot(float *System, float *right_part)
+__host__ void solve_sle_with_reconstruction(float *System, float *right_part)
 {
     gsl_matrix 	*Gsys = gsl_matrix_alloc (N*N,N*N);
     gsl_vector  *Grightpart = gsl_vector_alloc(N*N), 
 				*Gsolution = gsl_vector_alloc(N*N);
     int i, j;
 
-		//filling library-specified mathematical objects
+	//filling library-specified mathematical objects
     for(i = 0; i < N*N; i++)
     {
         gsl_vector_set(Grightpart, i, right_part[i]);
@@ -303,6 +303,21 @@ __host__ void solve_using_PGRM_with_plot(float *System, float *right_part)
 	plot_region(Gsolution);
 }
 
+__host__ void form_sle_on_gpu (float *System, float *right_part)
+{
+	float *dev_System, *dev_right_part;
+
+	cudaMalloc (&dev_System, N*N * N*N*sizeof(float));
+    cudaMalloc (&dev_right_part, N*N*sizeof(float));
+
+    form_PGRM_sle<<<N*N, N*N>>>(dev_System, dev_right_part);
+
+	cudaMemcpy( System, dev_System, N*N * N*N*sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy( right_part, dev_right_part, N*N*sizeof(float), cudaMemcpyDeviceToHost);
+	
+	cudaFree(dev_right_part);
+	cudaFree(dev_System);
+}
 int main()
 {
     initGaussInt<<<1,1>>>();
@@ -312,15 +327,8 @@ int main()
     System = (float *)malloc(N*N * N*N*sizeof(float));
     right_part = (float *)malloc(N*N*sizeof(float));
 
-	float *dev_System, *dev_right_part;
-    cudaMalloc (&dev_System, N*N * N*N*sizeof(float));
-    cudaMalloc (&dev_right_part, N*N*sizeof(float));
-
-    form_sle<<<N*N, N*N>>>(dev_System, dev_right_part);
-    cudaMemcpy( System, dev_System, N*N * N*N*sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy( right_part, dev_right_part, N*N*sizeof(float), cudaMemcpyDeviceToHost);
-
-	solve_using_PGRM_with_plot(System, right_part);
+	form_sle_on_gpu (System, right_part);
+	solve_sle_with_reconstruction(System, right_part);
 	
     return 0;
 }
