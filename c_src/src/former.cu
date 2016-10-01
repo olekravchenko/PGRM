@@ -38,19 +38,27 @@ __device__ double phi (double x, double y, int n)
 {
     return pow(x,n%N)*pow(y,n/N);
 }
-__device__ double omega(double x, double y) {
+__device__ double omega(double x, double y) 
+{
     return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
 }
 __device__ double structure(double x, double y, int n)
 {
     return phi(x,y,n)*omega(x,y);
 }
+__device__ double right_part_f(double x, double y)
+{
+    return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));
+}
+
+
 
 __host__ double Hphi (double x, double y, int n)
 {
     return pow(x,n%N)*pow(y,n/N);
 }
-__host__ double Homega(double x, double y) {
+__host__ double Homega(double x, double y) 
+{
     return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
 }
 __host__ double Hstructure(double x, double y, int n)
@@ -83,12 +91,6 @@ void plot_region(gsl_vector *solution/*, rect_area plot_area*/)
             fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
     fclose(op);
     i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");
-}
-
-
-__device__ double right_part_f(double x, double y)
-{
-    return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));
 }
 
 
@@ -318,6 +320,7 @@ __host__ void form_sle_on_gpu (float *System, float *right_part)
 	cudaFree(dev_right_part);
 	cudaFree(dev_System);
 }
+
 int main()
 {
     initGaussInt<<<1,1>>>();

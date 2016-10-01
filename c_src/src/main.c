@@ -58,11 +58,11 @@ void form_system_t (task *Task)
     for(i = 0; i < N*N; i++)
     {
         args.m = i;
-        gsl_vector_set(Task->rightpart, i, gauss_integral2(right_under_int_t,Task->area,args,2, Task));
+        gsl_vector_set(Task->rightpart, i, gauss_integral3(right_under_int_t,Task->area,args,2, Task));
         for(j = 0; j < N*N; j++)
         {
             args.n = j;
-            gsl_matrix_set(Task->sys, i,j, gauss_integral2(left_under_int_t, Task->area, args,2, Task));
+            gsl_matrix_set(Task->sys, i,j, gauss_integral3(left_under_int_t, Task->area, args,2, Task));
         }
     }
 }
@@ -80,7 +80,7 @@ void form_right_part_t (task *Task)
     for(i = 0; i < N*N; i++)
     {
         args.m = i;
-        gsl_vector_set(Task->rightpart, i, gauss_integral2(right_under_int_t,Task->area,args,2, Task));
+        gsl_vector_set(Task->rightpart, i, gauss_integral3(right_under_int_t,Task->area,args,2, Task));
     }
 }
 

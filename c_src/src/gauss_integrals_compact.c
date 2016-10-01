@@ -124,3 +124,57 @@ double gauss_integral2(	double (*f)(basis_args,task),
     return 0.;
 }
 
+double gauss_integral3(	double (*f)(basis_args,task),
+                        rect_area int_area,
+                        basis_args args,
+                        int dimension,
+                        task *Task)
+{
+    double x0 = int_area.x0;
+    double x1 = int_area.x1;
+    double y0 = int_area.y0;
+    double y1 = int_area.y1;
+    int i,j, M,N;
+    double res = 0., stepy = (y1-y0)/intStep, stepx = (x1-x0)/intStep;
+
+    basis_args temp_args = args;
+
+    if (dimension == 2) //case of two dimensional integration in rectangle area
+    {
+		//step = (y1-y0)/intStep;
+        for (i = 1; i <= intStep; i++)
+        {
+            for (j = 0; j < NodesQ; j++)
+            {
+                temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
+				for (M = 1; M <= intStep; M++)
+				{
+					for (N = 0; N < NodesQ; N++)
+					{
+						temp_args.x = (double)(M-1)*stepx + x0 + 0.5*(nodes[N]+1.)*stepx;
+						res += weights[j]*weights[N]*(*f)(temp_args, *Task);
+					}
+				}
+            }
+        }
+
+        return 0.5*res*stepx*stepy;
+    }
+    if (dimension == 1) //case of one dimensional integration
+    {
+		//step = (x1-x0)/intStep;
+        for (i = 1; i <= intStep; i++)
+        {
+            for (j = 0; j < NodesQ; j++)
+            {
+                temp_args.x = (double)(i-1)*stepx + x0 + 0.5*(nodes[j]+1.)*stepx;
+                res += weights[j]*(*f)(temp_args, *Task);
+            }
+        }
+
+        return 0.5*res*stepx;
+    }
+    return 0.;
+}
+
+
