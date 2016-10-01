@@ -2,15 +2,25 @@
 #include <gsl/gsl_linalg.h>
 
 
-#define N 	10
+#define N 10
 #define X0 -1.
 #define X1  1.
 #define Y0 -1.
 #define Y1  1.
-//~ #define diff_step 0.0009765625
-//~ #define glob_delta 1024.
-#define diff_step 0.00006103515625
-#define glob_delta 16384.
+
+//depends on which kind of variable supports patricular GPU
+
+//16-bit (tested on CUDA 5.5 + GT8600M + OS X 10.9)
+#define diff_step 0.0078125
+#define glob_delta 128.
+
+//32-bit (tested on CUDA 5.5 + GTX660 + xUbuntu)
+//#define diff_step 0.0009765625
+//#define glob_delta 1024.
+
+//64-bit (untested on GPU, tested only on CPU)
+//#define diff_step 0.00006103515625
+//#define glob_delta 16384.
 #define intStep 1.
 
 typedef struct basis_args {
@@ -65,11 +75,11 @@ void plot_region(gsl_vector *solution/*, rect_area plot_area*/)
            i,j;
 
     FILE * op;
-    op = fopen("../plot_data/plot_region", "w");
+    op = fopen("../plot_data/plot_region.txt", "w");
     for(i=X0; i<=X1; i+=hx)
         for(j=Y0; j<=Y1; j+=hy)
         {
-            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
+            fprintf(op, "%15.15f,%15.15f,%15.15f;\n", i,j, reconstruct_at(solution,i,j));
         }
     fclose(op);
     i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");
@@ -150,15 +160,12 @@ __device__ double gauss_integral_right1(rect_area int_area,
 {
     double x0 = int_area.x0;
     double x1 = int_area.x1;
-    //~ double y0 = int_area.y0;
-    //~ double y1 = int_area.y1;
 
     int i,j;
-    double res = 0., stepx = (x1-x0)/intStep;//, stepy = (y1-y0)/intStep;
+    double res = 0., stepx = (x1-x0)/intStep;
 
     basis_args temp_args = args;
 
-    //integral calculations
         for (i = 1; i <= intStep; i++)
         {
             for (j = 0; j < 16; j++)
@@ -175,23 +182,19 @@ __device__ double gauss_integral_right2(rect_area int_area,
                                        basis_args args
                                        )
 {
-    //~ double x0 = int_area.x0;
-    //~ double x1 = int_area.x1;
     double y0 = int_area.y0;
     double y1 = int_area.y1;
 
     int i,j;
-    double res = 0.,/* stepx = (x1-x0)/intStep, */stepy = (y1-y0)/intStep;
+    double res = 0., stepy = (y1-y0)/intStep;
 
     basis_args temp_args = args;
 
-    //integral calculations
         for (i = 1; i <= intStep; i++)
         {
             for (j = 0; j < 16; j++)
             {
                 temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
-                //res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
                 res += weights[j]*gauss_integral_right1( int_area, temp_args);
             }
         }
@@ -205,15 +208,12 @@ __device__ double gauss_integral_left1(rect_area int_area,
 {
     double x0 = int_area.x0;
     double x1 = int_area.x1;
-    //~ double y0 = int_area.y0;
-    //~ double y1 = int_area.y1;
 
     int i,j;
-    double res = 0., stepx = (x1-x0)/intStep;//, stepy = (y1-y0)/intStep;
+    double res = 0., stepx = (x1-x0)/intStep;
 
     basis_args temp_args = args;
 
-    //integral calculations
     for (i = 1; i <= intStep; i++)
     {
         for (j = 0; j < 16; j++)
@@ -229,23 +229,19 @@ __device__ double gauss_integral_left2(rect_area int_area,
                                        basis_args args
                                        )
 {
-    //~ double x0 = int_area.x0;
-    //~ double x1 = int_area.x1;
     double y0 = int_area.y0;
     double y1 = int_area.y1;
 
     int i,j;
-    double res = 0.,/* stepx = (x1-x0)/intStep, */stepy = (y1-y0)/intStep;
+    double res = 0., stepy = (y1-y0)/intStep;
 
     basis_args temp_args = args;
 
-    //integral calculations
     for (i = 1; i <= intStep; i++)
     {
         for (j = 0; j < 16; j++)
         {
             temp_args.y = (double)(i-1)*stepy + y0 + 0.5*(nodes[j]+1.)*stepy;
-            //res += weights[j]*SubIntegralLeft((*f),x0,x1,(double)(i-1)*step + x0 + 0.5*(nodes[j]+1.)*step,k1,k2);
             res += weights[j]*gauss_integral_left1( int_area, temp_args);
         }
     }
@@ -259,7 +255,6 @@ __device__ double gauss_integral_left2(rect_area int_area,
 
 __global__ void form_matrix_new (float *sys,
                                  float *RightPart)
-                                 //rect_area int_area)
 {
     int i = blockIdx.x, j = threadIdx.x;
     basis_args args;
@@ -284,39 +279,30 @@ int main()
 {
     initGaussInt<<<1,1>>>();
 
-
-    //pointers to host arrays
+    //as usual, we define pointer to arrays in RAM and GPU RAM
     float *System, *right_part;//, *solution;
-    //rect_area *Area;
-    //pointers to device copies of host arrays
     float *dev_System, *dev_right_part;//, *dev_solution;
 
+    //and allocaing this memory
     System = (float *)malloc(N*N * N*N*sizeof(float));
     cudaMalloc (&dev_System, N*N * N*N*sizeof(float));
     right_part = (float *)malloc(N*N*sizeof(float));
     cudaMalloc (&dev_right_part, N*N*sizeof(float));
 
-
-    int i, j;
-
-    for(i = 0; i< N*N * N*N; i++)
-        System[i] = 0.;
-    for(i = 0; i<N*N; i++)
-        right_part[i] = 0.;
-
-    cudaMemcpy( dev_System, System, N*N * N*N*sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy( dev_right_part,right_part,N*N*sizeof(float), cudaMemcpyHostToDevice);
+    //forming the system. TODO: rename this func...
     form_matrix_new<<<N*N, N*N>>>(dev_System, dev_right_part);
     cudaMemcpy( System, dev_System, N*N * N*N*sizeof(float), cudaMemcpyDeviceToHost);
     cudaMemcpy( right_part, dev_right_part, N*N*sizeof(float), cudaMemcpyDeviceToHost);
 
+
     gsl_matrix 	*Gsys;
     gsl_vector  *Grightpart, *Gsolution;
-
     Gsys		= gsl_matrix_alloc (N*N,N*N);
     Grightpart	= gsl_vector_alloc(N*N);
     Gsolution	= gsl_vector_alloc(N*N);
+    int i, j;
 
+    //filling library-specified mathematical objects
     for(i = 0; i < N*N; i++)
     {
         gsl_vector_set(Grightpart, i, right_part[i]);
@@ -325,7 +311,6 @@ int main()
             gsl_matrix_set(Gsys, i,j, System[i*N*N+j]);
         }
     }
-
 
     gsl_permutation * p = gsl_permutation_alloc (N*N);
     gsl_linalg_LU_decomp (Gsys, p, &i);
