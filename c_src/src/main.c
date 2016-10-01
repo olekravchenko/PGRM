@@ -13,7 +13,7 @@
 #include "basis_functions.c"
 #include "plotters_new.c"
 #include "gauss_integrals_compact.c"
-
+#include "error_fs_new.c"
 
 
 
@@ -217,8 +217,8 @@ int main(int argc, char **argv)
     else if(argc == 1)
     {
 
-        N 			= 8;
-        intStep 	= 3.;
+        N 			= 10;
+        intStep 	= 1.;
         init_eq		(1);
         init_basis	(2);
 
@@ -235,11 +235,17 @@ int main(int argc, char **argv)
     tasks_constructor	(&function,sol_area);
     form_system_t		(&function);
     
-    gsl_vector_fprintf(stdout,function.rightpart,"%f");
+    //~ gsl_vector_fprintf(stdout,function.rightpart,"%f");
     
     solve_task	(&function);
-    multiplot(function.solution, function.area);
-
+    //~ multiplot(function.solution, function.area);
+    basis_args zero_args = {0,0,0,0};
+    
+    multiplot_t(function);
+    
+	printf("%15.15e\n",errl2(zero_args,&function,2));
+	
+	
 	//~ CFD_problem(); //to be used for testing solutions for Navier-Stokes equation in Stream function-Rotor form
 	//task-id - 6 & 16
 	

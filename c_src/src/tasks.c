@@ -92,7 +92,7 @@ double bf14(double x, double y)
        (-2 + 625*x*x + 625*y*y + 
          Sqrt(2 - 1250*x*x + 390625*x*x*x*x - 1250*y*y + 390625*y*y*y*y)
          ))/(1248 - 625*Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y) + 
-       Sqrt(2 - 1250*x*x + 390625*x*x*x*x - 1250*y*y + 390625*y*y*y*y)));
+       Sqrt(2 - 1250*x*x + 390625*x*x/*exact_solution*/*x*x - 1250*y*y + 390625*y*y*y*y)));
 }
 
 double o13(double x, double y)
@@ -325,7 +325,7 @@ double f7(double x, double y)
                 Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y)) +
                2*Power(-2 + x*x + y*y,2)*
                (-2 + x*x + y*y +
-                Sqrt(2 - 2*x*x + x*x*x*x - 2*y*y + y*y*y*y))))/
+                Sqrt(2 - 2*x*x + x*x*x*x/*exact_solution*/ - 2*y*y + y*y*y*y))))/
            (2.*Power(-2 + x*x + y*y,3));
 }
 double bf7(double x, double y)
@@ -517,7 +517,7 @@ void init_eq(int id)
     structure = 0;
     f_boundary = 0;
     right_part_f = 0;
-
+	u_exact = 0;
 
     structure = &structure1;
     if(id == 1)
@@ -584,7 +584,6 @@ void init_eq(int id)
     {
         structure = &structure1;
         right_part_f = &f_num;
-        u_exact 	 = &u5;
         f_boundary	 = &bf6;
         omega		 = &o6;
         omega2		 = &o6;
@@ -597,7 +596,7 @@ void init_eq(int id)
     {
         structure	 = &structure2;
         right_part_f = &f7;
-        u_exact 	 = &u5;
+        //~ u_exact 	 = &u5;
         f_boundary	 = &bf7;
         omega		 = &o7;
         X0 =  -1.;
@@ -609,7 +608,7 @@ void init_eq(int id)
     {
         structure	 = &structure2;
         right_part_f = &f_num;
-        u_exact 	 = &u5;
+        //~ u_exact 	 = &u5;
         f_boundary	 = &bf7;
         omega		 = &o7;
         omega2		 = &o7;
@@ -622,7 +621,7 @@ void init_eq(int id)
     {
         structure	 = &structureM;
         right_part_f = &f_num;
-        u_exact 	 = &u5;
+        //~ u_exact 	 = &u5;
         f_boundary	 = &bf9;
         omega		 = &o9;
         omega2		 = &o9_2;
@@ -635,7 +634,7 @@ void init_eq(int id)
     {
         structure	 = &structureM;
         right_part_f = &f_num;
-        u_exact 	 = &u5;
+        //~ u_exact 	 = &u5;
         f_boundary	 = &bf10;
         omega		 = &o9;
         omega2		 = &o10_2;
@@ -648,7 +647,7 @@ void init_eq(int id)
     {
         structure	 = &structureM;
         right_part_f = &f_num;
-        u_exact 	 = &u5;
+        //~ u_exact 	 = &u5;
         f_boundary	 = &bf11;
         omega		 = &o11;
         omega2		 = &o11_2;
@@ -661,7 +660,7 @@ void init_eq(int id)
     {
         structure	 = &structureM;
         right_part_f = &f_num;
-        u_exact 	 = &u5;
+        //~ u_exact 	 = &u5;
         f_boundary	 = &bf12;
         omega		 = &o12;
         omega2		 = &o12_2;
@@ -674,7 +673,7 @@ void init_eq(int id)
     {   //doesn't work with basises: 1,
         structure	 = &structureM;
         right_part_f = &f_num;
-        u_exact 	 = &u5;
+        //~ u_exact 	 = &u5;
         f_boundary	 = &bf13;
         omega		 = &o13;
         omega2		 = &o12_2;
@@ -687,7 +686,7 @@ void init_eq(int id)
     {
         structure = &structure4;
         right_part_f = &f_num;
-        u_exact 	 = &u5;
+        //~ u_exact 	 = &u5;
         f_boundary	 = &bf14;
         omega		 = &o14;
         omega2		 = &o14;
@@ -700,7 +699,7 @@ void init_eq(int id)
     {
         structure = &structure1;
         right_part_f = &f_num;
-        u_exact 	 = &u5;
+        //~ u_exact 	 = &u5;
         f_boundary	 = &bf15;
         omega		 = &omega_rectangle;
         omega2		 = &omega_rectangle;
@@ -713,7 +712,7 @@ void init_eq(int id)
     {
         structure = &structure4;
         right_part_f = &f_num;
-        u_exact 	 = &u5;
+        //~ u_exact 	 = &u5;
         f_boundary	 = &bf16;
         omega		 = &o16;
         omega2		 = &o16;

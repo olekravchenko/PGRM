@@ -40,6 +40,7 @@ void tasks_constructor(task *Task, rect_area Area)
     Task->f_boundary = f_boundary;
     Task->omega = omega;
     Task->omega2 = omega2;
+    Task->exact_solution = u_exact;
     if(structure == structure1)
         Task->Structure = Structure1;
     if(structure == structure2)
