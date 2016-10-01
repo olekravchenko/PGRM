@@ -11,12 +11,12 @@
 //depends on which kind of variable supports patricular GPU
 
 //16-bit (tested on CUDA 5.5 + GT8600M + OS X 10.9)
-#define diff_step 0.0078125
-#define glob_delta 128.
+//#define diff_step 0.0078125
+//#define glob_delta 128.
 
 //32-bit (tested on CUDA 5.5 + GTX660 + xUbuntu)
-//#define diff_step 0.0009765625
-//#define glob_delta 1024.
+#define diff_step 0.0009765625
+#define glob_delta 1024.
 
 //64-bit (untested on GPU, tested only on CPU)
 //#define diff_step 0.00006103515625
@@ -32,6 +32,7 @@ typedef struct rect_area {
     double x0, x1;
     double y0, y1;
 } rect_area;
+
 
 __device__ double phi (double x, double y, int n)
 {
@@ -56,9 +57,10 @@ __host__ double Hstructure(double x, double y, int n)
 {
     return Hphi(x,y,n)*Homega(x,y);
 }
+
+
 __host__ double reconstruct_at(gsl_vector *solution,
                                double x, double y)
-// Reconstucts value of solution at point (x,y)
 {
     int i;
     double result = 0.;
@@ -75,12 +77,10 @@ void plot_region(gsl_vector *solution/*, rect_area plot_area*/)
            i,j;
 
     FILE * op;
-    op = fopen("../plot_data/plot_region.txt", "w");
+    op = fopen("../plot_data/plot_region", "w");
     for(i=X0; i<=X1; i+=hx)
         for(j=Y0; j<=Y1; j+=hy)
-        {
-            fprintf(op, "%15.15f,%15.15f,%15.15f;\n", i,j, reconstruct_at(solution,i,j));
-        }
+            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
     fclose(op);
     i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");
 }
@@ -99,7 +99,8 @@ __device__ double left_under_int_new(basis_args arguments)
     int 	m = arguments.m;
     int 	n = arguments.n;
 
-    return  	structure(x,y,m)*(
+	//returns S\phi_m \Delta (S\phi_n), where S is operator of the structure
+    return			structure(x,y,m)*(
                     structure(x+diff_step,y,n)+structure(x-diff_step,y,n)+
                     structure(x,y+diff_step,n)+structure(x,y-diff_step,n)
                     -4.*structure(x,y,n))*glob_delta*glob_delta;
@@ -116,8 +117,8 @@ __device__ double right_under_int_new(basis_args arguments)
 
 __device__ double nodes[16], weights[16];
 __global__ void initGaussInt()
+//initialization of node & weights values
 {
-    //initializing node & weights
     nodes[0] 	= -0.0950125098376374;
     nodes[1] 	=  0.0950125098376374;
     nodes[2] 	= -0.2816035507792589;
@@ -154,9 +155,17 @@ __global__ void initGaussInt()
     weights[15] =  0.0271524594117541;
 }
 
+
+
+
+/*
+ * TODO: try to reduce quantity of similar gauss integral functions, as next to the CPU
+ *  way as only possible
+ */
+
+
 __device__ double gauss_integral_right1(rect_area int_area,
-                                       basis_args args
-                                       )
+                                       basis_args args)
 {
     double x0 = int_area.x0;
     double x1 = int_area.x1;
@@ -179,8 +188,7 @@ __device__ double gauss_integral_right1(rect_area int_area,
 }
 
 __device__ double gauss_integral_right2(rect_area int_area,
-                                       basis_args args
-                                       )
+                                       basis_args args)
 {
     double y0 = int_area.y0;
     double y1 = int_area.y1;
@@ -203,8 +211,7 @@ __device__ double gauss_integral_right2(rect_area int_area,
 }
 
 __device__ double gauss_integral_left1(rect_area int_area,
-                                       basis_args args
-                                       )
+                                       basis_args args)
 {
     double x0 = int_area.x0;
     double x1 = int_area.x1;
@@ -226,8 +233,7 @@ __device__ double gauss_integral_left1(rect_area int_area,
     return 0.5*res*stepx;
 }
 __device__ double gauss_integral_left2(rect_area int_area,
-                                       basis_args args
-                                       )
+                                       basis_args args)
 {
     double y0 = int_area.y0;
     double y1 = int_area.y1;
@@ -253,8 +259,7 @@ __device__ double gauss_integral_left2(rect_area int_area,
 
 
 
-__global__ void form_matrix_new (float *sys,
-                                 float *RightPart)
+__global__ void form_sle (float *sys, float *RightPart)
 {
     int i = blockIdx.x, j = threadIdx.x;
     basis_args args;
@@ -274,35 +279,14 @@ __global__ void form_matrix_new (float *sys,
     sys[i*N*N+j] = gauss_integral_left2(int_area, args);
 }
 
-
-int main()
+__host__ void solve_using_PGRM_with_plot(float *System, float *right_part)
 {
-    initGaussInt<<<1,1>>>();
-
-    //as usual, we define pointer to arrays in RAM and GPU RAM
-    float *System, *right_part;//, *solution;
-    float *dev_System, *dev_right_part;//, *dev_solution;
-
-    //and allocaing this memory
-    System = (float *)malloc(N*N * N*N*sizeof(float));
-    cudaMalloc (&dev_System, N*N * N*N*sizeof(float));
-    right_part = (float *)malloc(N*N*sizeof(float));
-    cudaMalloc (&dev_right_part, N*N*sizeof(float));
-
-    //forming the system. TODO: rename this func...
-    form_matrix_new<<<N*N, N*N>>>(dev_System, dev_right_part);
-    cudaMemcpy( System, dev_System, N*N * N*N*sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy( right_part, dev_right_part, N*N*sizeof(float), cudaMemcpyDeviceToHost);
-
-
-    gsl_matrix 	*Gsys;
-    gsl_vector  *Grightpart, *Gsolution;
-    Gsys		= gsl_matrix_alloc (N*N,N*N);
-    Grightpart	= gsl_vector_alloc(N*N);
-    Gsolution	= gsl_vector_alloc(N*N);
+    gsl_matrix 	*Gsys = gsl_matrix_alloc (N*N,N*N);
+    gsl_vector  *Grightpart = gsl_vector_alloc(N*N), 
+				*Gsolution = gsl_vector_alloc(N*N);
     int i, j;
 
-    //filling library-specified mathematical objects
+		//filling library-specified mathematical objects
     for(i = 0; i < N*N; i++)
     {
         gsl_vector_set(Grightpart, i, right_part[i]);
@@ -317,7 +301,26 @@ int main()
     gsl_linalg_LU_solve (Gsys, p, Grightpart, Gsolution);
 
 	plot_region(Gsolution);
+}
 
+int main()
+{
+    initGaussInt<<<1,1>>>();
 
+    //as usual, we define pointer to arrays in RAM and GPU RAM
+    float *System, *right_part;
+    System = (float *)malloc(N*N * N*N*sizeof(float));
+    right_part = (float *)malloc(N*N*sizeof(float));
+
+	float *dev_System, *dev_right_part;
+    cudaMalloc (&dev_System, N*N * N*N*sizeof(float));
+    cudaMalloc (&dev_right_part, N*N*sizeof(float));
+
+    form_sle<<<N*N, N*N>>>(dev_System, dev_right_part);
+    cudaMemcpy( System, dev_System, N*N * N*N*sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy( right_part, dev_right_part, N*N*sizeof(float), cudaMemcpyDeviceToHost);
+
+	solve_using_PGRM_with_plot(System, right_part);
+	
     return 0;
 }
