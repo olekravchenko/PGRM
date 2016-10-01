@@ -58,11 +58,11 @@ void form_system_t (task *Task)
     for(i = 0; i < N*N; i++)
     {
         args.m = i;
-        gsl_vector_set(Task->rightpart, i, gauss_integral3(right_under_int_t,Task->area,args,2, Task));
+        gsl_vector_set(Task->rightpart, i, gauss_integral3(right_under_int_t,Task->area,args,2,Task));
         for(j = 0; j < N*N; j++)
         {
             args.n = j;
-            gsl_matrix_set(Task->sys, i,j, gauss_integral3(left_under_int_t, Task->area, args,2, Task));
+            gsl_matrix_set(Task->sys, i,j, gauss_integral3(left_under_int_t,Task->area,args,2,Task));
         }
     }
 }
@@ -80,7 +80,7 @@ void form_right_part_t (task *Task)
     for(i = 0; i < N*N; i++)
     {
         args.m = i;
-        gsl_vector_set(Task->rightpart, i, gauss_integral3(right_under_int_t,Task->area,args,2, Task));
+        gsl_vector_set(Task->rightpart, i, gauss_integral3(right_under_int_t,Task->area,args,2,Task));
     }
 }
 
@@ -88,15 +88,15 @@ void solve_task(task *Task)
 {
     int i;
     gsl_permutation * p = gsl_permutation_alloc (N*N);
-    gsl_linalg_LU_decomp (Task->sys, p, &i);
-    gsl_linalg_LU_solve (Task->sys, p, Task->rightpart, Task->solution);
+    gsl_linalg_LU_decomp (Task->sys,p,&i);
+    gsl_linalg_LU_solve (Task->sys,p,Task->rightpart,Task->solution);
 }
 
 void CFD_problem()
 {
     double Reynolds_number = 10.;
 	task stream_function, rotor_function;
-    rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
+    rect_area sol_area = {.x0 = X0,.x1 = X1,.y0 = Y0,.y1 = Y1};
     
     
     gsl_matrix *general_system = gsl_matrix_alloc (N*N,N*N); //single-use temporary storage for the matrix of the system

@@ -141,7 +141,6 @@ double gauss_integral3(	double (*f)(basis_args,task),
 
     if (dimension == 2) //case of two dimensional integration in rectangle area
     {
-		//step = (y1-y0)/intStep;
         for (i = 1; i <= intStep; i++)
         {
             for (j = 0; j < NodesQ; j++)
@@ -162,7 +161,6 @@ double gauss_integral3(	double (*f)(basis_args,task),
     }
     if (dimension == 1) //case of one dimensional integration
     {
-		//step = (x1-x0)/intStep;
         for (i = 1; i <= intStep; i++)
         {
             for (j = 0; j < NodesQ; j++)
