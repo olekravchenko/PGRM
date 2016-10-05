@@ -15,12 +15,12 @@
 //#define glob_delta 128.
 
 //32-bit (tested on CUDA 5.5 + GTX660 + xUbuntu)
-#define diff_step 0.0009765625
-#define glob_delta 1024.
+//#define diff_step 0.0009765625
+//#define glob_delta 1024.
 
 //64-bit (untested on GPU, tested only on CPU)
-//#define diff_step 0.00006103515625
-//#define glob_delta 16384.
+#define diff_step 0.00006103515625
+#define glob_delta 16384.
 #define intStep 1.
 
 typedef struct basis_args {
@@ -34,37 +34,8 @@ typedef struct rect_area {
 } rect_area;
 
 
-__device__ double phi (double x, double y, int n)
-{
-    return pow(x,n%N)*pow(y,n/N);
-}
-__device__ double omega(double x, double y) 
-{
-    return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
-}
-__device__ double structure(double x, double y, int n)
-{
-    return phi(x,y,n)*omega(x,y);
-}
-__device__ double right_part_f(double x, double y)
-{
-    return 12.*(y*y*(x*x*x*x-1.) + x*x*(y*y*y*y-1.));
-}
+#include "task.cu"
 
-
-
-__host__ double Hphi (double x, double y, int n)
-{
-    return pow(x,n%N)*pow(y,n/N);
-}
-__host__ double Homega(double x, double y) 
-{
-    return (x-X0)*(x-X1)*(y-Y0)*(y-Y1);
-}
-__host__ double Hstructure(double x, double y, int n)
-{
-    return Hphi(x,y,n)*Homega(x,y);
-}
 
 
 __host__ double reconstruct_at(gsl_vector *solution,
@@ -90,7 +61,7 @@ void plot_region(gsl_vector *solution/*, rect_area plot_area*/)
         for(j=Y0; j<=Y1; j+=hy)
             fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
     fclose(op);
-    i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");
+    i = system("screen -d -m ../bin/Plot &");
 }
 
 
@@ -324,8 +295,10 @@ __host__ void form_sle_on_gpu (float *System, float *right_part)
 int main()
 {
     initGaussInt<<<1,1>>>();
-
-    //as usual, we define pointer to arrays in RAM and GPU RAM
+	//phi = &phi_b3;
+    set_b3<<<1,1>>>();
+	
+	//as usual, we define pointer to arrays in RAM and GPU RAM
     float *System, *right_part;
     System = (float *)malloc(N*N * N*N*sizeof(float));
     right_part = (float *)malloc(N*N*sizeof(float));
