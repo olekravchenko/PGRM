@@ -289,7 +289,7 @@ int main(int argc, char **argv)
 	//printf("%15.15e\n",errl2(zero_args,&function,2));
 	
 	//Moving charged body in electrostatical approximation
-	// 	charged_body_el_stat();
+// 	charged_body_el_stat();
 	
 	
 	//~ CFD_problem(); //to be used for testing solutions for Navier-Stokes equation in Stream function-Rotor form
