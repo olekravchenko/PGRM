@@ -43,6 +43,23 @@ double structure3(double x, double y, int n)
 #define Power pow
 #define Sqrt sqrt
 
+double bf17(double x, double y)
+{
+	omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
+	omega_primitive inner	 = {.x0=x_center, .y0 = y_center, .a=X1/5., .b=Y1/5.};
+
+	double	inner_v = rectangle(inner, x,y,0,0), 
+			extern_v = rectangle(external, x,y,0,0);
+	return (/*0./extern_v*/ - 1./inner_v)/(-1./inner_v + 1./extern_v);
+}
+double o17(double x, double y)
+{
+	omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
+	omega_primitive inner	 = {.x0=x_center, .y0 = y_center, .a=X1/5., .b=Y1/5.};
+	return R_and(rectangle(external, x,y,0,0),-rectangle(inner, x,y,0,0));
+}
+
+
 
 double bf16(double x, double y)
 {
@@ -56,7 +73,7 @@ double bf16(double x, double y)
 double o16(double x, double y)
 {
 	omega_primitive external = {.x0=0., .y0 = 0., .a=X1, .b=Y1};
-	omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/9., .b=Y1/9.};
+	omega_primitive inner	 = {.x0=0., .y0 = 0., .a=X1/5., .b=Y1/5.};
 	return R_and(rectangle(external, x,y,0,0),-rectangle(inner, x,y,0,0));
 }
 
@@ -720,7 +737,20 @@ void init_eq(int id)
         X1 =   1.;
         Y0 =  -1.;
         Y1 =   1.;
-    }   
+    }
+    if(id == 17)
+    {
+        structure = &structure1;
+        right_part_f = &f_num;
+        //~ u_exact 	 = &u5;
+        f_boundary	 = &bf17;
+        omega		 = &o17;
+        omega2		 = &o17;
+        X0 =  -1.;
+        X1 =   1.;
+        Y0 =  -1.;
+        Y1 =   1.;
+    } 
 }
 
 void GetTask(int id, task *Task)

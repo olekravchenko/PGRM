@@ -69,3 +69,5 @@ double Structure4(double x, double y, int n, task Task);
 
 void GetTask(int id, task *Task);
 
+double x_center, y_center; 
+

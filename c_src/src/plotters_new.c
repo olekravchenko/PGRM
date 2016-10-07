@@ -129,27 +129,39 @@ void multiplot_t(task Task)
     i = system("../bin/plotter_experimental.py &");
 }
 
-
-
-void plot_region(gsl_vector *solution, rect_area plot_area)
-// Plot solution in rectangle region
-// from x1 till x2 by x, and from y1 till y2 by y
-
+void plot_region_colorplot_t(task Task)
 {
-    double hx = (plot_area.x1-plot_area.x0)/64.,
-           hy = (plot_area.y1-plot_area.y0)/64.,
+    double hx = (Task.area.x1-Task.area.x0)/64.,
+           hy = (Task.area.y1-Task.area.y0)/64.,
            i,j;
 
     FILE * op;
     op = fopen("../plot_data/plot_region", "w");
-    for(i=plot_area.x0; i<=plot_area.x1; i+=hx)
-        for(j=plot_area.y0; j<=plot_area.y1; j+=hy)
-        {
-            fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
-        }
+    for(i=Task.area.x0; i<=Task.area.x1; i+=hx)
+        for(j=Task.area.y0; j<=Task.area.y1; j+=hy)
+            fprintf(op, "%15.15f %15.15f %15.15f\n",i,j,reconstruct_at(Task.solution,i,j));
     fclose(op);
-    i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");
+
+    i = system("screen -d -m ../bin/Plot_colormap&");
 }
+
+
+void plot_region_t(task Task)
+{
+    double hx = (Task.area.x1-Task.area.x0)/64.,
+           hy = (Task.area.y1-Task.area.y0)/64.,
+           i,j;
+
+    FILE * op;
+    op = fopen("../plot_data/plot_region", "w");
+    for(i=Task.area.x0; i<=Task.area.x1; i+=hx)
+        for(j=Task.area.y0; j<=Task.area.y1; j+=hy)
+            fprintf(op, "%15.15f %15.15f %15.15f\n",i,j,reconstruct_at(Task.solution,i,j));
+    fclose(op);
+
+    i = system("screen -d -m ../bin/Plot&");
+}
+
 void plot_func(double (*f)(double, double), rect_area plot_area)
 // Plot solution in rectangle region
 // from x1 till x2 by x, and from y1 till y2 by y
@@ -284,37 +296,37 @@ void plot_region_error(gsl_vector *solution, rect_area plot_area)
 }
 
 
-void plot_by_argument(gsl_vector *solution, int output_format, rect_area area)
-{
-    if (output_format == 0)
-    {
-        return;
-    }
-    if (output_format == 1111)
-    {
-        multiplot	(solution, area);
-        return;
-    }
-
-
-    if (output_format/1000%10 == 1)
-    {
-        plot_region	(solution, area);
-    }
-    if (output_format/1000%10 == 2)
-    {
-        plot_region_colorplot	(solution, area);
-    }
-    if (output_format/100%10 == 1)
-    {
-        plot_exact_solution		(area);
-    }
-    if (output_format/10%10 == 1)
-    {
-        plot_region_error		(solution, area);
-    }
-    if (output_format%10 == 1)
-    {
-        plot_omega	(area);
-    }
-}
+// void plot_by_argument(gsl_vector *solution, int output_format, rect_area area)
+// {
+//     if (output_format == 0)
+//     {
+//         return;
+//     }
+//     if (output_format == 1111)
+//     {
+//         multiplot	(solution, area);
+//         return;
+//     }
+// 
+// 
+//     if (output_format/1000%10 == 1)
+//     {
+//         plot_region	(solution, area);
+//     }
+//     if (output_format/1000%10 == 2)
+//     {
+//         plot_region_colorplot	(solution, area);
+//     }
+//     if (output_format/100%10 == 1)
+//     {
+//         plot_exact_solution		(area);
+//     }
+//     if (output_format/10%10 == 1)
+//     {
+//         plot_region_error		(solution, area);
+//     }
+//     if (output_format%10 == 1)
+//     {
+//         plot_omega	(area);
+//     }
+// }

@@ -177,6 +177,52 @@ void CFD_problem()
     plot_lines_of_stream(stream_function.solution, stream_function.area);
 }
 
+void charged_body_el_stat()
+{
+	
+	
+	task function;
+    rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
+    tasks_constructor	(&function,sol_area);
+    
+	x_center = -0.7;
+	y_center = 0.;
+	form_system_t		(&function);
+    solve_task	(&function);
+//	basis_args zero_args = {0,0,0,0};
+    plot_region_colorplot_t(function);
+    
+	void solve_at_t(double time)
+	{
+		x_center = time;
+		form_system_t		(&function);
+		solve_task	(&function);
+		plot_region_colorplot_t(function);
+	}
+	
+// 	solve_at_t(-0.9);
+// 	solve_at_t(-0.8);
+// 	solve_at_t(-0.7);
+	solve_at_t(-0.6);
+	solve_at_t(-0.5);
+	solve_at_t(-0.4);
+	solve_at_t(-0.3);
+	solve_at_t(-0.2);
+	solve_at_t(-0.1);
+	solve_at_t(-0.0);
+	solve_at_t(0.1);
+	solve_at_t(0.2);
+	solve_at_t(0.3);
+	solve_at_t(0.4);
+	solve_at_t(0.5);
+	solve_at_t(0.6);
+	solve_at_t(0.7);
+// 	solve_at_t(0.8);
+// 	solve_at_t(0.9);
+// 	solve_at_t(1.0);
+
+}
+
 int main(int argc, char **argv)
 /*
  * requires 4 arguments to launch:
@@ -201,7 +247,6 @@ int main(int argc, char **argv)
  */
 {
     initGaussInt(16);
-
     omp_set_dynamic(1);
     omp_set_num_threads(8);
     int output_format = 0;
@@ -219,7 +264,7 @@ int main(int argc, char **argv)
 
         N 			= 10;
         intStep 	= 1.;
-        init_eq		(1);
+        init_eq		(17);
         init_basis	(2);
 
         output_format	= 1000;
@@ -228,22 +273,23 @@ int main(int argc, char **argv)
     diff_step 	= pow(2.,-14);
     glob_delta 	= 1./diff_step;
 
-	task function;// = &GetTask(1);
-	//~ GetTask(1, &function);
+	
+	//task initialization stage
+	task function;
     rect_area sol_area = {.x0 = X0, .x1 = X1, .y0 = Y0, .y1 = Y1};
-    
     tasks_constructor	(&function,sol_area);
-    form_system_t		(&function);
     
-    //~ gsl_vector_fprintf(stdout,function.rightpart,"%f");
-    
+	x_center = -0.7;
+	y_center = 0.;
+	form_system_t		(&function);
     solve_task	(&function);
-    //~ multiplot(function.solution, function.area);
-    basis_args zero_args = {0,0,0,0};
-    
-    multiplot_t(function);
-    
-	printf("%15.15e\n",errl2(zero_args,&function,2));
+//	basis_args zero_args = {0,0,0,0};
+    plot_region_colorplot_t(function);
+
+	//printf("%15.15e\n",errl2(zero_args,&function,2));
+	
+	//Moving charged body in electrostatical approximation
+	// 	charged_body_el_stat();
 	
 	
 	//~ CFD_problem(); //to be used for testing solutions for Navier-Stokes equation in Stream function-Rotor form

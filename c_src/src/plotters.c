@@ -87,7 +87,7 @@ void plot_region(gsl_vector *solution,
 				fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, reconstruct_at(solution,i,j));
 		}
     fclose(op);
-    i = system("../bin/plotter.py ../plot_data/plot_region Numerical &");
+    i = system("screen -d -m ../bin/Plot&");
 }
 void plot_region_colorplot(gsl_vector *solution,
                            double x1, double x2,
@@ -149,7 +149,7 @@ void plot_exact_solution(double x1, double x2,
         for(j=y1; j<=y2; j+=hy)
             fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, u_exact(i,j));
     fclose(op);
-    i = system("../bin/plotter.py ../plot_data/plot_exact_solution Exact &");
+    i = system("screen -d -m ../bin/Plot_exact &");
 }
 
 void plot_omega
@@ -170,7 +170,7 @@ void plot_omega
         for(j=y1; j<=y2; j+=hy)
             fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, omega(i,j));
     fclose(op);
-    i = system("../bin/plotter.py ../plot_data/plot_plot_omega Omega &");
+    i = system("screen -d -m ../bin/Plot_exact &");
 }
 
 void plot_region_error(gsl_vector *solution,
@@ -189,5 +189,5 @@ void plot_region_error(gsl_vector *solution,
         for(j=y1; j<=y2; j+=hy)
             fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, fabs(reconstruct_at(solution,i,j)-u_exact(i,j)));
     fclose(op);
-    i = system("../bin/plotter.py ../plot_data/plot_region_error Error &");
+    i = system("screen -d -m ../bin/Plot_err &");
 }
