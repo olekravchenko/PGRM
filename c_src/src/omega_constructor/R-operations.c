@@ -18,9 +18,9 @@ void plot_func(double (*f)(double, double))
 // from x1 till x2 by x, and from y1 till y2 by y
 
 {
-	double x0 = -2., x1 = 2., y0 = -2., y1 = 2.;
-    double hx = (x1-x0)/128.,
-           hy = (y1-y0)/128.,
+	double x0 = -1., x1 = 1., y0 = -1., y1 = 1.;
+    double hx = (x1-x0)/512.,
+           hy = (y1-y0)/512.,
            i,j;
 
     FILE * op;
@@ -31,17 +31,42 @@ void plot_func(double (*f)(double, double))
             fprintf(op, "%15.15f %15.15f %15.15f\n", i,j, (*f)(i,j));
         }
     fclose(op);
-    i = system("../../bin/plotter.py ../../plot_data/plot_region Numerical &");
+    i = system("../../bin/plotter_colorplot.py ../../plot_data/plot_region Numerical &");
 }
 
 int main()
 {
-	omega_primitive A = {.x0 = -1., .y0 = -1., .a = 1., .b = 1.};
-	double omega_new(double x, double y)
+	double omega_n (int n, double x, double y)
 	{
-		return line_segment(A,x,y);
+		double p =2./3.;
+		omega_primitive A = {.x0 = 0., .y0 = 0., .a = 1./3., .b = 1./3.};
+
+		
+		if(n == 0)
+			return 1.;
+		if(n == 1)
+			return -rectangle(A, x, y, 0,0);
+		
+		
+		
+		return  R_and(-rectangle(A, x, y, 0,0),
+				R_and( omega_n(n-1, 3.*(x - p), 3.*y),
+				R_and( omega_n(n-1, 3.*(x - p), 3.*(y + p)),
+				R_and( omega_n(n-1, 3.*x		, 3.*(y + p)),
+				R_and( omega_n(n-1, 3.*(x + p), 3.*(y + p)),
+				R_and( omega_n(n-1, 3.*(x + p), 3.*y		),
+				R_and( omega_n(n-1, 3.*(x + p), 3.*(y - p)),
+				R_and( omega_n(n-1, 3.*x		, 3.*(y - p)),
+					   omega_n(n-1, 3.*(x - p), 3.*(y - p))))))))));
+			
 	}
-	plot_func(omega_new);
+	
+	double omega_n2plot(double x, double y)
+	{
+		omega_primitive A = {.x0 = 0., .y0 = 0., .a = 1., .b = 1.};
+		return fmax(0.,R_and(omega_n(4,x,y),rectangle(A, x, y, 0,0)));
+	}
+	plot_func(omega_n2plot);
 	
 	return 0;
 }
