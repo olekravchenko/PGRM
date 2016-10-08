@@ -284,12 +284,12 @@ int main(int argc, char **argv)
 	form_system_t		(&function);
     solve_task	(&function);
 //	basis_args zero_args = {0,0,0,0};
-    plot_region_colorplot_t(function);
+    //~ plot_region_colorplot_t(function);
 
 	//printf("%15.15e\n",errl2(zero_args,&function,2));
 	
 	//Moving charged body in electrostatical approximation
-// 	charged_body_el_stat();
+ 	charged_body_el_stat();
 	
 	
 	//~ CFD_problem(); //to be used for testing solutions for Navier-Stokes equation in Stream function-Rotor form

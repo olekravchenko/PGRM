@@ -9,6 +9,7 @@
 # set samples 65; set isosamples 65
 # set dgrid3d 65,65
 # set hidden3d
+set terminal x11
 set view map
 splot "../plot_data/plot_region" using 1:2:3 with image
 pause -1
